@@ -115,32 +115,27 @@ export const findNearbyReports = query({
     )
 
     if (nearbyReports.length === 0) {
-      console.log("No reports found. Let's check what's in the index...")
-      // Let's also add a basic query to see if there are any reports at all
-      const allReports = await ctx.db.query('reports').collect()
-      console.log('Total reports in database:', allReports.length)
       return []
     }
 
-    const results = await Promise.all(
-      nearbyReports.map(async (result) => {
-        console.log('Looking up report with ID:', result.key)
-        const row = await ctx.db.get(result.key as Id<'reports'>)
-        if (!row) {
-          console.log('No report found for ID:', result.key)
-          throw new Error('Invalid locationId')
-        }
-        return {
-          ...row,
-          location: {
-            latitude: result.coordinates.latitude,
-            longitude: result.coordinates.longitude,
-          },
-        }
-      }),
-    )
+    const results = []
+    for (const result of nearbyReports) {
+      const row = await ctx.db.get(result.key as Id<'reports'>)
+      if (!row) {
+        continue // Skip this result instead of throwing error
+      }
+      const route = await ctx.db.get(row?.route as Id<'routes'>)
+      results.push({
+        ...row,
+        location: {
+          latitude: result.coordinates.latitude,
+          longitude: result.coordinates.longitude,
+        },
+        transportInfo: { ...route },
+        distance: result.distance, // Distance in meters from center point
+      })
+    }
 
-    console.log('Final results:', results)
     return results
   },
 })

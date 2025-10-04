@@ -80,7 +80,10 @@ export async function GET() {
       .flatMap((r) => (r as PromiseFulfilledResult<any[]>).value)
 
     // Log first few entries to see the structure
-    console.log('TripUpdates sample:', JSON.stringify(tripUpdates.slice(0, 5), null, 2))
+    console.log(
+      'TripUpdates sample:',
+      JSON.stringify(tripUpdates.slice(0, 5), null, 2),
+    )
 
     return NextResponse.json(tripUpdates, {
       headers: {

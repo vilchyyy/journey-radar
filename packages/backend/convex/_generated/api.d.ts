@@ -12,8 +12,10 @@ import type * as auth from "../auth.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
 import type * as index from "../index.js";
+import type * as mock_data from "../mock_data.js";
 import type * as privateData from "../privateData.js";
 import type * as reports from "../reports.js";
+import type * as seed from "../seed.js";
 
 import type {
   ApiFromModules,
@@ -34,8 +36,10 @@ declare const fullApi: ApiFromModules<{
   healthCheck: typeof healthCheck;
   http: typeof http;
   index: typeof index;
+  mock_data: typeof mock_data;
   privateData: typeof privateData;
   reports: typeof reports;
+  seed: typeof seed;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

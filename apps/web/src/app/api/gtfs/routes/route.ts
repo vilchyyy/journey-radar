@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
 import JSZip from 'jszip'
+import { NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
 
@@ -40,12 +40,16 @@ async function downloadAndParseGTFS(zipUrl: string): Promise<GTFSData> {
   }
 
   const routesText = await routesFile.textAsync()
-  const routesLines = routesText.split('\n').filter(line => line.trim())
-  const routesHeader = routesLines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  const routesLines = routesText.split('\n').filter((line) => line.trim())
+  const routesHeader = routesLines[0]
+    .split(',')
+    .map((h) => h.trim().replace(/"/g, ''))
 
   const routes: Route[] = []
   for (let i = 1; i < routesLines.length; i++) {
-    const values = routesLines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+    const values = routesLines[i]
+      .split(',')
+      .map((v) => v.trim().replace(/"/g, ''))
     if (values.length >= routesHeader.length) {
       const route: any = {}
       routesHeader.forEach((header, index) => {
@@ -62,12 +66,16 @@ async function downloadAndParseGTFS(zipUrl: string): Promise<GTFSData> {
   }
 
   const tripsText = await tripsFile.textAsync()
-  const tripsLines = tripsText.split('\n').filter(line => line.trim())
-  const tripsHeader = tripsLines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  const tripsLines = tripsText.split('\n').filter((line) => line.trim())
+  const tripsHeader = tripsLines[0]
+    .split(',')
+    .map((h) => h.trim().replace(/"/g, ''))
 
   const trips: Trip[] = []
   for (let i = 1; i < tripsLines.length; i++) {
-    const values = tripsLines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+    const values = tripsLines[i]
+      .split(',')
+      .map((v) => v.trim().replace(/"/g, ''))
     if (values.length >= tripsHeader.length) {
       const trip: any = {}
       tripsHeader.forEach((header, index) => {
@@ -92,7 +100,7 @@ export async function GET() {
       urls.map(async ({ url, mode }) => {
         const data = await downloadAndParseGTFS(url)
         return { ...data, mode }
-      })
+      }),
     )
 
     const gtfsData = results
@@ -110,39 +118,47 @@ export async function GET() {
 
     // Create route lookup map
     const routeMap = new Map<string, Route>()
-    allRoutes.forEach(route => {
+    allRoutes.forEach((route) => {
       routeMap.set(route.route_id, route)
     })
 
     // Create trip to route mapping
     const tripToRouteMap = new Map<string, string>()
-    allTrips.forEach(trip => {
+    allTrips.forEach((trip) => {
       tripToRouteMap.set(trip.trip_id, trip.route_id)
     })
 
     // Log some sample data for debugging
     console.log('Sample routes:', allRoutes.slice(0, 5))
     console.log('Sample trips:', allTrips.slice(0, 5))
-    console.log('Total routes:', allRoutes.length, 'Total trips:', allTrips.length)
+    console.log(
+      'Total routes:',
+      allRoutes.length,
+      'Total trips:',
+      allTrips.length,
+    )
 
-    return NextResponse.json({
-      routes: allRoutes,
-      trips: allTrips,
-      routeMap: Object.fromEntries(routeMap),
-      tripToRouteMap: Object.fromEntries(tripToRouteMap),
-    }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+    return NextResponse.json(
+      {
+        routes: allRoutes,
+        trips: allTrips,
+        routeMap: Object.fromEntries(routeMap),
+        tripToRouteMap: Object.fromEntries(tripToRouteMap),
       },
-    })
+      {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        },
+      },
+    )
   } catch (error) {
     console.error('Error fetching GTFS routes:', error)
     return NextResponse.json(
       { error: 'Failed to fetch GTFS routes' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
