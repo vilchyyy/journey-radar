@@ -13,7 +13,9 @@
     "dev:server": "turbo -F @journey-radar/backend dev",
     "dev:setup": "turbo -F @journey-radar/backend dev:setup"
   },
-  "dependencies": {},
+  "dependencies": {
+    "nanoid": "^5.1.6"
+  },
   "devDependencies": {
     "turbo": "^2.5.4",
     "@biomejs/biome": "^2.2.0"
