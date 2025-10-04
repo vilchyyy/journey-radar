@@ -137,6 +137,76 @@ export default defineSchema({
     .index('by_route', ['route']),
 
   // =================================================================
+  // GTFS ROUTES TABLE - GTFS static route data
+  // =================================================================
+  gtfsRoutes: defineTable({
+    routeId: v.string(), // GTFS route_id
+    routeShortName: v.string(), // e.g., "52", "139", "SK1"
+    routeLongName: v.string(),
+    routeType: v.number(), // GTFS route type (0=tram, 3=bus)
+    transportMode: v.union(v.literal('BUS'), v.literal('TRAM')), // Derived from route_type
+    lastUpdated: v.number(), // Unix timestamp
+  })
+    .index('by_route_id', ['routeId'])
+    .index('by_route_short_name', ['routeShortName'])
+    .index('by_transport_mode', ['transportMode']),
+
+  // =================================================================
+  // GTFS TRIPS TABLE - GTFS static trip data
+  // =================================================================
+  gtfsTrips: defineTable({
+    tripId: v.string(), // GTFS trip_id
+    routeId: v.string(), // GTFS route_id
+    lastUpdated: v.number(), // Unix timestamp
+  })
+    .index('by_trip_id', ['tripId'])
+    .index('by_route_id', ['routeId']),
+
+  // =================================================================
+  // GTFS VEHICLE POSITIONS TABLE - Real-time vehicle positions
+  // =================================================================
+  gtfsVehiclePositions: defineTable({
+    vehicleId: v.string(), // Vehicle identifier
+    tripId: v.string(), // GTFS trip_id
+    routeId: v.string(), // GTFS route_id (extracted from trip mapping)
+    routeNumber: v.string(), // Human readable route number
+    latitude: v.number(),
+    longitude: v.number(),
+    bearing: v.optional(v.number()),
+    timestamp: v.number(), // Position timestamp
+    mode: v.union(v.literal('BUS'), v.literal('TRAM')), // Transport mode
+    lastUpdated: v.number(), // When we received this data
+  })
+    .index('by_vehicle_id', ['vehicleId'])
+    .index('by_trip_id', ['tripId'])
+    .index('by_route_id', ['routeId'])
+    .index('by_mode', ['mode'])
+    .index('by_timestamp', ['timestamp']),
+
+  // =================================================================
+  // GTFS TRIP UPDATES TABLE - Real-time trip delay information
+  // =================================================================
+  gtfsTripUpdates: defineTable({
+    id: v.string(), // Entity ID
+    tripId: v.string(), // GTFS trip_id
+    routeId: v.string(), // GTFS route_id
+    vehicleId: v.optional(v.string()), // Vehicle ID if available
+    mode: v.union(v.literal('BUS'), v.literal('TRAM')), // Transport mode
+    stopUpdates: v.array(
+      v.object({
+        stopId: v.string(),
+        arrivalDelay: v.optional(v.number()),
+        departureDelay: v.optional(v.number()),
+      }),
+    ),
+    lastUpdated: v.number(), // When we received this data
+  })
+    .index('by_trip_id', ['tripId'])
+    .index('by_route_id', ['routeId'])
+    .index('by_vehicle_id', ['vehicleId'])
+    .index('by_mode', ['mode']),
+
+  // =================================================================
   // ROUTES TABLE - Route information for navigation
   // =================================================================
   routes: defineTable({

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.8.4",
+    "@here/flexpolyline": "^0.1.0",
     "@journey-radar/backend": "workspace:*",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "^1.1.7",

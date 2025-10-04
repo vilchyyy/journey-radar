@@ -6,6 +6,8 @@ export interface VehiclePosition {
   tripId: string
   routeId: string
   vehicleId?: string
+  routeLongName?: string
+  routeShortName?: string
   timestamp?: number
   mode?: 'bus' | 'tram'
 }

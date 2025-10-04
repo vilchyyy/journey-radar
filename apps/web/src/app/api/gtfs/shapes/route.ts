@@ -46,6 +46,26 @@ function toNumber(value: unknown, fallback = 0): number {
 
 export async function GET() {
   try {
+    // Simple in-memory cache per server instance
+    const g = globalThis as unknown as {
+      __gtfs_shapes_cache__?: {
+        ts: number
+        data: { type: 'FeatureCollection'; features: typeof features }
+      }
+    }
+    const CACHE_KEY = '__gtfs_shapes_cache__'
+    const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+    const now = Date.now()
+    if (g[CACHE_KEY] && now - g[CACHE_KEY].ts < CACHE_TTL_MS) {
+      return NextResponse.json(g[CACHE_KEY].data, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Cache-Control': 'public, max-age=300',
+        },
+      })
+    }
     // Known Kraków GTFS static archives for bus (A) and tram (T)
     const base = 'https://gtfs.ztp.krakow.pl'
     const urls = [
@@ -114,12 +134,13 @@ export async function GET() {
     }
 
     const collection = { type: 'FeatureCollection' as const, features }
+    g[CACHE_KEY] = { ts: now, data: collection }
     return NextResponse.json(collection, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Cache-Control': 'no-store, max-age=0',
+        'Cache-Control': 'public, max-age=300',
       },
     })
   } catch (error) {
