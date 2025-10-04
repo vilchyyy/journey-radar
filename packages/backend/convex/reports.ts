@@ -140,6 +140,85 @@ export const findNearbyReports = query({
   },
 })
 
+// Find reports within a radius using the geospatial addon with filters
+export const findNearbyReportsFiltered = query({
+  args: {
+    center: v.object({
+      latitude: v.number(),
+      longitude: v.number(),
+    }),
+    radiusKm: v.number(),
+    limit: v.optional(v.number()),
+    routeFilter: v.optional(v.string()),
+    statusFilter: v.optional(v.string()),
+    maxDistanceKm: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const {
+      center,
+      limit = 100,
+      radiusKm,
+      routeFilter,
+      statusFilter,
+      maxDistanceKm,
+    } = args
+    // Convert km to meters for the geospatial query
+    const radiusMeters = radiusKm * 1000
+
+    // Use the geospatial addon to find reports within radius
+    const nearbyReports = await geospatial.queryNearest(
+      ctx,
+      center,
+      limit ?? 100,
+      radiusMeters,
+    )
+
+    if (nearbyReports.length === 0) {
+      return []
+    }
+
+    const results = []
+    for (const result of nearbyReports) {
+      // Skip if beyond max distance filter
+      if (maxDistanceKm && result.distance > maxDistanceKm * 1000) {
+        continue
+      }
+
+      const row = await ctx.db.get(result.key as Id<'reports'>)
+      if (!row) {
+        continue // Skip this result instead of throwing error
+      }
+
+      // Skip if status filter is set and doesn't match
+      if (statusFilter && row.status !== statusFilter) {
+        continue
+      }
+
+      const route = await ctx.db.get(row?.route as Id<'routes'>)
+      if (!route) {
+        continue
+      }
+
+      // Skip if route filter is set and doesn't match
+      if (routeFilter && route.routeNumber !== routeFilter) {
+        continue
+      }
+
+      results.push({
+        ...row,
+        location: {
+          latitude: result.coordinates.latitude,
+          longitude: result.coordinates.longitude,
+        },
+        transportInfo: { ...route },
+        distance: result.distance, // Distance in meters from center point
+      })
+    }
+
+    return results
+  },
+})
+
 // Find reports in a bounding box using the geospatial addon
 export const findReportsInBoundingBox = query({
   args: {

@@ -23,47 +23,55 @@ export function ReportItem({ report }: ReportItemProps) {
   const formattedDate = formatDate(report._creationTime)
 
   return (
-    <div className="bg-white rounded-2xl border border-[#48c9b0] p-4 shadow-sm">
+    <div className="relative bg-card rounded-2xl border border-primary p-4 shadow-lg">
       <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-muted-foreground">
           <span className="capitalize">{report.type.toLowerCase()}</span>
           {report.delayMinutes && (
             <span className="ml-2">{report.delayMinutes} min</span>
           )}
         </div>
-        <span className="text-sm text-[#48c9b0] font-medium">
+        <span className="text-sm text-primary font-medium">
           {formattedDistance}
         </span>
       </div>
-      <div className="w-full flex flex-col justify-center items-center my-2 p-2">
-        <h3 className="font-semibold text-gray-900 mb-1">
+      <div className="w-full flex flex-col justify-center mt-2 p-2">
+        <h3 className="font-semibold text-foreground mb-1">
           {report.transportInfo.source && report.transportInfo.destination
             ? `${report.transportInfo.source} - ${report.transportInfo.destination}`
             : `Route ${report.transportInfo.routeNumber || 'Unknown'}`}
         </h3>
-        <Separator className="my-2 bg-[#48c9b0]" />
-        <p className="text-sm text-gray-500">{formattedDate}</p>
+        <div className="flex flex-col items-center">
+          <Separator className="my-2 bg-primary" />
+          <p className="text-sm text-muted-foreground">{formattedDate}</p>
+        </div>
       </div>
 
       {/* {report.comment && (
-        <p className="text-sm text-gray-700 mt-2">{report.comment}</p>
+        <p className="text-sm text-foreground mt-2">{report.comment}</p>
       )}
 
       <div className="flex items-center gap-2 mt-2">
-        <span className="text-xs px-2 py-1 bg-gray-100 rounded text-gray-700">
+        <span className="text-xs px-2 py-1 bg-secondary rounded text-secondary-foreground">
           {report.transportMode}
         </span>
         {report.transportInfo.routeNumber && (
-          <span className="text-xs px-2 py-1 bg-gray-100 rounded text-gray-700">
+          <span className="text-xs px-2 py-1 bg-secondary rounded text-secondary-foreground">
             Line {report.transportInfo.routeNumber}
           </span>
         )}
       </div> */}
-      <div className="w-full flex justify-end">
+      <div className="absolute bottom-2 right-2 flex justify-end">
         {isVerified ? (
-          <CheckCircle2 className="w-5 h-5 text-[#48c9b0] flex-shrink-0" />
+          <CheckCircle2
+            size={'1.5em'}
+            className=" text-primary flex-shrink-0"
+          />
         ) : (
-          <AlertCircle className="w-5 h-5 text-gray-400 flex-shrink-0" />
+          <AlertCircle
+            size={'1.5em'}
+            className=" text-muted-foreground flex-shrink-0"
+          />
         )}
       </div>
     </div>

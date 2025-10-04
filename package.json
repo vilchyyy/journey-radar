@@ -5,6 +5,7 @@
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "check": "biome check --write .",
+    "lint": "biome lint",
     "dev": "turbo dev",
     "build": "turbo build",
     "check-types": "turbo check-types",

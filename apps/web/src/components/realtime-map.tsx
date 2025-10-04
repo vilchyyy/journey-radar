@@ -134,12 +134,12 @@ export default function RealtimeMap() {
         </div>
       )}
 
-      <div className="absolute top-4 right-4 bg-white bg-opacity-90 p-3 rounded-md z-10 shadow-lg">
+      <div className="absolute top-4 right-4 bg-card/90 p-3 rounded-md z-10 shadow-lg">
         <div className="flex items-center gap-2 text-sm">
           <Bus className="w-4 h-4 text-blue-500" />
           <div>
             <div className="font-medium">Vehicles: {vehicles.length}</div>
-            <div className="text-xs text-gray-600">
+            <div className="text-xs text-muted-foreground">
               Last updated: {new Date().toLocaleTimeString()}
             </div>
           </div>

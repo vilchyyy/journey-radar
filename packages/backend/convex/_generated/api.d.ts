@@ -15,6 +15,7 @@ import type * as index from "../index.js";
 import type * as mock_data from "../mock_data.js";
 import type * as privateData from "../privateData.js";
 import type * as reports from "../reports.js";
+import type * as routes from "../routes.js";
 import type * as seed from "../seed.js";
 
 import type {
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   mock_data: typeof mock_data;
   privateData: typeof privateData;
   reports: typeof reports;
+  routes: typeof routes;
   seed: typeof seed;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

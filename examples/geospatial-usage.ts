@@ -67,11 +67,11 @@ export function NearbyReportsExample() {
     <div>
       <button onClick={getCurrentLocation}>Get My Location</button>
       <h3>Reports within 5km:</h3>nearbyReports?.map((report) => (
-        <div key={report._id}>
-          <p>Type: {report.type}</p>
-          <p>Line: {report.transportInfo.line}</p>
-          <p>Status: {report.status}</p>
-          <p>Comment: {report.comment}</p>
+        <div key=report._id>
+          <p>Type: report.type</p>
+          <p>Line: report.transportInfo.line</p>
+          <p>Status: report.status</p>
+          <p>Comment: report.comment</p>
         </div>
       ))
     </div>
@@ -117,8 +117,7 @@ export function DistanceCalculationExample() {
   return (
     <div>
       <h3>Distance from Central Station to Airport:</h3>calculateDistance && (
-        <p>
-          {calculateDistance.kilometers.toFixed(2)} km
+        <p>calculateDistance.kilometers.toFixed(2)km
           ({calculateDistance.meters.toFixed(0)} meters)
         </p>
       )
@@ -144,9 +143,9 @@ export function AdvancedFilteringExample() {
     <div>
       <h3>Crowding reports near you:</h3>filteredCrowdReports?.map((report) => (
         <div key={report._id}>
-          <p>Line: {report.transportInfo.line}</p>
-          <p>Mode: {report.transportInfo.mode}</p>
-          <p>Comment: {report.comment || 'No comment'}</p>
+          <p>Line: report.transportInfo.line</p>
+          <p>Mode: report.transportInfo.mode</p>
+          <p>Comment: report.comment || 'No comment'</p>
         </div>
       ))
     </div>
