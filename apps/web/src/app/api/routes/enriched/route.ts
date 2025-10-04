@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     if (!origin || !destination) {
       return NextResponse.json(
         { error: 'Missing required fields: origin, destination' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -80,29 +80,27 @@ export async function POST(request: NextRequest) {
       origin,
       destination,
       return: ['polyline', 'travelSummary', 'actions', 'intermediate'],
-      transportModes: ['bus', 'tram', 'pedestrian'],
-      alternatives: 5,
     })
 
     if (!routeResponse.routes || routeResponse.routes.length === 0) {
       return NextResponse.json({
         routes: [],
-        summary: { totalReports: 0, reportsByType: {}, reportsByStatus: {} }
+        summary: { totalReports: 0, reportsByType: {}, reportsByStatus: {} },
       })
     }
 
     // For now, we'll just return the route without database enrichment
     // This allows the route planning to work without Convex setup
-    const enrichedRoutes = routeResponse.routes.map(route => ({
+    const enrichedRoutes = routeResponse.routes.map((route) => ({
       ...route,
-      sections: route.sections.map(section => ({
+      sections: route.sections.map((section) => ({
         ...section,
         nearbyReports: [], // TODO: Add real reports when database is connected
-        intermediateStops: section.intermediateStops?.map(stop => ({
+        intermediateStops: section.intermediateStops?.map((stop) => ({
           ...stop,
-          reports: [] // TODO: Add real reports when database is connected
-        }))
-      }))
+          reports: [], // TODO: Add real reports when database is connected
+        })),
+      })),
     }))
 
     const response: EnrichedRouteResponse = {
@@ -110,8 +108,8 @@ export async function POST(request: NextRequest) {
       summary: {
         totalReports: 0,
         reportsByType: {},
-        reportsByStatus: {}
-      }
+        reportsByStatus: {},
+      },
     }
 
     return NextResponse.json(response)
@@ -119,7 +117,7 @@ export async function POST(request: NextRequest) {
     console.error('Enriched route API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

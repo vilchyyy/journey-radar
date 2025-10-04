@@ -59,8 +59,6 @@ export async function GET(request: NextRequest) {
         origin,
         destination,
         return: ['polyline', 'travelSummary', 'actions', 'intermediate'],
-        transportModes: ['bus', 'tram', 'pedestrian'],
-        alternatives: 5,
       })
       return NextResponse.json(routeResponse)
     }
@@ -106,8 +104,6 @@ export async function POST(request: NextRequest) {
         origin,
         destination,
         return: ['polyline', 'travelSummary', 'actions', 'intermediate'],
-        transportModes: ['bus', 'tram', 'pedestrian'],
-        alternatives: 5,
       })
       return NextResponse.json(routeResponse)
     }

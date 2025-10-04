@@ -9,8 +9,6 @@ export interface RouteRequest {
   origin: RouteCoordinate
   destination: RouteCoordinate
   return?: string[]
-  transportModes?: string[]
-  alternatives?: number
 }
 
 export interface RouteResponse {
@@ -51,13 +49,7 @@ class RouteService {
   }
 
   async calculateRoute(request: RouteRequest): Promise<RouteResponse> {
-    const {
-      origin,
-      destination,
-      return: returnParams = ['polyline'],
-      transportModes,
-      alternatives,
-    } = request
+    const { origin, destination, return: returnParams = ['polyline'] } = request
 
     const url = new URL(`${this.baseUrl}/routes`)
     url.searchParams.append('origin', `${origin.lat},${origin.lng}`)
@@ -66,15 +58,6 @@ class RouteService {
       `${destination.lat},${destination.lng}`,
     )
     url.searchParams.append('return', returnParams.join(','))
-
-    const alternativesParam = Math.max(alternatives ?? 5, 5)
-    url.searchParams.append('alternatives', alternativesParam.toString())
-
-    if (transportModes && transportModes.length > 0) {
-      const modesParam = transportModes.join(',')
-      url.searchParams.append('modes', modesParam)
-      url.searchParams.append('transportModes', modesParam)
-    }
 
     try {
       console.log('Making request to:', url.toString())

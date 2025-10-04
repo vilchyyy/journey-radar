@@ -9,8 +9,6 @@ export interface RouteRequest {
   origin: RouteCoordinate
   destination: RouteCoordinate
   return?: string[]
-  transportModes?: string[]
-  alternatives?: number
 }
 
 export interface RouteResponse {
@@ -52,8 +50,6 @@ export async function calculateRoute(
       'actions',
       'intermediate',
     ],
-    transportModes,
-    alternatives,
   } = request
 
   const baseUrl =
@@ -69,20 +65,8 @@ export async function calculateRoute(
   url.searchParams.append('return', returnParams.join(','))
   url.searchParams.append('apikey', apiKey)
 
-  const alternativesParam = Math.max(alternatives ?? 5, 5)
-  url.searchParams.append('alternatives', alternativesParam.toString())
-
-  if (transportModes && transportModes.length > 0) {
-    const modesParam = transportModes.join(',')
-    url.searchParams.append('modes', modesParam)
-    url.searchParams.append('transportModes', modesParam)
-  }
-
   console.log('Return params:', returnParams)
   console.log('Full URL:', url.toString())
-  if (transportModes && transportModes.length > 0) {
-    console.log('Transport modes filter:', transportModes)
-  }
 
   try {
     console.log('Making request to:', url.toString())

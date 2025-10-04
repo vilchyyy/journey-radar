@@ -14,8 +14,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import type { RouteCoordinate } from '@/lib/route-service'
 import { useLocationSearch } from '@/hooks/use-location-search'
+import type { RouteCoordinate } from '@/lib/route-service'
 
 interface RoutePoint {
   coordinate: RouteCoordinate
@@ -69,29 +69,32 @@ export default function RouteNavigation() {
     )
   }, [])
 
-  const selectLocationFromSearch = useCallback((location: any, type: 'origin' | 'destination') => {
-    const coords: RouteCoordinate = {
-      lat: location.position.lat,
-      lng: location.position.lng,
-    }
+  const selectLocationFromSearch = useCallback(
+    (location: any, type: 'origin' | 'destination') => {
+      const coords: RouteCoordinate = {
+        lat: location.position.lat,
+        lng: location.position.lng,
+      }
 
-    setRoutePoints((prev) =>
-      prev
-        .filter((p) => p.type !== type)
-        .concat({ coordinate: coords, type }),
-    )
+      setRoutePoints((prev) =>
+        prev
+          .filter((p) => p.type !== type)
+          .concat({ coordinate: coords, type }),
+      )
 
-    // Close search UI and reset all selection states
-    setShowOriginSearch(false)
-    setShowDestinationSearch(false)
-    setIsSelectingOrigin(false)
-    setIsSelectingDestination(false)
+      // Close search UI and reset all selection states
+      setShowOriginSearch(false)
+      setShowDestinationSearch(false)
+      setIsSelectingOrigin(false)
+      setIsSelectingDestination(false)
 
-    setError(null)
+      setError(null)
 
-    // Notify map to center on this location
-    window.dispatchEvent(new CustomEvent('centerMap', { detail: coords }))
-  }, [])
+      // Notify map to center on this location
+      window.dispatchEvent(new CustomEvent('centerMap', { detail: coords }))
+    },
+    [],
+  )
 
   const getCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -308,7 +311,9 @@ export default function RouteNavigation() {
                           <Input
                             placeholder="Search for a location..."
                             value={originSearch.query}
-                            onChange={(e) => originSearch.handleQueryChange(e.target.value)}
+                            onChange={(e) =>
+                              originSearch.handleQueryChange(e.target.value)
+                            }
                             className="flex-1"
                             autoFocus
                           />
@@ -329,51 +334,57 @@ export default function RouteNavigation() {
                         )}
 
                         {originSearch.error && (
-                          <p className="text-xs text-red-600">{originSearch.error}</p>
+                          <p className="text-xs text-red-600">
+                            {originSearch.error}
+                          </p>
                         )}
 
-                        {originSearch.results && originSearch.results.length > 0 && (
-                          <div className="max-h-48 overflow-y-auto space-y-1">
-                            {originSearch.results.map((location) => (
-                              <button
-                                key={location.id}
-                                onClick={() => selectLocationFromSearch(location, 'origin')}
-                                className="w-full text-left p-2 hover:bg-blue-50 rounded border border-gray-200 transition-colors"
-                              >
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 truncate">
-                                      {location.title}
-                                    </p>
-                                    <p className="text-xs text-gray-500 truncate">
-                                      {location.address?.label}
-                                    </p>
-                                    {location.categories && location.categories.length > 0 && (
-                                      <div className="flex flex-wrap gap-1 mt-1">
-                                        {location.categories
-                                          .filter(cat => cat.primary)
-                                          .slice(0, 2)
-                                          .map((category, idx) => (
-                                            <span
-                                              key={idx}
-                                              className="inline-block px-1 py-0.5 text-xs bg-blue-100 text-blue-700 rounded"
-                                            >
-                                              {category.name}
-                                            </span>
-                                          ))}
-                                      </div>
+                        {originSearch.results &&
+                          originSearch.results.length > 0 && (
+                            <div className="max-h-48 overflow-y-auto space-y-1">
+                              {originSearch.results.map((location) => (
+                                <button
+                                  key={location.id}
+                                  onClick={() =>
+                                    selectLocationFromSearch(location, 'origin')
+                                  }
+                                  className="w-full text-left p-2 hover:bg-blue-50 rounded border border-gray-200 transition-colors"
+                                >
+                                  <div className="flex items-start justify-between">
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-gray-900 truncate">
+                                        {location.title}
+                                      </p>
+                                      <p className="text-xs text-gray-500 truncate">
+                                        {location.address?.label}
+                                      </p>
+                                      {location.categories &&
+                                        location.categories.length > 0 && (
+                                          <div className="flex flex-wrap gap-1 mt-1">
+                                            {location.categories
+                                              .filter((cat) => cat.primary)
+                                              .slice(0, 2)
+                                              .map((category, idx) => (
+                                                <span
+                                                  key={idx}
+                                                  className="inline-block px-1 py-0.5 text-xs bg-blue-100 text-blue-700 rounded"
+                                                >
+                                                  {category.name}
+                                                </span>
+                                              ))}
+                                          </div>
+                                        )}
+                                    </div>
+                                    {location.distance && (
+                                      <span className="text-xs text-gray-400 ml-2 whitespace-nowrap">
+                                        {Math.round(location.distance)}m
+                                      </span>
                                     )}
                                   </div>
-                                  {location.distance && (
-                                    <span className="text-xs text-gray-400 ml-2 whitespace-nowrap">
-                                      {Math.round(location.distance)}m
-                                    </span>
-                                  )}
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                       </div>
                     )}
                   </div>
@@ -416,7 +427,9 @@ export default function RouteNavigation() {
                         <Input
                           placeholder="Search for destination..."
                           value={destinationSearch.query}
-                          onChange={(e) => destinationSearch.handleQueryChange(e.target.value)}
+                          onChange={(e) =>
+                            destinationSearch.handleQueryChange(e.target.value)
+                          }
                           className="flex-1"
                           autoFocus
                         />
@@ -437,51 +450,60 @@ export default function RouteNavigation() {
                       )}
 
                       {destinationSearch.error && (
-                        <p className="text-xs text-red-600">{destinationSearch.error}</p>
+                        <p className="text-xs text-red-600">
+                          {destinationSearch.error}
+                        </p>
                       )}
 
-                      {destinationSearch.results && destinationSearch.results.length > 0 && (
-                        <div className="max-h-48 overflow-y-auto space-y-1">
-                          {destinationSearch.results.map((location) => (
-                            <button
-                              key={location.id}
-                              onClick={() => selectLocationFromSearch(location, 'destination')}
-                              className="w-full text-left p-2 hover:bg-red-50 rounded border border-gray-200 transition-colors"
-                            >
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-gray-900 truncate">
-                                    {location.title}
-                                  </p>
-                                  <p className="text-xs text-gray-500 truncate">
-                                    {location.address?.label}
-                                  </p>
-                                  {location.categories && location.categories.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 mt-1">
-                                      {location.categories
-                                        .filter(cat => cat.primary)
-                                        .slice(0, 2)
-                                        .map((category, idx) => (
-                                          <span
-                                            key={idx}
-                                            className="inline-block px-1 py-0.5 text-xs bg-red-100 text-red-700 rounded"
-                                          >
-                                            {category.name}
-                                          </span>
-                                        ))}
-                                    </div>
+                      {destinationSearch.results &&
+                        destinationSearch.results.length > 0 && (
+                          <div className="max-h-48 overflow-y-auto space-y-1">
+                            {destinationSearch.results.map((location) => (
+                              <button
+                                key={location.id}
+                                onClick={() =>
+                                  selectLocationFromSearch(
+                                    location,
+                                    'destination',
+                                  )
+                                }
+                                className="w-full text-left p-2 hover:bg-red-50 rounded border border-gray-200 transition-colors"
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                      {location.title}
+                                    </p>
+                                    <p className="text-xs text-gray-500 truncate">
+                                      {location.address?.label}
+                                    </p>
+                                    {location.categories &&
+                                      location.categories.length > 0 && (
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                          {location.categories
+                                            .filter((cat) => cat.primary)
+                                            .slice(0, 2)
+                                            .map((category, idx) => (
+                                              <span
+                                                key={idx}
+                                                className="inline-block px-1 py-0.5 text-xs bg-red-100 text-red-700 rounded"
+                                              >
+                                                {category.name}
+                                              </span>
+                                            ))}
+                                        </div>
+                                      )}
+                                  </div>
+                                  {location.distance && (
+                                    <span className="text-xs text-gray-400 ml-2 whitespace-nowrap">
+                                      {Math.round(location.distance)}m
+                                    </span>
                                   )}
                                 </div>
-                                {location.distance && (
-                                  <span className="text-xs text-gray-400 ml-2 whitespace-nowrap">
-                                    {Math.round(location.distance)}m
-                                  </span>
-                                )}
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                     </div>
                   )}
                 </div>
@@ -562,8 +584,12 @@ export default function RouteNavigation() {
               <Card className="border-green-200 bg-green-50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <RouteIcon className={`w-4 h-4 ${routeData.summary?.hasPublicTransport ? 'text-green-600' : 'text-blue-600'}`} />
-                    {routeData.summary?.hasPublicTransport ? '🚌 Public Transport Route!' : '🚶 Route Found'}
+                    <RouteIcon
+                      className={`w-4 h-4 ${routeData.summary?.hasPublicTransport ? 'text-green-600' : 'text-blue-600'}`}
+                    />
+                    {routeData.summary?.hasPublicTransport
+                      ? '🚌 Public Transport Route!'
+                      : '🚶 Route Found'}
                     <div className="ml-auto flex items-center gap-2 text-sm">
                       {!routeData.summary?.hasPublicTransport && (
                         <span className="text-yellow-600 text-xs italic">
@@ -594,100 +620,111 @@ export default function RouteNavigation() {
                           {route.sections?.length || 0} transport sections
                         </p>
                         <div className="max-h-96 overflow-y-auto space-y-2">
-                          {route.sections?.map((section: any, sectionIndex: number) => (
-                            <div
-                              key={section.id || sectionIndex}
-                              className="p-2 bg-white rounded border"
-                            >
-                              <div className="flex items-center justify-between">
-                                <p className="text-xs font-medium">
-                                  {section.type === 'transit' ?
-                                    `🚌 ${section.transport?.mode || 'Unknown'}` :
-                                    '🚶 Pedestrian'
-                                  } -{' '}
-                                  {section.transport?.shortName ||
-                                    section.transport?.name ||
-                                    (section.type === 'transit' ? 'Unknown Route' : 'Walking')}
-                                </p>
-                                {section.travelSummary?.duration && (
-                                  <span className="text-xs text-gray-600">
-                                    {section.travelSummary.duration}
-                                  </span>
+                          {route.sections?.map(
+                            (section: any, sectionIndex: number) => (
+                              <div
+                                key={section.id || sectionIndex}
+                                className="p-2 bg-white rounded border"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <p className="text-xs font-medium">
+                                    {section.type === 'transit'
+                                      ? `🚌 ${section.transport?.mode || 'Unknown'}`
+                                      : '🚶 Pedestrian'}{' '}
+                                    -{' '}
+                                    {section.transport?.shortName ||
+                                      section.transport?.name ||
+                                      (section.type === 'transit'
+                                        ? 'Unknown Route'
+                                        : 'Walking')}
+                                  </p>
+                                  {section.travelSummary?.duration && (
+                                    <span className="text-xs text-gray-600">
+                                      {section.travelSummary.duration}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Vehicle Match - only for transit sections */}
+                                {section.type === 'transit' &&
+                                  section.transport?.ourVehicleMatch && (
+                                    <div className="mt-1 p-1 bg-blue-50 rounded text-xs">
+                                      <p className="text-blue-700 font-medium">
+                                        🚌 Vehicle Match:{' '}
+                                        {
+                                          section.transport.ourVehicleMatch
+                                            .vehicle.routeShortName
+                                        }
+                                      </p>
+                                      <p className="text-blue-600">
+                                        Confidence:{' '}
+                                        {
+                                          section.transport.ourVehicleMatch
+                                            .confidence
+                                        }
+                                        % -{' '}
+                                        {
+                                          section.transport.ourVehicleMatch
+                                            .reason
+                                        }
+                                      </p>
+                                      {section.transport.ourVehicleMatch.vehicle
+                                        .reports?.length > 0 && (
+                                        <p className="text-orange-600 mt-1">
+                                          ⚠️ Vehicle has{' '}
+                                          {
+                                            section.transport.ourVehicleMatch
+                                              .vehicle.reports.length
+                                          }{' '}
+                                          recent reports
+                                        </p>
+                                      )}
+                                    </div>
+                                  )}
+
+                                {/* Nearby Vehicles - only for transit sections */}
+                                {section.type === 'transit' &&
+                                  section.nearbyVehicles?.length > 0 && (
+                                    <div className="mt-1 p-1 bg-blue-50 rounded text-xs">
+                                      <p className="text-blue-700 font-medium">
+                                        🚌 {section.nearbyVehicles.length}{' '}
+                                        nearby vehicles
+                                      </p>
+                                      {section.nearbyVehicles
+                                        .slice(0, 2)
+                                        .map((nv: any, i: number) => (
+                                          // biome-ignore lint/suspicious/noArrayIndexKey: <s>
+                                          <p key={i} className="text-blue-600">
+                                            • {nv.vehicle.routeShortName} (
+                                            {nv.confidence}% match,{' '}
+                                            {nv.distance}m)
+                                            {nv.reports?.length > 0 && (
+                                              <span className="text-orange-600">
+                                                {' '}
+                                                🚨 {nv.reports.length} reports
+                                              </span>
+                                            )}
+                                          </p>
+                                        ))}
+                                      {section.nearbyVehicles.length > 2 && (
+                                        <p className="text-blue-600 italic">
+                                          ... and{' '}
+                                          {section.nearbyVehicles.length - 2}{' '}
+                                          more
+                                        </p>
+                                      )}
+                                    </div>
+                                  )}
+
+                                {/* Reports */}
+                                {section.reports?.length > 0 && (
+                                  <p className="text-xs text-orange-600 mt-1">
+                                    🚨 {section.reports.length} nearby reports
+                                  </p>
                                 )}
                               </div>
-
-                              {/* Vehicle Match - only for transit sections */}
-                              {section.type === 'transit' && section.transport?.ourVehicleMatch && (
-                                <div className="mt-1 p-1 bg-blue-50 rounded text-xs">
-                                  <p className="text-blue-700 font-medium">
-                                    🚌 Vehicle Match:{' '}
-                                    {
-                                      section.transport.ourVehicleMatch.vehicle
-                                        .routeShortName
-                                    }
-                                  </p>
-                                  <p className="text-blue-600">
-                                    Confidence:{' '}
-                                    {
-                                      section.transport.ourVehicleMatch
-                                        .confidence
-                                    }
-                                    % -{' '}
-                                    {section.transport.ourVehicleMatch.reason}
-                                  </p>
-                                  {section.transport.ourVehicleMatch.vehicle
-                                    .reports?.length > 0 && (
-                                    <p className="text-orange-600 mt-1">
-                                      ⚠️ Vehicle has{' '}
-                                      {
-                                        section.transport.ourVehicleMatch
-                                          .vehicle.reports.length
-                                      }{' '}
-                                      recent reports
-                                    </p>
-                                  )}
-                                </div>
-                              )}
-
-                              {/* Nearby Vehicles - only for transit sections */}
-                              {section.type === 'transit' && section.nearbyVehicles?.length > 0 && (
-                                <div className="mt-1 p-1 bg-blue-50 rounded text-xs">
-                                  <p className="text-blue-700 font-medium">
-                                    🚌 {section.nearbyVehicles.length} nearby
-                                    vehicles
-                                  </p>
-                                  {section.nearbyVehicles
-                                    .slice(0, 2)
-                                    .map((nv: any, i: number) => (
-                                      // biome-ignore lint/suspicious/noArrayIndexKey: <s>
-                                      <p key={i} className="text-blue-600">
-                                        • {nv.vehicle.routeShortName} (
-                                        {nv.confidence}% match, {nv.distance}m)
-                                        {nv.reports?.length > 0 && (
-                                          <span className="text-orange-600">
-                                            {' '}
-                                            🚨 {nv.reports.length} reports
-                                          </span>
-                                        )}
-                                      </p>
-                                    ))}
-                                  {section.nearbyVehicles.length > 2 && (
-                                    <p className="text-blue-600 italic">
-                                      ... and{' '}
-                                      {section.nearbyVehicles.length - 2} more
-                                    </p>
-                                  )}
-                                </div>
-                              )}
-
-                              {/* Reports */}
-                              {section.reports?.length > 0 && (
-                                <p className="text-xs text-orange-600 mt-1">
-                                  🚨 {section.reports.length} nearby reports
-                                </p>
-                              )}
-                            </div>
-                          ))}
+                            ),
+                          )}
                         </div>
                       </div>
                     </div>
