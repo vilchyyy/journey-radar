@@ -1,9 +1,12 @@
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { defineSchema, defineTable } from 'convex/server'
+import { v } from 'convex/values'
 
 export default defineSchema({
-	todos: defineTable({
-		text: v.string(),
-		completed: v.boolean(),
-	}),
-});
+  users: defineTable({
+    name: v.string(),
+    // Connects to your auth provider (e.g., Clerk)
+    tokenIdentifier: v.string(),
+    points: v.number(),
+    avatarUrl: v.optional(v.string()),
+  }).index('by_token', ['tokenIdentifier']),
+})
