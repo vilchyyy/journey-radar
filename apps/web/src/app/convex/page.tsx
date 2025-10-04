@@ -47,6 +47,11 @@ const TRANSPORT_MODES = [
   { value: 'TRAIN', label: 'Train' },
   { value: 'TRAM', label: 'Tram' },
 ] as const
+const TRANSPORTS = [
+  { type: 'BUS', label: 'Bus', id: '123' },
+  { type: 'TRAIN', label: 'Train', id: '132' },
+  { type: 'TRAM', label: 'Tram', id: '321' },
+] as const
 
 export default function ReportsPage() {
   const [isGettingLocation, setIsGettingLocation] = useState(false)
@@ -65,8 +70,9 @@ export default function ReportsPage() {
   const form = useForm({
     defaultValues: {
       type: '',
+      transport: '',
       transportMode: '',
-      line: '',
+      route: '',
       destination: '',
       comment: '',
       delayMinutes: '',
@@ -74,7 +80,7 @@ export default function ReportsPage() {
       longitude: '',
     },
     onSubmit: async ({ value }) => {
-      if (!value.type || !value.transportMode || !value.line) {
+      if (!value.type || !value.transportMode || !value.route) {
         toast.error('Please fill in all required fields')
         return
       }
@@ -100,11 +106,9 @@ export default function ReportsPage() {
             latitude: parseFloat(value.latitude),
             longitude: parseFloat(value.longitude),
           },
-          transportInfo: {
-            mode: value.transportMode as 'BUS' | 'TRAIN' | 'TRAM',
-            line: value.line,
-            destination: value.destination || undefined,
-          },
+          transportInfo: value.transportMode as Id<'transports'>,
+          transportMode: value.transportMode as 'BUS' | 'TRAIN' | 'TRAM',
+          route: value.route as Id<'routes'>,
           comment: value.comment || undefined,
           delayMinutes: value.delayMinutes
             ? parseInt(value.delayMinutes, 10)
@@ -289,11 +293,43 @@ export default function ReportsPage() {
                 />
               </div>
 
-              {/* Line */}
+              {/* Transport Info */}
               <div className="space-y-2">
-                <Label>Line Number</Label>
+                <Label>Transport ID</Label>
                 <form.Field
-                  name="line"
+                  name="transport"
+                  validators={{ onChangeListenTo: ['transportMode'] }}
+                  children={(field) => (
+                    <Select
+                      value={field.state.value}
+                      onValueChange={(value) => field.handleChange(value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select exact transport" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TRANSPORTS.filter((t) => {
+                          console.log(field.form.getFieldValue('transportMode'))
+                          return field.form.getFieldValue('transportMode')
+                            ? t.type ===
+                                field.form.getFieldValue('transportMode')
+                            : true
+                        }).map((mode) => (
+                          <SelectItem key={mode.id} value={mode.id}>
+                            {mode.id}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              {/* Route */}
+              <div className="space-y-2">
+                <Label>Route</Label>
+                <form.Field
+                  name="route"
                   children={(field) => (
                     <Input
                       placeholder="e.g., 52, 139, SK1"
@@ -445,8 +481,9 @@ export default function ReportsPage() {
 
                       <div className="text-sm text-muted-foreground">
                         <p>
-                          {report.transportInfo.mode} Line{' '}
-                          {report.transportInfo.line}
+                          {report.transportInfo.transportMode ??
+                            report.transportMode}{' '}
+                          Line {report.transportInfo.routeNumber}
                         </p>
                         {report.transportInfo.destination && (
                           <p>Destination: {report.transportInfo.destination}</p>
