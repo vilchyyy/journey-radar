@@ -1,4 +1,6 @@
-import { cronJobs } from '@convex-dev/crons'
+import { cronJobs } from 'convex/server'
+import { internal } from './_generated/api'
+import { internalAction } from './_generated/server'
 
 export default cronJobs([
   {

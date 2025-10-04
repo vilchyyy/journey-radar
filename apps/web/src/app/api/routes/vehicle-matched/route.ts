@@ -116,7 +116,6 @@ export async function POST(request: NextRequest) {
       origin,
       destination,
       return: ['polyline', 'travelSummary', 'actions', 'intermediate'],
-      transportModes: ['bus', 'tram'], // Only public transport
     })
 
     let routeResponse = publicTransportResponse
