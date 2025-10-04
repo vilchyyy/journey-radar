@@ -55,11 +55,13 @@ export const createReport = mutation({
       latitude: v.number(),
       longitude: v.number(),
     }),
-    transportInfo: v.object({
-      mode: v.union(v.literal('BUS'), v.literal('TRAIN'), v.literal('TRAM')),
-      line: v.string(),
-      destination: v.optional(v.string()),
-    }),
+    transportInfo: v.optional(v.id('transports')),
+    transportMode: v.union(
+      v.literal('BUS'),
+      v.literal('TRAIN'),
+      v.literal('TRAM'),
+    ),
+    route: v.id('routes'),
     comment: v.optional(v.string()),
     delayMinutes: v.optional(v.number()),
   },
@@ -68,9 +70,12 @@ export const createReport = mutation({
       userId: args.userId,
       status: 'UNVERIFIED',
       type: args.type,
-      transportInfo: args.transportInfo,
+      transportId: args.transportInfo,
+      transportMode: args.transportMode,
+      route: args.route,
       comment: args.comment,
       delayMinutes: args.delayMinutes,
+      verificationScore: 1,
     })
     await geospatial.insert(
       ctx,
