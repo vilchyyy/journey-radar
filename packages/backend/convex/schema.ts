@@ -32,7 +32,6 @@ export default defineSchema({
       v.literal('OTHER'),
     ),
     // CORE GEOSPATIAL DATA
-    location_key: v.string(),
     transportInfo: v.object({
       mode: v.union(v.literal('BUS'), v.literal('TRAIN'), v.literal('TRAM')),
       line: v.string(), // e.g., "52", "139", "SK1"
