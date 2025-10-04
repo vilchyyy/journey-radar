@@ -18,20 +18,20 @@ async function getRouteMapping(): Promise<RouteData> {
   const now = Date.now()
 
   // Return cached data if still valid
-  if (routeCache && (now - cacheTimestamp) < CACHE_DURATION) {
+  if (routeCache && now - cacheTimestamp < CACHE_DURATION) {
     return routeCache
   }
 
   try {
     const response = await fetch('/api/gtfs/routes', {
-      next: { revalidate: 3600 }
+      next: { revalidate: 3600 },
     })
 
     if (!response.ok) {
       throw new Error('Failed to fetch route mapping')
     }
 
-    const data = await response.json() as RouteData
+    const data = (await response.json()) as RouteData
     routeCache = data
     cacheTimestamp = now
     return data
@@ -60,7 +60,11 @@ type FeedObject = {
   }>
 }
 
-async function getVehiclesFromFeed(url: string, mode: 'bus' | 'tram', routeData: RouteData) {
+async function getVehiclesFromFeed(
+  url: string,
+  mode: 'bus' | 'tram',
+  routeData: RouteData,
+) {
   const response = await fetch(url, {
     headers: { 'User-Agent': 'journey-radar/1.0' },
     next: { revalidate: 0 },
@@ -101,7 +105,7 @@ async function getVehiclesFromFeed(url: string, mode: 'bus' | 'tram', routeData:
       const routeId = routeData.tripToRouteMap[tripId]
       if (routeId) {
         // Find route short name from routes data
-        const route = routeData.routes.find(r => r.route_id === routeId)
+        const route = routeData.routes.find((r) => r.route_id === routeId)
         if (route) {
           routeNumber = route.route_short_name
         }
