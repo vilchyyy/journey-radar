@@ -97,9 +97,6 @@ export const findNearbyReports = query({
   },
   handler: async (ctx, args) => {
     const { center, limit = 100, radiusKm } = args
-
-    console.log('Searching for reports near:', center, 'within', radiusKm, 'km')
-
     // Convert km to meters for the geospatial query
     const radiusMeters = radiusKm * 1000
 
@@ -111,8 +108,6 @@ export const findNearbyReports = query({
       limit ?? 100,
       radiusMeters,
     )
-
-    console.log('Nearby reports found:', nearbyReports)
 
     if (nearbyReports.length === 0) {
       console.log("No reports found. Let's check what's in the index...")

@@ -67,34 +67,8 @@ export default defineSchema({
       mode: v.union(v.literal('BUS'), v.literal('TRAIN'), v.literal('TRAM')),
       line: v.string(), // The affected line
     }),
-    // An incident might be line-wide, not at a specific point
-    location_key: v.string(),
     // Timestamps for the incident's validity period
     validFrom: v.number(), // Unix timestamp (ms)
     validUntil: v.optional(v.number()), // Unix timestamp (ms)
   }),
-
-  // Optional geospatial index if you want to query incidents by location
-  // =================================================================
-  // 4. REPORT CLUSTERS TABLE - Groups similar reports for verification
-  // =================================================================
-  reportClusters: defineTable({
-    status: v.union(
-      v.literal('POTENTIAL'), // Below verification threshold
-      v.literal('CONFIRMED'), // Met verification threshold
-      v.literal('MERGED_INTO_INCIDENT'), // Superseded by an official incident
-      v.literal('REJECTED'),
-    ),
-    // The calculated center-point of all reports in the cluster
-    location_key: v.string(),
-    transportInfo: v.object({
-      mode: v.union(v.literal('BUS'), v.literal('TRAIN'), v.literal('TRAM')),
-      line: v.string(),
-    }),
-    reportCount: v.number(),
-    firstReportAt: v.number(), // Timestamp of the first report
-    lastReportAt: v.number(), // Timestamp of the most recent report
-  })
-    // Index to quickly find clusters for a given transport line
-    .index('by_line', ['transportInfo.line']),
 })
