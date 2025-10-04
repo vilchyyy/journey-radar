@@ -13,7 +13,9 @@
     "dev:web": "turbo -F web dev",
     "dev:server": "turbo -F @journey-radar/backend dev",
     "dev:setup": "turbo -F @journey-radar/backend dev:setup",
-    "db:seed": "cd packages/backend && bun run db:seed"
+    "gtfs:test": "cd packages/backend && bun run scripts/test-gtfs.ts",
+    "gtfs:service": "cd packages/backend && bun run scripts/gtfs-service.ts",
+    "gtfs:load": "cd packages/backend && bunx convex run internal.gtfs.refreshAllGTFSData"
   },
   "dependencies": {
     "nanoid": "^5.1.6"
