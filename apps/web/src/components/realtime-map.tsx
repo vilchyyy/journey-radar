@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   ArrowRightLeft,
   Briefcase,
+  Check,
   Clock,
   Home,
   Loader2,
@@ -17,6 +18,7 @@ import {
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import MapGL, { Layer, Source } from 'react-map-gl/maplibre'
+import { ReportVoting } from '@/components/report-voting'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -78,14 +80,32 @@ const recents = [
   },
 ]
 
-export default function RealtimeMap() {
+interface RealtimeMapProps {
+  autoSelectVehicle?: string
+  autoSelectTripId?: string
+  autoSelectRouteId?: string
+  autoSelectRoute?: string
+  autoSelectMode?: 'bus' | 'tram'
+  initialCenter?: {
+    latitude: number
+    longitude: number
+  }
+}
+
+export default function RealtimeMap({
+  autoSelectVehicle,
+  autoSelectTripId,
+  autoSelectRouteId,
+  autoSelectRoute,
+  autoSelectMode,
+  initialCenter,
+}: RealtimeMapProps = {}) {
   const { vehicles, loading } = useVehiclePositions()
   const [error, setError] = useState<string | null>(null)
-  const [shapes, setShapes] = useState<ShapesCollection | null>(null)
   const [viewState, setViewState] = useState({
-    longitude: 19.9383,
-    latitude: 50.0614,
-    zoom: 12,
+    longitude: initialCenter?.longitude ?? 19.9383,
+    latitude: initialCenter?.latitude ?? 50.0614,
+    zoom: initialCenter ? 15 : 12,
   })
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [searchedLocation, setSearchedLocation] = useState<any>(null)
@@ -100,14 +120,95 @@ export default function RealtimeMap() {
   const [isPlanningJourney, setIsPlanningJourney] = useState(false)
   const [plannerError, setPlannerError] = useState<string | null>(null)
   const [routeData, setRouteData] = useState<any | null>(null)
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState<number | null>(
+    null,
+  )
   const [currentLocationLoading, setCurrentLocationLoading] = useState(false)
+
+  // Reports drawer state
+  const [showReportsDrawer, setShowReportsDrawer] = useState(false)
+  const [nearbyReports, setNearbyReports] = useState<any[]>([])
+  const [reportsLoading, setReportsLoading] = useState(false)
+  const [nearbyReportsScores, setNearbyReportsScores] = useState<
+    Record<string, number>
+  >({})
+
+  // Transport details drawer state
+  const [showTransportDrawer, setShowTransportDrawer] = useState(false)
+  const [selectedTransport, setSelectedTransport] = useState<any>(null)
+  const [transportReports, setTransportReports] = useState<any[]>([])
+  const [transportReportsLoading, setTransportReportsLoading] = useState(false)
+  const [transportReportsScores, setTransportReportsScores] = useState<
+    Record<string, number>
+  >({})
 
   const fromSearch = useLocationSearch({ limit: 6 })
   const toSearch = useLocationSearch({ limit: 6 })
   const searchResults = useLocationSearch({ limit: 8, debounceMs: 200 })
 
   const vehiclesSourceId = 'vehicles-layer'
-  const shapesSourceId = 'shapes-layer'
+
+  const handleVehicleClick = useCallback((vehicle: any) => {
+    setSelectedTransport(vehicle)
+    setShowTransportDrawer(true)
+    fetchTransportReports(vehicle)
+  }, [])
+
+  const fetchTransportReports = useCallback(async (vehicle: any) => {
+    setTransportReportsLoading(true)
+
+    try {
+      // Fetch user reports for this transport
+      const [reportsResponse, gtfsResponse] = await Promise.all([
+        fetch('/api/reports/transport', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            tripId: vehicle.tripId,
+            vehicleId: vehicle.vehicleId,
+            routeId: vehicle.routeId,
+            routeNumber: vehicle.routeNumber,
+            mode: vehicle.mode.toUpperCase(),
+          }),
+        }),
+        fetch('/api/gtfs/trip-updates', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            vehicleId: vehicle.vehicleId,
+            routeId: vehicle.routeId,
+            routeNumber: vehicle.routeNumber,
+            tripId: vehicle.tripId,
+          }),
+        }),
+      ])
+
+      if (!reportsResponse.ok) {
+        throw new Error('Failed to fetch transport reports')
+      }
+
+      const reportsData = await reportsResponse.json()
+      setTransportReports(reportsData.reports || [])
+
+      // Store GTFS delay information for display
+      if (gtfsResponse.ok) {
+        const gtfsData = await gtfsResponse.json()
+        setSelectedTransport((prev) => ({
+          ...prev,
+          gtfsDelayInfo: gtfsData,
+        }))
+      }
+    } catch (err) {
+      console.error('Error fetching transport data:', err)
+      setTransportReports([])
+    } finally {
+      setTransportReportsLoading(false)
+    }
+  }, [])
 
   const vehicleGeoJSON = useMemo(
     () => ({
@@ -173,31 +274,14 @@ export default function RealtimeMap() {
         .map((section: any, sectionIndex: number) => ({
           id: `${routeIndex}-${sectionIndex}-${section.type}`,
           type: section.type,
+          routeIndex,
+          isSelected: selectedRouteIndex === routeIndex,
           coordinates: section.geometry.map(
             (coord: any) => [coord.lng, coord.lat] as [number, number],
           ),
         })),
     )
-  }, [routeData])
-
-  useEffect(() => {
-    const fetchShapes = async () => {
-      try {
-        const res = await fetch('/api/gtfs/shapes')
-        if (!res.ok) {
-          throw new Error('Unable to load network lines right now')
-        }
-        const data = (await res.json()) as ShapesCollection
-        setShapes(data)
-        setError(null)
-      } catch (err) {
-        console.error('Error fetching GTFS shapes:', err)
-        setError('Unable to load network lines right now')
-      }
-    }
-
-    fetchShapes()
-  }, [])
+  }, [routeData, selectedRouteIndex])
 
   const clearError = useCallback(() => setError(null), [])
 
@@ -208,6 +292,91 @@ export default function RealtimeMap() {
       zoom: Math.max(prev.zoom, 13),
     }))
   }, [])
+
+  const selectRoute = useCallback(
+    (routeIndex: number) => {
+      setSelectedRouteIndex(routeIndex)
+      const route = routeData?.routes?.[routeIndex]
+      if (route?.sections?.length > 0) {
+        // Center map on the selected route
+        const firstSection = route.sections.find(
+          (section: any) => section.geometry && section.geometry.length > 0,
+        )
+        if (firstSection && firstSection.geometry?.length > 0) {
+          const midPoint =
+            firstSection.geometry[Math.floor(firstSection.geometry.length / 2)]
+          centerOn({ lat: midPoint.lat, lng: midPoint.lng })
+        }
+      }
+    },
+    [routeData, centerOn],
+  )
+
+  const clearRouteSelection = useCallback(() => {
+    setSelectedRouteIndex(null)
+  }, [])
+
+  // Auto-select vehicle when coming from a report
+  useEffect(() => {
+    if (loading || vehicles.length === 0) return
+
+    // Only run once when vehicles are loaded and we have auto-select params
+    if (!autoSelectVehicle && !autoSelectTripId && !autoSelectRouteId) return
+
+    // Find the vehicle to select
+    let vehicleToSelect: any = null
+
+    if (autoSelectVehicle) {
+      // First priority: exact vehicle ID match
+      vehicleToSelect = vehicles.find(
+        (v: any) => v.vehicleId === autoSelectVehicle,
+      )
+    }
+
+    if (!vehicleToSelect && autoSelectTripId) {
+      // Second priority: trip ID match
+      vehicleToSelect = vehicles.find((v: any) => v.tripId === autoSelectTripId)
+    }
+
+    if (!vehicleToSelect && autoSelectRouteId) {
+      // Third priority: route ID match (may match multiple, take first)
+      vehicleToSelect = vehicles.find(
+        (v: any) => v.routeId === autoSelectRouteId,
+      )
+    }
+
+    if (!vehicleToSelect && autoSelectRoute && autoSelectMode) {
+      // Fourth priority: route number + mode match
+      vehicleToSelect = vehicles.find(
+        (v: any) =>
+          v.routeNumber === autoSelectRoute &&
+          v.mode.toLowerCase() === autoSelectMode.toLowerCase(),
+      )
+    }
+
+    if (vehicleToSelect) {
+      // Close the drawer and select the vehicle
+      setDrawerOpen(false)
+      handleVehicleClick(vehicleToSelect)
+
+      // Center on the vehicle
+      setViewState((prev: any) => ({
+        ...prev,
+        longitude: vehicleToSelect.longitude,
+        latitude: vehicleToSelect.latitude,
+        zoom: 16,
+      }))
+    }
+    // biome-ignore lint/correctness/useExhaustiveDependencies: Only run once on vehicle load
+  }, [
+    loading,
+    vehicles,
+    autoSelectVehicle,
+    autoSelectTripId,
+    autoSelectRouteId,
+    autoSelectRoute,
+    autoSelectMode,
+  ])
 
   const handleSelectLocation = useCallback(
     (location: any, type: 'from' | 'to') => {
@@ -220,21 +389,26 @@ export default function RealtimeMap() {
         subtitle: location.address?.label,
         coordinate: coords,
       }
+
+      setDrawerOpen(true)
+
       if (type === 'from') {
         setFromLocation(selection)
         fromSearch.clearResults()
         fromSearch.handleQueryChange('')
+        setActiveInput(toLocation ? null : 'to')
       } else {
         setToLocation(selection)
         toSearch.clearResults()
         toSearch.handleQueryChange('')
+        setActiveInput(fromLocation ? null : 'from')
       }
-      setActiveInput(null)
+
       setPlannerError(null)
       setRouteData(null)
       centerOn(coords)
     },
-    [centerOn, fromSearch, toSearch],
+    [centerOn, fromLocation, fromSearch, toLocation, toSearch],
   )
 
   const handleSearchLocationSelect = useCallback(
@@ -262,6 +436,24 @@ export default function RealtimeMap() {
 
   const handleMapClick = useCallback(
     (event: any) => {
+      // Check if a vehicle was clicked
+      const features = event.features || []
+      const vehicleFeature = features.find(
+        (f: any) =>
+          f.layer.id === 'vehicle-points' || f.layer.id === 'vehicle-labels',
+      )
+
+      if (vehicleFeature && vehicleFeature.properties) {
+        const vehicle = vehicles.find(
+          (v) => v.vehicleId === vehicleFeature.properties.id,
+        )
+        if (vehicle) {
+          handleVehicleClick(vehicle)
+          return
+        }
+      }
+
+      // Original point selection logic
       if (!isSelectingPoint) return
       const coords: RouteCoordinate = {
         lat: event.lngLat.lat,
@@ -275,18 +467,30 @@ export default function RealtimeMap() {
         subtitle: `${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}`,
         coordinate: coords,
       }
+
+      setDrawerOpen(true)
+
       if (isSelectingPoint === 'from') {
         setFromLocation(selection)
+        setActiveInput(toLocation ? null : 'to')
       } else {
         setToLocation(selection)
+        setActiveInput(fromLocation ? null : 'from')
       }
+
       setIsSelectingPoint(null)
       setPlannerError(null)
       setRouteData(null)
       centerOn(coords)
-      setDrawerOpen(true)
     },
-    [centerOn, isSelectingPoint],
+    [
+      centerOn,
+      fromLocation,
+      isSelectingPoint,
+      toLocation,
+      vehicles,
+      handleVehicleClick,
+    ],
   )
 
   const startSelecting = useCallback((type: 'from' | 'to') => {
@@ -341,6 +545,7 @@ export default function RealtimeMap() {
     setSearchedLocation(null)
     setPlannerError(null)
     setRouteData(null)
+    setSelectedRouteIndex(null)
     fromSearch.clearResults()
     toSearch.clearResults()
     searchResults.clearResults()
@@ -399,6 +604,42 @@ export default function RealtimeMap() {
     }
   }, [centerOn, fromLocation, toLocation])
 
+  const fetchNearbyReports = useCallback(async () => {
+    setReportsLoading(true)
+    setShowReportsDrawer(true)
+
+    try {
+      // Get current map center
+      const centerLat = viewState.latitude
+      const centerLng = viewState.longitude
+      const radius = 2000 // 2km radius
+
+      const response = await fetch('/api/reports/list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          latitude: centerLat,
+          longitude: centerLng,
+          radiusKm: radius / 1000, // Convert meters to km
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch nearby reports')
+      }
+
+      const data = await response.json()
+      setNearbyReports(data.reports || [])
+    } catch (err) {
+      console.error('Error fetching nearby reports:', err)
+      setNearbyReports([])
+    } finally {
+      setReportsLoading(false)
+    }
+  }, [viewState])
+
   const formattedTimestamp = useMemo(
     () =>
       new Date().toLocaleTimeString([], {
@@ -430,35 +671,13 @@ export default function RealtimeMap() {
           }
         }}
         onClick={handleMapClick}
+        interactiveLayerIds={['vehicle-points', 'vehicle-labels']}
         mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
         style={{ width: '100%', height: '100%' }}
         cursor={isSelectingPoint ? 'crosshair' : 'grab'}
         reuseMaps
         preserveDrawingBuffer={false}
       >
-        {shapes && (
-          <Source id={shapesSourceId} type="geojson" data={shapes}>
-            <Layer
-              id="transit-shapes"
-              type="line"
-              paint={{
-                'line-color': [
-                  'match',
-                  ['get', 'mode'],
-                  'tram',
-                  '#15803d',
-                  'bus',
-                  '#1d4ed8',
-                  '#64748b',
-                ],
-                'line-width': 2,
-                'line-opacity': 0.6,
-              }}
-              layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-            />
-          </Source>
-        )}
-
         {vehicleGeoJSON.features.length > 0 && (
           <Source id={vehiclesSourceId} type="geojson" data={vehicleGeoJSON}>
             <Layer
@@ -564,12 +783,25 @@ export default function RealtimeMap() {
               id={`route-line-${section.id}`}
               type="line"
               paint={{
-                'line-color':
-                  section.type === 'transit' ? '#3b82f6' : '#6b7280',
-                'line-width': section.type === 'transit' ? 5 : 3,
-                'line-opacity': section.type === 'transit' ? 0.85 : 0.6,
+                'line-color': section.isSelected
+                  ? '#ef4444' // Red for selected route
+                  : section.type === 'transit'
+                    ? '#3b82f6' // Blue for unselected transit
+                    : '#6b7280', // Gray for walking
+                'line-width': section.isSelected
+                  ? 7 // Thicker for selected
+                  : section.type === 'transit'
+                    ? 5
+                    : 3,
+                'line-opacity': section.isSelected
+                  ? 1.0 // Fully opaque for selected
+                  : section.type === 'transit'
+                    ? 0.85
+                    : 0.6,
                 'line-dasharray':
-                  section.type === 'transit' ? undefined : [1, 1.5],
+                  section.type === 'transit' || section.isSelected
+                    ? undefined
+                    : [1, 1.5],
               }}
             />
           </Source>
@@ -629,8 +861,8 @@ export default function RealtimeMap() {
                 </button>
               </DrawerClose>
 
-              <div className="px-5 pb-5">
-                {true && (
+              <div className="px-5 pb-5 max-h-[80vh] overflow-y-auto">
+                {!searchedLocation && !toLocation && !fromLocation && (
                   <div className="mt-5 space-y-6 text-sm">
                     <div className="relative rounded-full border border-border bg-background">
                       <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -712,6 +944,13 @@ export default function RealtimeMap() {
                           ({ label, description, icon: Icon }) => (
                             <button
                               key={label}
+                              onClick={() => {
+                                if (label === 'Report congestion') {
+                                  window.location.href = '/reports/register'
+                                } else if (label === 'Nearby transit updates') {
+                                  fetchNearbyReports()
+                                }
+                              }}
                               className="flex w-full items-start gap-3 rounded-2xl border border-border bg-muted/30 px-4 py-3 text-left hover:bg-muted/50"
                             >
                               <span className="mt-1 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -784,11 +1023,11 @@ export default function RealtimeMap() {
                   </div>
                 )}
 
-                {/* Journey Planner - always visible now */}
-                {(searchedLocation || fromLocation || toLocation) && (
+                {/* Journey Planner - only visible after destination is selected */}
+                {(searchedLocation || toLocation) && (
                   <div className="mt-5 space-y-4 text-sm">
                     {/* Prompt for starting point if we have a destination from search */}
-                    {searchedLocation && !fromLocation && (
+                    {!fromLocation && (
                       <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
                         <div className="flex items-start gap-3">
                           <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
@@ -797,7 +1036,7 @@ export default function RealtimeMap() {
                           <div className="flex-1">
                             <p className="text-sm font-medium text-blue-900">
                               Ready to plan your journey to{' '}
-                              {searchedLocation.label}?
+                              {(searchedLocation || toLocation)?.label}?
                             </p>
                             <p className="text-xs text-blue-700">
                               Choose your starting point below or use your
@@ -1013,7 +1252,10 @@ export default function RealtimeMap() {
                           'Plan journey'
                         )}
                       </Button>
-                      {(fromLocation || toLocation || routeData) && (
+                      {(fromLocation ||
+                        toLocation ||
+                        routeData ||
+                        searchedLocation) && (
                         <Button
                           size="sm"
                           variant="ghost"
@@ -1026,113 +1268,457 @@ export default function RealtimeMap() {
                     </div>
 
                     {routeData && (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-semibold text-foreground">
-                            Journey options
-                          </h3>
+                          <div className="flex items-center gap-3">
+                            <h3 className="text-base font-semibold text-foreground">
+                              Journey Options ({routeData.routes?.length || 0}{' '}
+                              routes)
+                            </h3>
+                            {selectedRouteIndex !== null && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={clearRouteSelection}
+                                className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <X className="mr-1 h-3 w-3" />
+                                Clear selection
+                              </Button>
+                            )}
+                          </div>
                           {routeData.summary?.totalReports ? (
-                            <span className="text-xs text-orange-600">
-                              {routeData.summary.totalReports} nearby reports
+                            <span className="text-xs text-orange-600 font-medium">
+                              🚨 {routeData.summary.totalReports} nearby reports
                             </span>
                           ) : null}
                         </div>
 
-                        {routeData.routes?.map((route: any, index: number) => (
+                        {/* Overall warnings if there are any reports */}
+                        {routeData.summary?.totalReports > 0 && (
                           <div
-                            key={route.id || index}
-                            className="space-y-3 rounded-2xl border border-border bg-muted/20 px-4 py-4"
+                            className={`rounded-2xl border px-4 py-3 ${
+                              routeData.summary.totalReports > 5
+                                ? 'border-red-200 bg-red-50'
+                                : routeData.summary.totalReports > 2
+                                  ? 'border-orange-200 bg-orange-50'
+                                  : 'border-yellow-200 bg-yellow-50'
+                            }`}
                           >
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="text-sm font-semibold text-foreground">
-                                  Option {index + 1}
+                            <div className="flex items-start gap-3">
+                              <AlertTriangle
+                                className={`h-5 w-5 mt-0.5 ${
+                                  routeData.summary.totalReports > 5
+                                    ? 'text-red-500'
+                                    : routeData.summary.totalReports > 2
+                                      ? 'text-orange-500'
+                                      : 'text-yellow-600'
+                                }`}
+                              />
+                              <div className="flex-1">
+                                <p
+                                  className={`text-sm font-semibold ${
+                                    routeData.summary.totalReports > 5
+                                      ? 'text-red-900'
+                                      : routeData.summary.totalReports > 2
+                                        ? 'text-orange-900'
+                                        : 'text-yellow-900'
+                                  }`}
+                                >
+                                  {routeData.summary.totalReports > 5
+                                    ? 'High disruption alert'
+                                    : routeData.summary.totalReports > 2
+                                      ? 'Moderate disruption warning'
+                                      : 'Minor disruption notice'}
                                 </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {route.summary?.durationText ||
-                                    route.summary?.duration ||
-                                    'Duration available after start'}
+                                <p
+                                  className={`text-xs ${
+                                    routeData.summary.totalReports > 5
+                                      ? 'text-red-700'
+                                      : routeData.summary.totalReports > 2
+                                        ? 'text-orange-700'
+                                        : 'text-yellow-700'
+                                  }`}
+                                >
+                                  {routeData.summary.totalReports} report
+                                  {routeData.summary.totalReports > 1
+                                    ? 's'
+                                    : ''}{' '}
+                                  detected in your journey area.
+                                  {routeData.summary.totalReports > 5
+                                    ? ' Consider alternative routes or allow extra time.'
+                                    : ' Check individual routes for details.'}
                                 </p>
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                  {Object.entries(
+                                    routeData.summary.reportsByType || {},
+                                  ).map(([type, count]) => (
+                                    <span
+                                      key={type}
+                                      className="text-[0.65rem] px-2 py-1 bg-white/60 rounded-full font-medium"
+                                    >
+                                      {count} {type.toLowerCase()}
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
-                              <div className="text-right text-xs text-muted-foreground">
-                                {route.summary?.departure && (
-                                  <p>
-                                    {route.summary.departure} →{' '}
-                                    {route.summary.arrival}
-                                  </p>
-                                )}
-                                {route.summary?.transportModes && (
-                                  <p>
-                                    {route.summary.transportModes.join(', ')}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="space-y-2">
-                              {route.sections?.map(
-                                (section: any, sectionIndex: number) => (
-                                  <div
-                                    key={section.id || sectionIndex}
-                                    className="rounded-2xl border border-border bg-card/80 px-3 py-2 text-xs"
-                                  >
-                                    <div className="flex items-center justify-between">
-                                      <div className="flex items-center gap-2">
-                                        <span
-                                          className={cn(
-                                            'rounded px-2 py-1 text-[0.65rem] font-semibold uppercase',
-                                            section.type === 'transit'
-                                              ? 'bg-blue-100 text-blue-700'
-                                              : 'bg-slate-200 text-slate-700',
-                                          )}
-                                        >
-                                          {section.type === 'transit'
-                                            ? section.transport?.mode ||
-                                              'Transit'
-                                            : 'Walk'}
-                                        </span>
-                                        <span className="font-medium text-foreground">
-                                          {section.transport?.shortName ||
-                                            section.transport?.name ||
-                                            section.summary ||
-                                            'Step'}
-                                        </span>
-                                      </div>
-                                      {section.travelSummary?.duration && (
-                                        <span className="text-muted-foreground">
-                                          {section.travelSummary.duration}
-                                        </span>
-                                      )}
-                                    </div>
-
-                                    {section.transport?.ourVehicleMatch && (
-                                      <div className="mt-2 rounded-xl bg-blue-50 px-3 py-2 text-[0.65rem] text-blue-700">
-                                        Vehicle match{' '}
-                                        {
-                                          section.transport.ourVehicleMatch
-                                            .vehicle.routeShortName
-                                        }{' '}
-                                        (
-                                        {
-                                          section.transport.ourVehicleMatch
-                                            .confidence
-                                        }
-                                        % confidence)
-                                      </div>
-                                    )}
-
-                                    {section.reports?.length > 0 && (
-                                      <p className="mt-2 text-[0.65rem] text-orange-600">
-                                        ⚠️ {section.reports.length} nearby
-                                        reports
-                                      </p>
-                                    )}
-                                  </div>
-                                ),
-                              )}
                             </div>
                           </div>
-                        ))}
+                        )}
+
+                        {routeData.routes?.map((route: any, index: number) => {
+                          const hasIncidents = route.sections?.some(
+                            (section: any) =>
+                              (section.reports || []).some(
+                                (r: any) => r.status === 'OFFICIAL_CONFIRMED',
+                              ),
+                          )
+                          const totalReports =
+                            route.sections?.reduce(
+                              (sum: number, section: any) =>
+                                sum + (section.reports?.length || 0),
+                              0,
+                            ) || 0
+                          const hasWarnings = totalReports > 0
+
+                          return (
+                            <div
+                              key={route.id || index}
+                              onClick={() => selectRoute(index)}
+                              className={`space-y-4 rounded-2xl border px-4 py-4 cursor-pointer transition-all hover:shadow-md ${
+                                selectedRouteIndex === index
+                                  ? 'border-red-300 bg-red-50/50 shadow-lg ring-2 ring-red-200'
+                                  : hasIncidents
+                                    ? 'border-red-200 bg-red-50'
+                                    : hasWarnings
+                                      ? 'border-orange-200 bg-orange-50/40'
+                                      : index === 0
+                                        ? 'border-blue-200 bg-blue-50/50'
+                                        : 'border-border bg-muted/20'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div
+                                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                      selectedRouteIndex === index
+                                        ? 'bg-red-500 text-white'
+                                        : index === 0
+                                          ? 'bg-blue-500 text-white'
+                                          : hasWarnings
+                                            ? 'bg-orange-400 text-white'
+                                            : 'bg-gray-400 text-white'
+                                    }`}
+                                  >
+                                    {selectedRouteIndex === index ? (
+                                      <Check className="h-4 w-4" />
+                                    ) : (
+                                      index + 1
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-base font-semibold text-foreground">
+                                      {selectedRouteIndex === index
+                                        ? 'Selected Route'
+                                        : index === 0
+                                          ? 'Recommended'
+                                          : `Alternative ${index}`}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                      {route.summary?.durationText ||
+                                        route.summary?.duration ||
+                                        'Duration available after start'}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="text-right text-sm">
+                                  {route.summary?.departure && (
+                                    <p className="font-medium text-foreground">
+                                      {route.summary.departure} →{' '}
+                                      {route.summary.arrival}
+                                    </p>
+                                  )}
+                                  {route.summary?.transportModes && (
+                                    <p className="text-xs text-muted-foreground">
+                                      {route.summary.transportModes.join(' • ')}
+                                    </p>
+                                  )}
+                                  {totalReports > 0 && (
+                                    <p className="text-xs text-orange-600 font-medium">
+                                      ⚠️ {totalReports} reports
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="space-y-3">
+                                {route.sections?.map(
+                                  (section: any, sectionIndex: number) => {
+                                    const sectionReports =
+                                      section.reports?.length || 0
+                                    const hasLowConfidence =
+                                      section.transport?.ourVehicleMatch &&
+                                      section.transport.ourVehicleMatch
+                                        .confidence < 80
+
+                                    return (
+                                      <div
+                                        key={section.id || sectionIndex}
+                                        className={`rounded-2xl border px-4 py-3 text-sm ${
+                                          sectionReports > 0 || hasLowConfidence
+                                            ? 'border-orange-200 bg-orange-50/50'
+                                            : 'border-border bg-card/80'
+                                        }`}
+                                      >
+                                        <div className="flex items-start justify-between">
+                                          <div className="flex items-center gap-3">
+                                            <span
+                                              className={cn(
+                                                'rounded-lg px-3 py-1.5 text-xs font-semibold uppercase',
+                                                section.type === 'transit'
+                                                  ? 'bg-blue-100 text-blue-700'
+                                                  : 'bg-slate-200 text-slate-700',
+                                              )}
+                                            >
+                                              {section.type === 'transit'
+                                                ? section.transport?.mode ||
+                                                  'Transit'
+                                                : 'Walk'}
+                                            </span>
+                                            <div>
+                                              <p className="font-medium text-foreground">
+                                                {section.transport?.shortName ||
+                                                  section.transport?.name ||
+                                                  section.summary ||
+                                                  'Step'}
+                                              </p>
+                                              {section.transport?.headsign && (
+                                                <p className="text-xs text-muted-foreground">
+                                                  to{' '}
+                                                  {section.transport.headsign}
+                                                </p>
+                                              )}
+                                            </div>
+                                          </div>
+                                          {section.travelSummary?.duration && (
+                                            <span className="text-sm font-medium text-muted-foreground bg-muted/50 px-2 py-1 rounded">
+                                              {section.travelSummary.duration}
+                                            </span>
+                                          )}
+                                        </div>
+
+                                        {/* Enhanced vehicle match display */}
+                                        {section.transport?.ourVehicleMatch && (
+                                          <div
+                                            className={`mt-3 rounded-xl px-3 py-2 text-xs ${
+                                              section.transport.ourVehicleMatch
+                                                .confidence >= 90
+                                                ? 'bg-green-50 text-green-700'
+                                                : section.transport
+                                                      .ourVehicleMatch
+                                                      .confidence >= 80
+                                                  ? 'bg-blue-50 text-blue-700'
+                                                  : 'bg-orange-50 text-orange-700'
+                                            }`}
+                                          >
+                                            <div className="flex items-center justify-between">
+                                              <span className="font-semibold">
+                                                📍 Live tracking
+                                              </span>
+                                              {section.transport.ourVehicleMatch
+                                                .confidence < 100 && (
+                                                <span className="font-medium">
+                                                  {
+                                                    section.transport
+                                                      .ourVehicleMatch
+                                                      .confidence
+                                                  }
+                                                  %
+                                                </span>
+                                              )}
+                                            </div>
+                                            <div className="mt-1 text-[0.65rem] opacity-90">
+                                              Route{' '}
+                                              {
+                                                section.transport
+                                                  .ourVehicleMatch.vehicle
+                                                  .routeShortName
+                                              }{' '}
+                                              • Vehicle{' '}
+                                              {
+                                                section.transport
+                                                  .ourVehicleMatch.vehicle
+                                                  .vehicleId
+                                              }
+                                              {section.transport.ourVehicleMatch
+                                                .vehicle.delay !==
+                                                undefined && (
+                                                <>
+                                                  {' '}
+                                                  •{' '}
+                                                  {section.transport
+                                                    .ourVehicleMatch.vehicle
+                                                    .delay > 0
+                                                    ? '+'
+                                                    : ''}
+                                                  {
+                                                    section.transport
+                                                      .ourVehicleMatch.vehicle
+                                                      .delay
+                                                  }
+                                                  min delay
+                                                </>
+                                              )}
+                                            </div>
+                                          </div>
+                                        )}
+
+                                        {/* Enhanced reports display */}
+                                        {sectionReports > 0 && (
+                                          <div className="mt-3 rounded-xl bg-orange-50 border border-orange-200 px-3 py-2">
+                                            <div className="flex items-start gap-2">
+                                              <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5" />
+                                              <div className="flex-1">
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <p className="text-xs font-semibold text-orange-800">
+                                                    {sectionReports} disruption
+                                                    {sectionReports > 1
+                                                      ? 's'
+                                                      : ''}{' '}
+                                                    reported
+                                                  </p>
+                                                  <span className="text-[0.6rem] text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+                                                    Within 500m
+                                                  </span>
+                                                </div>
+                                                <div className="space-y-2">
+                                                  {section.reports
+                                                    ?.slice(0, 3)
+                                                    .map((report: any) => (
+                                                      <div
+                                                        key={report.id}
+                                                        className="bg-white/60 rounded-lg p-2"
+                                                      >
+                                                        <div className="flex items-start justify-between">
+                                                          <div className="flex-1">
+                                                            <div className="flex items-center gap-1 mb-1">
+                                                              <span
+                                                                className={`text-[0.6rem] font-semibold uppercase px-1.5 py-0.5 rounded ${
+                                                                  report.type ===
+                                                                  'DELAY'
+                                                                    ? 'bg-yellow-100 text-yellow-700'
+                                                                    : report.type ===
+                                                                        'CANCELLED'
+                                                                      ? 'bg-red-100 text-red-700'
+                                                                      : report.type ===
+                                                                          'CROWDED'
+                                                                        ? 'bg-orange-100 text-orange-700'
+                                                                        : report.type ===
+                                                                            'ACCIDENT'
+                                                                          ? 'bg-red-100 text-red-800'
+                                                                          : 'bg-gray-100 text-gray-700'
+                                                                }`}
+                                                              >
+                                                                {report.type?.toLowerCase()}
+                                                              </span>
+                                                              {report.delayMinutes && (
+                                                                <span className="text-[0.6rem] font-medium text-orange-700">
+                                                                  +
+                                                                  {
+                                                                    report.delayMinutes
+                                                                  }
+                                                                  min
+                                                                </span>
+                                                              )}
+                                                              <span className="text-[0.55rem] text-muted-foreground">
+                                                                {
+                                                                  report.distance
+                                                                }
+                                                                m away
+                                                              </span>
+                                                            </div>
+                                                            {report.comment && (
+                                                              <p className="text-[0.65rem] text-orange-700 line-clamp-2">
+                                                                {report.comment}
+                                                              </p>
+                                                            )}
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    ))}
+                                                  {sectionReports > 3 && (
+                                                    <p className="text-[0.6rem] text-orange-600 italic text-center">
+                                                      +{sectionReports - 3} more
+                                                      report
+                                                      {sectionReports - 3 > 1
+                                                        ? 's'
+                                                        : ''}{' '}
+                                                      in this area
+                                                    </p>
+                                                  )}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+
+                                        {/* Low confidence warning */}
+                                        {hasLowConfidence &&
+                                          !sectionReports && (
+                                            <div className="mt-3 rounded-xl bg-yellow-50 border border-yellow-200 px-3 py-2">
+                                              <div className="flex items-center gap-2">
+                                                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                                                <p className="text-xs text-yellow-800">
+                                                  Low confidence vehicle match (
+                                                  {
+                                                    section.transport
+                                                      .ourVehicleMatch
+                                                      .confidence
+                                                  }
+                                                  %)
+                                                </p>
+                                              </div>
+                                            </div>
+                                          )}
+
+                                        {/* Departure/arrival times */}
+                                        {(section.departure?.time ||
+                                          section.arrival?.time) && (
+                                          <div className="mt-3 flex justify-between text-xs text-muted-foreground">
+                                            {section.departure?.time && (
+                                              <span>
+                                                Departs:{' '}
+                                                {new Date(
+                                                  section.departure.time,
+                                                ).toLocaleTimeString([], {
+                                                  hour: '2-digit',
+                                                  minute: '2-digit',
+                                                })}
+                                              </span>
+                                            )}
+                                            {section.arrival?.time && (
+                                              <span
+                                                className={`${(section.reports || []).some((r: any) => r.type === 'DELAY' || r.type === 'CANCELLED') ? 'bg-yellow-100 text-yellow-800 font-semibold px-1.5 py-0.5 rounded' : ''}`}
+                                              >
+                                                Arrives:{' '}
+                                                {new Date(
+                                                  section.arrival.time,
+                                                ).toLocaleTimeString([], {
+                                                  hour: '2-digit',
+                                                  minute: '2-digit',
+                                                })}
+                                              </span>
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )
+                                  },
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
                       </div>
                     )}
                   </div>
@@ -1273,6 +1859,468 @@ export default function RealtimeMap() {
           </div>
         </div>
       )}
+
+      {/* Reports Drawer */}
+      <Drawer
+        open={showReportsDrawer}
+        onOpenChange={setShowReportsDrawer}
+        modal={false}
+      >
+        <DrawerContent className="border-none bg-transparent shadow-none data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:border-none">
+          <div className="pointer-events-auto mx-auto w-full max-w-md px-4 pb-6">
+            <div className="rounded-3xl border border-border bg-card/95 shadow-2xl">
+              <DrawerClose asChild>
+                <button
+                  type="button"
+                  aria-label="Collapse reports drawer"
+                  className="mx-auto mt-2 flex h-6 w-full items-center justify-center"
+                >
+                  <span className="inline-block h-1 w-12 rounded-full bg-muted" />
+                </button>
+              </DrawerClose>
+
+              <div className="px-5 pb-5">
+                <div className="mt-5 space-y-4 text-sm">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-foreground">
+                      Nearby transit updates
+                    </h3>
+                    <span className="text-xs text-muted-foreground">
+                      2km radius
+                    </span>
+                  </div>
+
+                  {reportsLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : nearbyReports.length > 0 ? (
+                    <div className="space-y-3">
+                      {nearbyReports.map((report: any) => (
+                        <div
+                          key={report._id}
+                          className="rounded-2xl border border-border bg-muted/20 px-4 py-3"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-3">
+                              <span
+                                className={`mt-1 flex h-8 w-8 items-center justify-center rounded-full ${
+                                  report.type === 'DELAY'
+                                    ? 'bg-yellow-100 text-yellow-600'
+                                    : report.type === 'CANCELLED'
+                                      ? 'bg-red-100 text-red-600'
+                                      : report.type === 'CROWDED'
+                                        ? 'bg-orange-100 text-orange-600'
+                                        : report.type === 'ACCIDENT'
+                                          ? 'bg-red-100 text-red-700'
+                                          : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                <AlertTriangle className="h-4 w-4" />
+                              </span>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-medium text-foreground uppercase">
+                                      {report.type.toLowerCase()}
+                                    </span>
+                                    {report.route && (
+                                      <span className="rounded bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
+                                        {report.route.routeNumber}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <ReportVoting
+                                    reportId={report._id}
+                                    upvotes={report.upvotes || 0}
+                                    downvotes={report.downvotes || 0}
+                                    voteScore={
+                                      nearbyReportsScores[report._id] ||
+                                      (report.upvotes || 0) -
+                                        (report.downvotes || 0)
+                                    }
+                                    size="sm"
+                                    onUpdate={(newScore, deleted) => {
+                                      if (deleted) {
+                                        // Remove the report from the list
+                                        setNearbyReports((prev) =>
+                                          prev.filter(
+                                            (r) => r._id !== report._id,
+                                          ),
+                                        )
+                                      } else {
+                                        // Update the score in local state
+                                        setNearbyReportsScores((prev) => ({
+                                          ...prev,
+                                          [report._id]: newScore,
+                                        }))
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                {report.comment && (
+                                  <p className="text-sm text-muted-foreground mb-2">
+                                    {report.comment}
+                                  </p>
+                                )}
+                                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                  <span>
+                                    Reported{' '}
+                                    {report._creationTime
+                                      ? new Date(
+                                          report._creationTime,
+                                        ).toLocaleTimeString([], {
+                                          hour: '2-digit',
+                                          minute: '2-digit',
+                                        })
+                                      : 'Recently'}
+                                  </span>
+                                  {report.delayMinutes && (
+                                    <span className="text-orange-600">
+                                      {report.delayMinutes} min delay
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-border bg-muted/30 px-4 py-6 text-center">
+                      <AlertTriangle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">
+                        No recent reports in your area
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Be the first to report transit issues
+                      </p>
+                    </div>
+                  )}
+
+                  <Button
+                    asChild
+                    className="mt-4 h-12 w-full rounded-full bg-primary text-primary-foreground"
+                  >
+                    <Link href="/reports/register">
+                      <AlertTriangle className="mr-2 h-4 w-4" />
+                      Report an issue
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Transport Details Drawer */}
+      <Drawer
+        open={showTransportDrawer}
+        onOpenChange={setShowTransportDrawer}
+        modal={false}
+      >
+        <DrawerContent className="border-none bg-transparent shadow-none data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:border-none">
+          <div className="pointer-events-auto mx-auto w-full max-w-md px-4 pb-6">
+            <div className="rounded-3xl border border-border bg-card/95 shadow-2xl">
+              <DrawerClose asChild>
+                <button
+                  type="button"
+                  aria-label="Collapse transport drawer"
+                  className="mx-auto mt-2 flex h-6 w-full items-center justify-center"
+                >
+                  <span className="inline-block h-1 w-12 rounded-full bg-muted" />
+                </button>
+              </DrawerClose>
+
+              <div className="px-5 pb-5">
+                <div className="mt-5 space-y-4 text-sm">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-foreground">
+                      Transport Details
+                    </h3>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        selectedTransport?.mode === 'tram'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-blue-100 text-blue-700'
+                      }`}
+                    >
+                      {selectedTransport?.mode?.toUpperCase() || 'TRANSPORT'}
+                    </span>
+                  </div>
+
+                  {selectedTransport && (
+                    <div className="space-y-4">
+                      {/* Transport Info */}
+                      <div className="rounded-2xl border border-border bg-muted/20 px-4 py-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                                selectedTransport.mode === 'tram'
+                                  ? 'bg-green-100 text-green-600'
+                                  : 'bg-blue-100 text-blue-600'
+                              }`}
+                            >
+                              <span className="text-lg font-bold text-white">
+                                {selectedTransport.routeNumber}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-foreground">
+                                Route {selectedTransport.routeNumber}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Vehicle ID: {selectedTransport.vehicleId}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-muted-foreground">
+                              Status:
+                            </span>
+                            <span className="ml-1 font-medium text-green-600">
+                              Active
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">
+                              Last Update:
+                            </span>
+                            <span className="ml-1 font-medium">
+                              {selectedTransport.timestamp
+                                ? new Date(
+                                    selectedTransport.timestamp * 1000,
+                                  ).toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })
+                                : 'Unknown'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* GTFS Real-time Delays */}
+                      <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
+                        <h4 className="text-sm font-semibold text-blue-900 mb-2">
+                          Expected Delays (GTFS)
+                        </h4>
+                        {selectedTransport.gtfsDelayInfo ? (
+                          <div className="text-xs text-blue-700">
+                            <p className="flex items-center justify-between mb-1">
+                              <span>Status:</span>
+                              <span
+                                className={`font-medium ${
+                                  selectedTransport.gtfsDelayInfo
+                                    .delayStatus === 'Significant Delay'
+                                    ? 'text-red-600'
+                                    : selectedTransport.gtfsDelayInfo
+                                          .delayStatus === 'Minor Delay'
+                                      ? 'text-orange-600'
+                                      : selectedTransport.gtfsDelayInfo
+                                            .delayStatus === 'Early'
+                                        ? 'text-green-600'
+                                        : 'text-blue-600'
+                                }`}
+                              >
+                                {selectedTransport.gtfsDelayInfo.delayStatus}
+                              </span>
+                            </p>
+                            {selectedTransport.gtfsDelayInfo.expectedDelay !==
+                              0 && (
+                              <p className="flex items-center justify-between mb-1">
+                                <span>Expected Delay:</span>
+                                <span
+                                  className={`font-medium ${
+                                    selectedTransport.gtfsDelayInfo
+                                      .expectedDelay > 5
+                                      ? 'text-red-600'
+                                      : selectedTransport.gtfsDelayInfo
+                                            .expectedDelay > 2
+                                        ? 'text-orange-600'
+                                        : 'text-green-600'
+                                  }`}
+                                >
+                                  {selectedTransport.gtfsDelayInfo
+                                    .expectedDelay > 0
+                                    ? '+'
+                                    : ''}
+                                  {
+                                    selectedTransport.gtfsDelayInfo
+                                      .expectedDelay
+                                  }{' '}
+                                  min
+                                </span>
+                              </p>
+                            )}
+                            <p className="text-[0.6rem] text-blue-600 mt-2">
+                              Last updated:{' '}
+                              {new Date(
+                                selectedTransport.gtfsDelayInfo.lastUpdated,
+                              ).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-blue-700">
+                            <p>Loading real-time delay information...</p>
+                            <p className="mt-1">
+                              Status:{' '}
+                              <span className="font-medium">Checking</span>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* User Reports */}
+                      <div className="rounded-2xl border border-border bg-muted/20 px-4 py-3">
+                        <h4 className="text-sm font-semibold text-foreground mb-2">
+                          User Reports
+                        </h4>
+                        {transportReportsLoading ? (
+                          <div className="flex justify-center py-4">
+                            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                          </div>
+                        ) : transportReports.length > 0 ? (
+                          <div className="space-y-2">
+                            {transportReports.map((report: any) => (
+                              <div
+                                key={report._id}
+                                className="rounded-xl border border-border bg-card/60 px-3 py-2"
+                              >
+                                <div className="flex items-start gap-2">
+                                  <span
+                                    className={`mt-0.5 flex h-6 w-6 items-center justify-center rounded-full ${
+                                      report.type === 'DELAY'
+                                        ? 'bg-yellow-100 text-yellow-600'
+                                        : report.type === 'CANCELLED'
+                                          ? 'bg-red-100 text-red-600'
+                                          : report.type === 'CROWDED'
+                                            ? 'bg-orange-100 text-orange-600'
+                                            : report.type === 'ACCIDENT'
+                                              ? 'bg-red-100 text-red-700'
+                                              : 'bg-gray-100 text-gray-600'
+                                    }`}
+                                  >
+                                    <AlertTriangle className="h-3 w-3" />
+                                  </span>
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-xs font-medium text-foreground uppercase">
+                                          {report.type.toLowerCase()}
+                                        </span>
+                                        {report.delayMinutes && (
+                                          <span className="text-xs text-orange-600">
+                                            +{report.delayMinutes}min
+                                          </span>
+                                        )}
+                                        {report.hasProgressed !== undefined && (
+                                          <span
+                                            className={`text-xs px-1 py-0.5 rounded ${
+                                              report.hasProgressed
+                                                ? 'bg-gray-100 text-gray-600'
+                                                : 'bg-red-100 text-red-600'
+                                            }`}
+                                          >
+                                            {report.hasProgressed
+                                              ? 'Moved'
+                                              : 'Active'}
+                                          </span>
+                                        )}
+                                      </div>
+                                      <ReportVoting
+                                        reportId={report._id}
+                                        upvotes={report.upvotes || 0}
+                                        downvotes={report.downvotes || 0}
+                                        voteScore={
+                                          transportReportsScores[report._id] ||
+                                          (report.upvotes || 0) -
+                                            (report.downvotes || 0)
+                                        }
+                                        size="sm"
+                                        onUpdate={(newScore, deleted) => {
+                                          if (deleted) {
+                                            // Remove the report from the list
+                                            setTransportReports((prev) =>
+                                              prev.filter(
+                                                (r) => r._id !== report._id,
+                                              ),
+                                            )
+                                          } else {
+                                            // Update the score in local state
+                                            setTransportReportsScores(
+                                              (prev) => ({
+                                                ...prev,
+                                                [report._id]: newScore,
+                                              }),
+                                            )
+                                          }
+                                        }}
+                                      />
+                                    </div>
+                                    {report.comment && (
+                                      <p className="text-xs text-muted-foreground mb-1">
+                                        {report.comment}
+                                      </p>
+                                    )}
+                                    {report.issueStatus && (
+                                      <p className="text-[0.6rem] text-muted-foreground mb-1">
+                                        Status: {report.issueStatus}
+                                      </p>
+                                    )}
+                                    <p className="text-[0.6rem] text-muted-foreground">
+                                      Reported{' '}
+                                      {report._creationTime
+                                        ? new Date(
+                                            report._creationTime,
+                                          ).toLocaleTimeString([], {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                          })
+                                        : 'Recently'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-4">
+                            <p className="text-xs text-muted-foreground">
+                              No user reports for this transport
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Report Problem Button */}
+                      <Button
+                        asChild
+                        className="h-12 w-full rounded-full bg-primary text-primary-foreground"
+                      >
+                        <Link
+                          href={`/reports/register?tripId=${selectedTransport.tripId}&mode=${selectedTransport.mode}&route=${selectedTransport.routeNumber}&routeId=${selectedTransport.routeId}&vehicleId=${selectedTransport.vehicleId}`}
+                        >
+                          <AlertTriangle className="mr-2 h-4 w-4" />
+                          Report a problem with this transport
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
 
       {isSelectingPoint && (
         <div className="pointer-events-none absolute inset-x-0 bottom-8 z-30 flex justify-center px-4">

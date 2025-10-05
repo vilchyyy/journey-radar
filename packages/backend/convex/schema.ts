@@ -12,6 +12,7 @@ export default defineSchema({
     reportsSubmitted: v.number(), // Total number of reports submitted
     verifiedReports: v.number(), // Number of reports that were verified
     reputationScore: v.number(), // Overall reputation score for verification
+    receivedUpvotes: v.number(), // Number of upvotes received on reports
   })
     .index('by_token', ['tokenIdentifier'])
     .index('by_reputation', ['reputationScore']),
@@ -20,7 +21,8 @@ export default defineSchema({
   // REPORTS TABLE - Individual, raw reports from users
   // =================================================================
   reports: defineTable({
-    userId: v.id('users'),
+    userId: v.optional(v.id('users')), // Optional for anonymous reports
+    isAnonymous: v.boolean(), // Flag to indicate anonymous reports
     status: v.union(
       v.literal('UNVERIFIED'), // Just submitted
       v.literal('COMMUNITY_VERIFIED'), // Part of a verified cluster
@@ -42,7 +44,13 @@ export default defineSchema({
       v.literal('TRAM'),
     ),
 
-    route: v.id('routes'), // e.g., "52", "139", "SK1"
+    route: v.optional(v.id('routes')), // Optional to support GTFS-only routes
+    // GTFS route information (used when route is not in routes table)
+    gtfsRouteId: v.optional(v.string()),
+    gtfsTripId: v.optional(v.string()),
+    gtfsVehicleId: v.optional(v.string()),
+    routeShortName: v.optional(v.string()), // e.g., "52", "139"
+
     comment: v.optional(v.string()),
     delayMinutes: v.optional(v.number()),
     // Essential verification field
@@ -51,6 +59,10 @@ export default defineSchema({
     incidentId: v.optional(v.id('incidents')),
     // Link to the cluster this report belongs to
     clusterId: v.optional(v.id('reportClusters')),
+    // Voting fields
+    upvotes: v.optional(v.number()), // Number of upvotes (optional for backwards compatibility)
+    downvotes: v.optional(v.number()), // Number of downvotes (optional for backwards compatibility)
+    voteScore: v.optional(v.number()), // Net score (upvotes - downvotes) (optional for backwards compatibility)
   })
     // CRITICAL: Geospatial index for "find reports in map view" queries
     .index('by_user', ['userId'])
@@ -58,7 +70,11 @@ export default defineSchema({
     .index('by_incident', ['incidentId'])
     .index('by_cluster', ['clusterId'])
     .index('by_verification_score', ['verificationScore'])
-    .index('by_route', ['route']),
+    .index('by_transport', ['transportId'])
+    .index('by_route', ['route'])
+    .index('by_gtfs_route', ['gtfsRouteId'])
+    .index('by_gtfs_trip', ['gtfsTripId'])
+    .index('by_anonymous', ['isAnonymous']),
 
   // =================================================================
   // INCIDENTS TABLE - Source of truth from dispatchers or the system
@@ -198,4 +214,17 @@ export default defineSchema({
   })
     .index('by_route_number', ['routeNumber'])
     .index('by_active', ['isActive']),
+
+  // =================================================================
+  // REPORT VOTES TABLE - Tracks individual votes on reports
+  // =================================================================
+  reportVotes: defineTable({
+    reportId: v.id('reports'), // The report being voted on
+    userId: v.id('users'), // The user who voted
+    voteType: v.union(v.literal('UPVOTE'), v.literal('DOWNVOTE')), // Vote direction
+    createdAt: v.number(), // Unix timestamp when vote was cast
+  })
+    .index('by_report', ['reportId'])
+    .index('by_user', ['userId'])
+    .index('by_report_user', ['reportId', 'userId']), // Prevent duplicate votes
 })

@@ -9,6 +9,7 @@ interface VehicleMatchedRouteRequest {
   origin: RouteCoordinate
   destination: RouteCoordinate
   maxRadiusMeters?: number
+  alternatives?: number
 }
 
 interface VehicleInfo {
@@ -31,9 +32,9 @@ interface VehicleMatchedRouteResponse {
     id: string
     sections: Array<{
       id: string
-      type: string
+      type?: string
       transport?: {
-        mode: string
+        mode?: string
         name?: string
         category?: string
         color?: string
@@ -101,7 +102,12 @@ interface VehicleMatchedRouteResponse {
 export async function POST(request: NextRequest) {
   try {
     const body: VehicleMatchedRouteRequest = await request.json()
-    const { origin, destination, maxRadiusMeters = 500 } = body
+    const {
+      origin,
+      destination,
+      maxRadiusMeters = 500,
+      alternatives = 6,
+    } = body
 
     // Validate request
     if (!origin || !destination) {
@@ -111,28 +117,30 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // First, try to get public transport routes (buses and trams only)
+    // First, try to get public transport routes (buses and trams only) - request more alternatives
     const publicTransportResponse = await calculateRoute({
       origin,
       destination,
       return: ['polyline', 'travelSummary', 'actions', 'intermediate'],
+      alternatives, // Request N alternative routes
     })
 
     let routeResponse = publicTransportResponse
     let needsAlternativeRoutes = false
 
-    // If no public transport routes found, get all routes for fallback
+    // If no public transport routes found or less than desired routes, get all routes for fallback
     if (
       !publicTransportResponse.routes ||
-      publicTransportResponse.routes.length === 0
+      publicTransportResponse.routes.length < Math.min(5, alternatives)
     ) {
       console.log(
-        'No public transport routes found, getting all available routes...',
+        `Found ${publicTransportResponse.routes?.length || 0} routes, getting more alternatives...`,
       )
       const allRoutesResponse = await calculateRoute({
         origin,
         destination,
         return: ['polyline', 'travelSummary', 'actions', 'intermediate'],
+        alternatives, // Ensure we get alternatives
       })
       routeResponse = allRoutesResponse
       needsAlternativeRoutes = true
@@ -215,14 +223,30 @@ export async function POST(request: NextRequest) {
 
     console.log('Processing routes:', routeResponse.routes.length)
 
+    // Exclude any route that contains unsupported transit (e.g., trains). Keep ONLY walk/bus/tram routes.
+    const filteredRoutes = routeResponse.routes.filter((route) =>
+      route.sections.every((section) => {
+        const transportMode = section.transport?.mode?.toLowerCase()
+        const isPedestrian =
+          (section as any).type === 'pedestrian' || !section.transport
+        return (
+          isPedestrian || transportMode === 'bus' || transportMode === 'tram'
+        )
+      }),
+    )
+
+    console.log(
+      `Filtered to ${filteredRoutes.length} valid routes (bus/tram/walk only)`,
+    )
+
     // Process each route
     const processedRoutes = await Promise.all(
-      routeResponse.routes.map(async (route, routeIndex) => {
+      filteredRoutes.map(async (route, routeIndex) => {
         console.log(`Route ${routeIndex}: ${route.sections.length} sections`)
         const processedSections = await Promise.all(
           route.sections.map(async (section, sectionIndex) => {
             console.log(`Section ${sectionIndex}:`, {
-              type: section.type,
+              type: (section as any).type,
               transportMode: section.transport?.mode,
               transportName:
                 section.transport?.shortName || section.transport?.name,
@@ -276,19 +300,23 @@ export async function POST(request: NextRequest) {
                 (reportsByStatus[report.status] || 0) + 1
             })
 
+            const transport = section.transport
+              ? {
+                  ...section.transport,
+                  ourVehicleId: matchedVehicle?.id,
+                  ourVehicleMatch: matchedVehicle
+                    ? {
+                        vehicle: matchedVehicle,
+                        confidence: matchConfidence,
+                        reason: matchReason,
+                      }
+                    : undefined,
+                }
+              : undefined
+
             return {
               ...section,
-              transport: {
-                ...section.transport,
-                ourVehicleId: matchedVehicle?.id,
-                ourVehicleMatch: matchedVehicle
-                  ? {
-                      vehicle: matchedVehicle,
-                      confidence: matchConfidence,
-                      reason: matchReason,
-                    }
-                  : undefined,
-              },
+              transport,
               nearbyVehicles: nearbyVehicles.map((v) => ({
                 ...v,
                 reports: hasRecentReports(

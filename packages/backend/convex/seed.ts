@@ -3,6 +3,43 @@ import { internalMutation, mutation } from './_generated/server'
 import { geospatial } from './index'
 import { mockReports, mockRoutes, mockUsers } from './mock_data'
 
+// Migration function to add voting fields to existing reports
+export const migrateVotingFields = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const existingReports = await ctx.db.query('reports').collect()
+    let migratedCount = 0
+
+    for (const report of existingReports) {
+      // Only update if the voting fields don't exist
+      if (!('upvotes' in report) || !('downvotes' in report) || !('voteScore' in report)) {
+        await ctx.db.patch(report._id, {
+          upvotes: 0,
+          downvotes: 0,
+          voteScore: 0,
+        })
+        migratedCount++
+      }
+    }
+
+    // Add receivedUpvotes field to users if missing
+    const existingUsers = await ctx.db.query('users').collect()
+    let userMigratedCount = 0
+
+    for (const user of existingUsers) {
+      if (!('receivedUpvotes' in user)) {
+        await ctx.db.patch(user._id, {
+          receivedUpvotes: 0,
+        })
+        userMigratedCount++
+      }
+    }
+
+    console.log(`Migrated ${migratedCount} reports and ${userMigratedCount} users with voting fields`)
+    return { reportsMigrated: migratedCount, usersMigrated: userMigratedCount }
+  },
+})
+
 export const seedDatabase = internalMutation({
   args: {},
   handler: async (ctx) => {

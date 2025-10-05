@@ -6,6 +6,7 @@ import { ChevronUp, Database, Loader2, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -34,8 +35,19 @@ type FilterItem =
 
 export default function ReportsPage() {
   const [activeFilters, setActiveFilters] = useState<FilterItem[]>([])
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number
+    longitude: number
+  } | null>(null)
   const searchRadius = 50
-  const currentLocation = {
+
+  const handleReportDelete = (reportId: string) => {
+    // Handle report deletion (could refresh the data or update local state)
+    console.log('Report deleted:', reportId)
+  }
+
+  // Default location (Warsaw) - will be replaced with user's actual location
+  const currentLocation = userLocation || {
     latitude: 52.2297,
     longitude: 21.0122,
   }
@@ -71,6 +83,29 @@ export default function ReportsPage() {
   const removeFilter = (filterType: FilterItem['type']) => {
     setActiveFilters((prev) => prev.filter((f) => f.type !== filterType))
   }
+
+  // Get user's location on component mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          })
+        },
+        (error) => {
+          console.error('Error getting user location:', error)
+          // Keep default location if geolocation fails
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        },
+      )
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-background">
@@ -122,7 +157,11 @@ export default function ReportsPage() {
           </p>
         ) : (
           reports.map((report) => (
-            <ReportItem key={report._id} report={report} />
+            <ReportItem
+              key={report._id}
+              report={report}
+              onDelete={() => handleReportDelete(report._id)}
+            />
           ))
         )}
       </div>
