@@ -1,9 +1,10 @@
 'use client'
 
-import { Edit, Heart, LogOut, Shield, User, Wallet, Calendar, Settings, Menu } from 'lucide-react'
+import { Edit, LogOut, User, Wallet, FileText, Settings, Menu, Map } from 'lucide-react'
 import Link from 'next/link'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -15,11 +16,10 @@ import { cn } from '@/lib/utils'
 
 export function SidebarNavigation() {
   const navigationItems = [
+    { icon: Map, label: 'Map', href: '/map' },
     { icon: Wallet, label: 'Rewards', href: '/rewards' },
-    { icon: Calendar, label: 'Date', href: '/date' },
+    { icon: FileText, label: 'Reports', href: '/reports' },
     { icon: User, label: 'Profile', href: '/profile' },
-    { icon: Heart, label: 'Personalisation', href: '/personalisation' },
-    { icon: Shield, label: 'Security', href: '/security' },
     { icon: Settings, label: 'Settings', href: '/settings' },
   ]
 
@@ -79,15 +79,17 @@ export function SidebarNavigation() {
                 const Icon = item.icon
                 return (
                   <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "flex items-center gap-4 px-3 py-3 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                      )}
-                    >
-                      <Icon className="w-5 h-5 text-gray-700" />
-                      <span>{item.label}</span>
-                    </Link>
+                    <SheetClose asChild>
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          "flex items-center gap-4 px-3 py-3 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                        )}
+                      >
+                        <Icon className="w-5 h-5 text-gray-700" />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SheetClose>
                   </li>
                 )
               })}
@@ -96,12 +98,14 @@ export function SidebarNavigation() {
 
           {/* Logout Link */}
           <div className="pt-8 border-t">
-            <Link
-              href="/logout"
-              className="flex items-center text-teal-500 font-medium underline hover:text-teal-600 transition-colors"
-            >
-              Logout
-            </Link>
+            <SheetClose asChild>
+              <Link
+                href="/logout"
+                className="flex items-center text-teal-500 font-medium underline hover:text-teal-600 transition-colors"
+              >
+                Logout
+              </Link>
+            </SheetClose>
           </div>
         </div>
       </SheetContent>
