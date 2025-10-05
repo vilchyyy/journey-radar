@@ -23,6 +23,7 @@ import type * as reports from "../reports.js";
 import type * as routes from "../routes.js";
 import type * as scheduler from "../scheduler.js";
 import type * as seed from "../seed.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   routes: typeof routes;
   scheduler: typeof scheduler;
   seed: typeof seed;
+  users: typeof users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

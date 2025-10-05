@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { convex, api } from '@/lib/convex-client'
+import { api, convex } from '@/lib/convex-client'
 
 export const runtime = 'nodejs'
 
@@ -16,7 +16,7 @@ export async function GET() {
       description: report.description,
       userPoints: report.userPoints,
       location: report.location,
-      _creationTime: report._creationTime
+      _creationTime: report._creationTime,
     }))
 
     return NextResponse.json(transformedReports, {
@@ -31,7 +31,42 @@ export async function GET() {
     console.error('Error fetching reports:', error)
     return NextResponse.json(
       { error: 'Failed to fetch reports' },
-      { status: 500 }
+      { status: 500 },
+    )
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const { latitude, longitude, radiusKm = 2 } = await request.json()
+
+    if (!latitude || !longitude) {
+      return NextResponse.json(
+        { error: 'Missing required fields: latitude and longitude' },
+        { status: 400 }
+      )
+    }
+
+    // Fetch nearby reports from Convex database
+    const nearbyReports = await convex.query(api.reports.findNearbyReports, {
+      center: { latitude, longitude },
+      radiusKm,
+      limit: 100,
+    })
+
+    return NextResponse.json(nearbyReports, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Cache-Control': 'no-store, max-age=0',
+      },
+    })
+  } catch (error) {
+    console.error('Error fetching nearby reports:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch nearby reports' },
+      { status: 500 },
     )
   }
 }
@@ -41,7 +76,7 @@ export async function OPTIONS() {
     status: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     },
   })

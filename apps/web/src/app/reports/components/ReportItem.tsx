@@ -2,7 +2,10 @@
 
 import type { Doc } from '@journey-radar/backend/convex/_generated/dataModel'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
+import { ReportVoting } from '@/components/report-voting'
+import { useState } from 'react'
 
 interface ReportItemProps {
   report: Doc<'reports'> & {
@@ -10,20 +13,55 @@ interface ReportItemProps {
       latitude: number
       longitude: number
     }
-    transportInfo: Partial<Doc<'routes'>>
+    transportInfo?: Partial<Doc<'routes'>>
     distance: number
   }
+  onDelete?: () => void
 }
 
-export function ReportItem({ report }: ReportItemProps) {
+export function ReportItem({ report, onDelete }: ReportItemProps) {
+  const [currentVoteScore, setCurrentVoteScore] = useState(
+    (report.upvotes || 0) - (report.downvotes || 0)
+  )
+  const router = useRouter()
   const isVerified =
     report.status === 'COMMUNITY_VERIFIED' ||
     report.status === 'OFFICIAL_CONFIRMED'
   const formattedDistance = formatDistance(report.distance)
   const formattedDate = formatDate(report._creationTime)
 
+  const handleClick = () => {
+    // Build query params to identify the vehicle on the map
+    const params = new URLSearchParams()
+
+    if (report.gtfsVehicleId) {
+      params.set('vehicleId', report.gtfsVehicleId)
+    }
+    if (report.gtfsTripId) {
+      params.set('tripId', report.gtfsTripId)
+    }
+    if (report.gtfsRouteId) {
+      params.set('routeId', report.gtfsRouteId)
+    }
+    if (report.routeShortName) {
+      params.set('route', report.routeShortName)
+    }
+    if (report.transportMode) {
+      params.set('mode', report.transportMode.toLowerCase())
+    }
+
+    // Add location for centering the map
+    params.set('lat', report.location.latitude.toString())
+    params.set('lng', report.location.longitude.toString())
+
+    router.push(`/map?${params.toString()}`)
+  }
+
   return (
-    <div className="relative bg-card rounded-2xl border border-primary p-4 shadow-lg">
+    <div
+      className="relative bg-card rounded-2xl border border-primary p-4 shadow-lg cursor-pointer hover:border-primary/80 hover:shadow-xl transition-all"
+      onClick={handleClick}
+    >
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
           <span className="capitalize">{report.type.toLowerCase()}</span>
@@ -31,15 +69,31 @@ export function ReportItem({ report }: ReportItemProps) {
             <span className="ml-2">{report.delayMinutes} min</span>
           )}
         </div>
-        <span className="text-sm text-primary font-medium">
-          {formattedDistance}
-        </span>
+        <div className="flex items-center gap-2">
+          <ReportVoting
+            reportId={report._id}
+            upvotes={report.upvotes || 0}
+            downvotes={report.downvotes || 0}
+            voteScore={currentVoteScore}
+            size="sm"
+            onUpdate={(newScore, deleted) => {
+              if (deleted) {
+                onDelete?.()
+              } else {
+                setCurrentVoteScore(newScore)
+              }
+            }}
+          />
+          <span className="text-sm text-primary font-medium">
+            {formattedDistance}
+          </span>
+        </div>
       </div>
       <div className="w-full flex flex-col justify-center mt-2 p-2">
         <h3 className="font-semibold text-foreground mb-1">
-          {report.transportInfo.source && report.transportInfo.destination
+          {report.transportInfo?.source && report.transportInfo?.destination
             ? `${report.transportInfo.source} - ${report.transportInfo.destination}`
-            : `Route ${report.transportInfo.routeNumber || 'Unknown'}`}
+            : `Route ${report.routeShortName || report.transportInfo?.routeNumber || 'Unknown'}`}
         </h3>
         <div className="flex flex-col items-center">
           <Separator className="my-2 bg-primary" />

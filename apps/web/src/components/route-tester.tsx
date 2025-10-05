@@ -2,6 +2,7 @@
 
 import { useForm } from '@tanstack/react-form'
 import { useState } from 'react'
+import RouteMap from '@/components/route-map'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -13,7 +14,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { RouteCoordinate } from '@/lib/route-service'
-import RouteMap from '@/components/route-map'
 
 interface RouteData {
   routes?: any[]
@@ -23,8 +23,11 @@ export function RouteTester() {
   const [isLoading, setIsLoading] = useState(false)
   const [routeData, setRouteData] = useState<RouteData | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [currentOrigin, setCurrentOrigin] = useState<RouteCoordinate | null>(null)
-  const [currentDestination, setCurrentDestination] = useState<RouteCoordinate | null>(null)
+  const [currentOrigin, setCurrentOrigin] = useState<RouteCoordinate | null>(
+    null,
+  )
+  const [currentDestination, setCurrentDestination] =
+    useState<RouteCoordinate | null>(null)
 
   const form = useForm({
     defaultValues: {
@@ -185,12 +188,13 @@ export function RouteTester() {
         </Card>
       )}
 
-      {(currentOrigin && currentDestination) && (
+      {currentOrigin && currentDestination && (
         <Card>
           <CardHeader>
             <CardTitle>Route Map</CardTitle>
             <CardDescription>
-              Visual representation of the calculated route with live vehicle positions
+              Visual representation of the calculated route with live vehicle
+              positions
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -212,7 +216,8 @@ export function RouteTester() {
               route options
               {routeData.summary?.totalReports > 0 && (
                 <span className="text-orange-600">
-                  {' '}• {routeData.summary.totalReports} nearby reports found
+                  {' '}
+                  • {routeData.summary.totalReports} nearby reports found
                 </span>
               )}
             </CardDescription>
@@ -287,7 +292,12 @@ export function RouteTester() {
                           <strong>Instructions:</strong>
                           <ul className="list-disc list-inside text-sm">
                             {section.actions.map((action) => (
-                              <li key={action.id || `${action.type}-${action.instruction}`}>
+                              <li
+                                key={
+                                  action.id ||
+                                  `${action.type}-${action.instruction}`
+                                }
+                              >
                                 {action.instruction ||
                                   action.action ||
                                   `${action.type} ${action.duration || ''}`}
@@ -305,54 +315,67 @@ export function RouteTester() {
                               Stops ({section.intermediateStops.length}):
                             </strong>
                             <ul className="list-disc list-inside text-sm max-h-20 overflow-y-auto">
-                              {section.intermediateStops.map(
-                                (stop) => (
-                                  <li key={stop.id || stop.place?.name || `${stop.place?.location?.lat}-${stop.place?.location?.lng}`}>
-                                    {stop.place?.name ||
-                                      `Stop`}
-                                    {stop.reports && stop.reports.length > 0 && (
-                                      <span className="text-orange-600 ml-1">
-                                        🚨 {stop.reports.length} reports
-                                      </span>
-                                    )}
-                                    {stop.departure && (
-                                      <span>
-                                        {' '}
-                                        -{' '}
-                                        {new Date(
-                                          stop.departure.time,
-                                        ).toLocaleTimeString()}
-                                      </span>
-                                    )}
-                                  </li>
-                                ),
-                              )}
+                              {section.intermediateStops.map((stop) => (
+                                <li
+                                  key={
+                                    stop.id ||
+                                    stop.place?.name ||
+                                    `${stop.place?.location?.lat}-${stop.place?.location?.lng}`
+                                  }
+                                >
+                                  {stop.place?.name || `Stop`}
+                                  {stop.reports && stop.reports.length > 0 && (
+                                    <span className="text-orange-600 ml-1">
+                                      🚨 {stop.reports.length} reports
+                                    </span>
+                                  )}
+                                  {stop.departure && (
+                                    <span>
+                                      {' '}
+                                      -{' '}
+                                      {new Date(
+                                        stop.departure.time,
+                                      ).toLocaleTimeString()}
+                                    </span>
+                                  )}
+                                </li>
+                              ))}
                             </ul>
                           </div>
                         )}
 
                       {/* Nearby Reports */}
-                      {section.nearbyReports && section.nearbyReports.length > 0 && (
-                        <div className="mb-2 bg-orange-50 p-2 rounded">
-                          <strong className="text-orange-800">
-                            Nearby Reports ({section.nearbyReports.length}):
-                          </strong>
-                          <ul className="list-disc list-inside text-sm mt-1">
-                            {section.nearbyReports.slice(0, 3).map((report) => (
-                              <li key={report.id} className="text-orange-700">
-                                {report.type} ({report.status}) - {report.distance}m
-                                <br />
-                                <span className="text-xs">{report.description}</span>
-                              </li>
-                            ))}
-                            {section.nearbyReports.length > 3 && (
-                              <li className="text-xs italic">
-                                ... and {section.nearbyReports.length - 3} more reports
-                              </li>
-                            )}
-                          </ul>
-                        </div>
-                      )}
+                      {section.nearbyReports &&
+                        section.nearbyReports.length > 0 && (
+                          <div className="mb-2 bg-orange-50 p-2 rounded">
+                            <strong className="text-orange-800">
+                              Nearby Reports ({section.nearbyReports.length}):
+                            </strong>
+                            <ul className="list-disc list-inside text-sm mt-1">
+                              {section.nearbyReports
+                                .slice(0, 3)
+                                .map((report) => (
+                                  <li
+                                    key={report.id}
+                                    className="text-orange-700"
+                                  >
+                                    {report.type} ({report.status}) -{' '}
+                                    {report.distance}m
+                                    <br />
+                                    <span className="text-xs">
+                                      {report.description}
+                                    </span>
+                                  </li>
+                                ))}
+                              {section.nearbyReports.length > 3 && (
+                                <li className="text-xs italic">
+                                  ... and {section.nearbyReports.length - 3}{' '}
+                                  more reports
+                                </li>
+                              )}
+                            </ul>
+                          </div>
+                        )}
 
                       {/* Polyline info */}
                       {section.polyline && (
@@ -373,22 +396,32 @@ export function RouteTester() {
             {/* Reports Summary */}
             {routeData.summary && routeData.summary.totalReports > 0 && (
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                <h3 className="font-semibold mb-2 text-orange-800">Reports Summary</h3>
+                <h3 className="font-semibold mb-2 text-orange-800">
+                  Reports Summary
+                </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <strong>By Type:</strong>
                     <ul className="ml-4">
-                      {Object.entries(routeData.summary.reportsByType).map(([type, count]) => (
-                        <li key={type}>{type}: {count}</li>
-                      ))}
+                      {Object.entries(routeData.summary.reportsByType).map(
+                        ([type, count]) => (
+                          <li key={type}>
+                            {type}: {count}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </div>
                   <div>
                     <strong>By Status:</strong>
                     <ul className="ml-4">
-                      {Object.entries(routeData.summary.reportsByStatus).map(([status, count]) => (
-                        <li key={status}>{status}: {count}</li>
-                      ))}
+                      {Object.entries(routeData.summary.reportsByStatus).map(
+                        ([status, count]) => (
+                          <li key={status}>
+                            {status}: {count}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </div>
                 </div>

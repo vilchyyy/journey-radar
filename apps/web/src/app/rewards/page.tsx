@@ -1,14 +1,15 @@
 'use client'
 
 import {
-  Plus,
-  Gift,
-  Clock,
   AlertCircle,
+  Calendar,
   CheckCircle,
+  Clock,
+  Gift,
+  Plus,
   TrendingUp,
-  Calendar
 } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -18,7 +19,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import Link from 'next/link'
 
 export default function RewardsPage() {
   const recentActivities = [
@@ -30,7 +30,7 @@ export default function RewardsPage() {
       points: 10,
       icon: Plus,
       iconBg: 'bg-green-100',
-      iconColor: 'text-green-600'
+      iconColor: 'text-green-600',
     },
     {
       id: 2,
@@ -40,7 +40,7 @@ export default function RewardsPage() {
       points: 5,
       icon: CheckCircle,
       iconBg: 'bg-green-100',
-      iconColor: 'text-green-600'
+      iconColor: 'text-green-600',
     },
     {
       id: 3,
@@ -50,7 +50,7 @@ export default function RewardsPage() {
       points: 8,
       icon: Plus,
       iconBg: 'bg-green-100',
-      iconColor: 'text-green-600'
+      iconColor: 'text-green-600',
     },
     {
       id: 4,
@@ -60,7 +60,7 @@ export default function RewardsPage() {
       points: -50,
       icon: Gift,
       iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600'
+      iconColor: 'text-blue-600',
     },
     {
       id: 5,
@@ -70,8 +70,8 @@ export default function RewardsPage() {
       points: 25,
       icon: TrendingUp,
       iconBg: 'bg-green-100',
-      iconColor: 'text-green-600'
-    }
+      iconColor: 'text-green-600',
+    },
   ]
 
   return (
@@ -106,7 +106,9 @@ export default function RewardsPage() {
         {/* Rewards Summary Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-center text-lg">Your Rewards Summary</CardTitle>
+            <CardTitle className="text-center text-lg">
+              Your Rewards Summary
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
@@ -134,7 +136,8 @@ export default function RewardsPage() {
           <CardHeader>
             <CardTitle className="text-lg">Earn More Points</CardTitle>
             <CardDescription>
-              Contribute to the community by reporting delays, cancellations, and overcrowding.
+              Contribute to the community by reporting delays, cancellations,
+              and overcrowding.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -150,7 +153,9 @@ export default function RewardsPage() {
         <div className="space-y-4">
           {/* Section Title */}
           <div className="px-2">
-            <p className="text-sm font-medium text-muted-foreground">Recent Activity</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Recent Activity
+            </p>
           </div>
 
           {/* Recent Activity Card */}
@@ -164,11 +169,15 @@ export default function RewardsPage() {
                       <div className="flex items-center justify-between">
                         {/* Left Side - Action */}
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 ${activity.iconBg} rounded-full flex items-center justify-center`}>
+                          <div
+                            className={`w-10 h-10 ${activity.iconBg} rounded-full flex items-center justify-center`}
+                          >
                             <Icon className={`w-5 h-5 ${activity.iconColor}`} />
                           </div>
                           <div>
-                            <p className="font-medium text-foreground">{activity.title}</p>
+                            <p className="font-medium text-foreground">
+                              {activity.title}
+                            </p>
                             <div className="flex items-center gap-1 text-sm text-muted-foreground">
                               <Clock className="w-3 h-3" />
                               <span>{activity.timestamp}</span>
@@ -177,17 +186,22 @@ export default function RewardsPage() {
                         </div>
 
                         {/* Right Side - Points */}
-                        <div className={`font-semibold ${
-                          activity.type === 'earned'
-                            ? 'text-green-600'
-                            : 'text-gray-600'
-                        }`}>
-                          {activity.type === 'earned' ? '+' : ''}{activity.points} Points
+                        <div
+                          className={`font-semibold ${
+                            activity.type === 'earned'
+                              ? 'text-green-600'
+                              : 'text-gray-600'
+                          }`}
+                        >
+                          {activity.type === 'earned' ? '+' : ''}
+                          {activity.points} Points
                         </div>
                       </div>
 
                       {/* Add separator except for last item */}
-                      {index < recentActivities.length - 1 && <Separator className="mt-4" />}
+                      {index < recentActivities.length - 1 && (
+                        <Separator className="mt-4" />
+                      )}
                     </div>
                   )
                 })}
@@ -195,7 +209,10 @@ export default function RewardsPage() {
 
               {/* View All Activity Link */}
               <div className="mt-6 pt-4 border-t">
-                <Link href="/rewards/activity" className="flex items-center justify-center text-teal-600 hover:text-teal-700 font-medium">
+                <Link
+                  href="/rewards/activity"
+                  className="flex items-center justify-center text-teal-600 hover:text-teal-700 font-medium"
+                >
                   <span>View All Activity</span>
                   <svg
                     className="w-4 h-4 ml-1"

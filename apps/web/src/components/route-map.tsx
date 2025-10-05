@@ -26,7 +26,11 @@ interface RouteMapProps {
   destination?: RouteCoordinate
 }
 
-export default function RouteMap({ routeData, origin, destination }: RouteMapProps) {
+export default function RouteMap({
+  routeData,
+  origin,
+  destination,
+}: RouteMapProps) {
   const [vehicles, setVehicles] = useState<VehiclePosition[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -37,23 +41,42 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
   })
 
   // MapLibre style URL - using a CORS-compliant style
-  const mapStyle = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+  const mapStyle =
+    'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
 
   const rid = useId()
   const sourceId = useMemo(() => `vehicles-${rid.replace(/[:]/g, '')}`, [rid])
-  const layerId = useMemo(() => `vehicle-points-${rid.replace(/[:]/g, '')}`, [rid])
-  const labelsLayerId = useMemo(() => `vehicle-labels-${rid.replace(/[:]/g, '')}`, [rid])
-  const routesSourceId = useMemo(() => `routes-${rid.replace(/[:]/g, '')}`, [rid])
-  const routeLayerId = useMemo(() => `route-lines-${rid.replace(/[:]/g, '')}`, [rid])
-  const pointsSourceId = useMemo(() => `points-${rid.replace(/[:]/g, '')}`, [rid])
-  const pointsLayerId = useMemo(() => `point-markers-${rid.replace(/[:]/g, '')}`, [rid])
+  const layerId = useMemo(
+    () => `vehicle-points-${rid.replace(/[:]/g, '')}`,
+    [rid],
+  )
+  const labelsLayerId = useMemo(
+    () => `vehicle-labels-${rid.replace(/[:]/g, '')}`,
+    [rid],
+  )
+  const routesSourceId = useMemo(
+    () => `routes-${rid.replace(/[:]/g, '')}`,
+    [rid],
+  )
+  const routeLayerId = useMemo(
+    () => `route-lines-${rid.replace(/[:]/g, '')}`,
+    [rid],
+  )
+  const pointsSourceId = useMemo(
+    () => `points-${rid.replace(/[:]/g, '')}`,
+    [rid],
+  )
+  const pointsLayerId = useMemo(
+    () => `point-markers-${rid.replace(/[:]/g, '')}`,
+    [rid],
+  )
 
   // Fit map to show route bounds
   useEffect(() => {
     if (routeData?.routes?.[0]?.sections) {
       const allPoints: RouteCoordinate[] = []
 
-      routeData.routes[0].sections.forEach(section => {
+      routeData.routes[0].sections.forEach((section) => {
         if (section.geometry) {
           allPoints.push(...section.geometry)
         }
@@ -64,7 +87,7 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
           allPoints.push(section.arrival.place.location)
         }
         if (section.intermediateStops) {
-          section.intermediateStops.forEach(stop => {
+          section.intermediateStops.forEach((stop) => {
             if (stop.place?.location) {
               allPoints.push(stop.place.location)
             }
@@ -73,14 +96,14 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
       })
 
       if (allPoints.length > 0) {
-        const lats = allPoints.map(p => p.lat)
-        const lngs = allPoints.map(p => p.lng)
+        const lats = allPoints.map((p) => p.lat)
+        const lngs = allPoints.map((p) => p.lng)
 
         const bounds = {
           north: Math.max(...lats),
           south: Math.min(...lats),
           east: Math.max(...lngs),
-          west: Math.min(...lngs)
+          west: Math.min(...lngs),
         }
 
         // Add some padding
@@ -90,7 +113,19 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
         setViewState({
           longitude: (bounds.west + bounds.east) / 2,
           latitude: (bounds.north + bounds.south) / 2,
-          zoom: Math.min(14, Math.max(8, Math.log2(360 / Math.max(bounds.east - bounds.west + lngPadding * 2, bounds.north - bounds.south + latPadding * 2))))
+          zoom: Math.min(
+            14,
+            Math.max(
+              8,
+              Math.log2(
+                360 /
+                  Math.max(
+                    bounds.east - bounds.west + lngPadding * 2,
+                    bounds.north - bounds.south + latPadding * 2,
+                  ),
+              ),
+            ),
+          ),
         })
       }
     }
@@ -121,26 +156,29 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
   const routeGeoJSON = useMemo(() => {
     if (!routeData?.routes) return null
 
-    const features = routeData.routes.flatMap(route =>
+    const features = routeData.routes.flatMap((route) =>
       route.sections
-        .filter(section => section.geometry && section.geometry.length > 0)
+        .filter((section) => section.geometry && section.geometry.length > 0)
         .map((section, index) => ({
           type: 'Feature' as const,
           geometry: {
             type: 'LineString' as const,
-            coordinates: section.geometry.map(coord => [coord.lng, coord.lat])
+            coordinates: section.geometry.map((coord) => [
+              coord.lng,
+              coord.lat,
+            ]),
           },
           properties: {
             id: section.id,
             mode: section.transport?.mode || 'unknown',
-            index
-          }
-        }))
+            index,
+          },
+        })),
     )
 
     return {
       type: 'FeatureCollection' as const,
-      features
+      features,
     }
   }, [routeData])
 
@@ -153,12 +191,12 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
         type: 'Feature' as const,
         geometry: {
           type: 'Point' as const,
-          coordinates: [origin.lng, origin.lat]
+          coordinates: [origin.lng, origin.lat],
         },
         properties: {
           type: 'origin',
-          name: 'Origin'
-        }
+          name: 'Origin',
+        },
       })
     }
 
@@ -167,31 +205,34 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
         type: 'Feature' as const,
         geometry: {
           type: 'Point' as const,
-          coordinates: [destination.lng, destination.lat]
+          coordinates: [destination.lng, destination.lat],
         },
         properties: {
           type: 'destination',
-          name: 'Destination'
-        }
+          name: 'Destination',
+        },
       })
     }
 
     // Add intermediate stops
     if (routeData?.routes?.[0]?.sections) {
-      routeData.routes[0].sections.forEach(section => {
+      routeData.routes[0].sections.forEach((section) => {
         if (section.intermediateStops) {
-          section.intermediateStops.forEach(stop => {
+          section.intermediateStops.forEach((stop) => {
             if (stop.place?.location) {
               features.push({
                 type: 'Feature' as const,
                 geometry: {
                   type: 'Point' as const,
-                  coordinates: [stop.place.location.lng, stop.place.location.lat]
+                  coordinates: [
+                    stop.place.location.lng,
+                    stop.place.location.lat,
+                  ],
                 },
                 properties: {
                   type: 'stop',
-                  name: stop.place.name || 'Stop'
-                }
+                  name: stop.place.name || 'Stop',
+                },
               })
             }
           })
@@ -201,27 +242,30 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
 
     return {
       type: 'FeatureCollection' as const,
-      features
+      features,
     }
   }, [origin, destination, routeData])
 
   // Vehicle GeoJSON
-  const vehicleGeoJSON = useMemo(() => ({
-    type: 'FeatureCollection' as const,
-    features: vehicles.map(vehicle => ({
-      type: 'Feature' as const,
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [vehicle.position.longitude, vehicle.position.latitude]
-      },
-      properties: {
-        id: vehicle.vehicle.id,
-        route: vehicle.vehicle.route_id,
-        label: vehicle.vehicle.route_id,
-        mode: vehicle.vehicle.route_id?.includes('TRAM') ? 'tram' : 'bus'
-      }
-    }))
-  }), [vehicles])
+  const vehicleGeoJSON = useMemo(
+    () => ({
+      type: 'FeatureCollection' as const,
+      features: vehicles.map((vehicle) => ({
+        type: 'Feature' as const,
+        geometry: {
+          type: 'Point' as const,
+          coordinates: [vehicle.position.longitude, vehicle.position.latitude],
+        },
+        properties: {
+          id: vehicle.vehicle.id,
+          route: vehicle.vehicle.route_id,
+          label: vehicle.vehicle.route_id,
+          mode: vehicle.vehicle.route_id?.includes('TRAM') ? 'tram' : 'bus',
+        },
+      })),
+    }),
+    [vehicles],
+  )
 
   if (error) {
     return (
@@ -243,7 +287,7 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
     <div className="w-full h-96 relative">
       <MapGL
         {...viewState}
-        onMove={evt => setViewState(evt.viewState)}
+        onMove={(evt) => setViewState(evt.viewState)}
         style={{ width: '100%', height: '100%' }}
         mapStyle={mapStyle}
       >
@@ -256,7 +300,7 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
               paint={{
                 'line-color': '#3b82f6',
                 'line-width': 4,
-                'line-opacity': 0.8
+                'line-opacity': 0.8,
               }}
             />
           </Source>
@@ -272,21 +316,27 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
                 'circle-radius': [
                   'match',
                   ['get', 'type'],
-                  'origin', 8,
-                  'destination', 8,
-                  'stop', 5,
-                  4
+                  'origin',
+                  8,
+                  'destination',
+                  8,
+                  'stop',
+                  5,
+                  4,
                 ],
                 'circle-color': [
                   'match',
                   ['get', 'type'],
-                  'origin', '#22c55e',
-                  'destination', '#ef4444',
-                  'stop', '#f59e0b',
-                  '#3b82f6'
+                  'origin',
+                  '#22c55e',
+                  'destination',
+                  '#ef4444',
+                  'stop',
+                  '#f59e0b',
+                  '#3b82f6',
                 ],
                 'circle-stroke-color': '#ffffff',
-                'circle-stroke-width': 2
+                'circle-stroke-width': 2,
               }}
             />
           </Source>
@@ -299,9 +349,15 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
             type="circle"
             paint={{
               'circle-radius': 6,
-              'circle-color': ['match', ['get', 'mode'], 'tram', '#dc2626', '#059669'],
+              'circle-color': [
+                'match',
+                ['get', 'mode'],
+                'tram',
+                '#dc2626',
+                '#059669',
+              ],
               'circle-stroke-color': '#ffffff',
-              'circle-stroke-width': 2
+              'circle-stroke-width': 2,
             }}
           />
           <Layer
@@ -312,12 +368,12 @@ export default function RouteMap({ routeData, origin, destination }: RouteMapPro
               'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
               'text-size': 12,
               'text-offset': [0, 1.5],
-              'text-anchor': 'top'
+              'text-anchor': 'top',
             }}
             paint={{
               'text-color': '#000000',
               'text-halo-color': '#ffffff',
-              'text-halo-width': 2
+              'text-halo-width': 2,
             }}
           />
         </Source>

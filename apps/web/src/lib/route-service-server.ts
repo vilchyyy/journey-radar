@@ -9,6 +9,8 @@ export interface RouteRequest {
   origin: RouteCoordinate
   destination: RouteCoordinate
   return?: string[]
+  // Ask the API for alternative routes; can be boolean or a number of alternatives
+  alternatives?: boolean | number
 }
 
 export interface RouteResponse {
@@ -22,13 +24,36 @@ export interface Route {
 
 export interface RouteSection {
   id: string
+  // HERE may include a section type like 'transit' or 'pedestrian'
+  type?: string
   departure: RoutePoint
   arrival: RoutePoint
   polyline: string
   geometry: RouteCoordinate[]
-  transport: {
+  transport?: {
     mode: string
+    name?: string
+    category?: string
+    color?: string
+    textColor?: string
+    headsign?: string
+    shortName?: string
+    longName?: string
   }
+  // Optional extras frequently returned from HERE
+  travelSummary?: any
+  actions?: any[]
+  intermediateStops?: Array<{
+    id?: string
+    place: {
+      id?: string
+      name?: string
+      location: RouteCoordinate
+      wheelchairAccessible?: string
+    }
+    departure?: any
+    arrival?: any
+  }>
 }
 
 export interface RoutePoint {
@@ -50,6 +75,7 @@ export async function calculateRoute(
       'actions',
       'intermediate',
     ],
+    alternatives,
   } = request
 
   const baseUrl =
@@ -64,6 +90,14 @@ export async function calculateRoute(
   )
   url.searchParams.append('return', returnParams.join(','))
   url.searchParams.append('apikey', apiKey)
+  if (typeof alternatives !== 'undefined') {
+    // HERE APIs accept either a boolean or a count for alternatives (varies by product);
+    // we set the parameter directly. Fallback to 'true' when boolean.
+    url.searchParams.append(
+      'alternatives',
+      typeof alternatives === 'number' ? String(alternatives) : 'true',
+    )
+  }
 
   console.log('Return params:', returnParams)
   console.log('Full URL:', url.toString())

@@ -1,7 +1,18 @@
 'use client'
 
-import { Edit, LogOut, User, Wallet, FileText, Settings, Menu, Map } from 'lucide-react'
+import {
+  Edit,
+  FileText,
+  LogOut,
+  Map,
+  Menu,
+  Settings,
+  User,
+  Wallet,
+} from 'lucide-react'
 import Link from 'next/link'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   Sheet,
   SheetClose,
@@ -10,8 +21,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 
 export function SidebarNavigation() {
@@ -35,10 +44,7 @@ export function SidebarNavigation() {
         </Button>
       </SheetTrigger>
 
-      <SheetContent
-        side="left"
-        className="w-80 p-0 rounded-r-2xl"
-      >
+      <SheetContent side="left" className="w-80 p-0 rounded-r-2xl">
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
         {/* Header Section */}
@@ -83,7 +89,7 @@ export function SidebarNavigation() {
                       <Link
                         href={item.href}
                         className={cn(
-                          "flex items-center gap-4 px-3 py-3 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                          'flex items-center gap-4 px-3 py-3 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors',
                         )}
                       >
                         <Icon className="w-5 h-5 text-gray-700" />
