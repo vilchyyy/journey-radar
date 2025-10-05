@@ -19,6 +19,7 @@ import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
 import type * as incidents from "../incidents.js";
 import type * as index from "../index.js";
+import type * as init from "../init.js";
 import type * as journeyPlanner from "../journeyPlanner.js";
 import type * as migrations_rewards from "../migrations/rewards.js";
 import type * as mock_data from "../mock_data.js";
@@ -57,6 +58,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   incidents: typeof incidents;
   index: typeof index;
+  init: typeof init;
   journeyPlanner: typeof journeyPlanner;
   "migrations/rewards": typeof migrations_rewards;
   mock_data: typeof mock_data;
