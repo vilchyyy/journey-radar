@@ -35,7 +35,8 @@ export const createAuth = (
       'http://127.0.0.1:3211',
       'http://localhost:3210',
       'http://127.0.0.1:3210',
-      '*'
+      '*',
+      'https://journey-radar-web.vercel.app'
     ],
     plugins: [
       // The Convex plugin is required for Convex compatibility
