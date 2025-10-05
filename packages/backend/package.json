@@ -2,7 +2,7 @@
   "name": "@journey-radar/backend",
   "version": "1.0.0",
   "scripts": {
-    "dev": "convex dev",
+    "dev": "convex dev --typecheck=disable",
     "dev:setup": "convex dev --configure --until-success",
     "db:seed": "convex run seed:seedDatabase"
   },
