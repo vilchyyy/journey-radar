@@ -8,31 +8,33 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
+import type * as authActions from "../authActions.js";
+import type * as cleanup from "../cleanup.js";
+import type * as cron from "../cron.js";
+import type * as gtfs from "../gtfs.js";
+import type * as gtfsCrons from "../gtfsCrons.js";
+import type * as gtfsDebug from "../gtfsDebug.js";
+import type * as healthCheck from "../healthCheck.js";
+import type * as http from "../http.js";
+import type * as incidents from "../incidents.js";
+import type * as index from "../index.js";
+import type * as journeyPlanner from "../journeyPlanner.js";
+import type * as migrations_rewards from "../migrations/rewards.js";
+import type * as mock_data from "../mock_data.js";
+import type * as privateData from "../privateData.js";
+import type * as reports from "../reports.js";
+import type * as rewards from "../rewards.js";
+import type * as routes from "../routes.js";
+import type * as scheduler from "../scheduler.js";
+import type * as seed from "../seed.js";
+import type * as users from "../users.js";
+
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
-} from 'convex/server'
-import type * as auth from '../auth.js'
-import type * as authActions from '../authActions.js'
-import type * as cleanup from '../cleanup.js'
-import type * as cron from '../cron.js'
-import type * as gtfs from '../gtfs.js'
-import type * as gtfsCrons from '../gtfsCrons.js'
-import type * as gtfsDebug from '../gtfsDebug.js'
-import type * as healthCheck from '../healthCheck.js'
-import type * as http from '../http.js'
-import type * as incidents from '../incidents.js'
-import type * as index from '../index.js'
-import type * as journeyPlanner from '../journeyPlanner.js'
-import type * as migrations_rewards from '../migrations/rewards.js'
-import type * as mock_data from '../mock_data.js'
-import type * as privateData from '../privateData.js'
-import type * as reports from '../reports.js'
-import type * as rewards from '../rewards.js'
-import type * as routes from '../routes.js'
-import type * as scheduler from '../scheduler.js'
-import type * as seed from '../seed.js'
+} from "convex/server";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -43,3316 +45,3317 @@ import type * as seed from '../seed.js'
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  auth: typeof auth
-  authActions: typeof authActions
-  cleanup: typeof cleanup
-  cron: typeof cron
-  gtfs: typeof gtfs
-  gtfsCrons: typeof gtfsCrons
-  gtfsDebug: typeof gtfsDebug
-  healthCheck: typeof healthCheck
-  http: typeof http
-  incidents: typeof incidents
-  index: typeof index
-  journeyPlanner: typeof journeyPlanner
-  'migrations/rewards': typeof migrations_rewards
-  mock_data: typeof mock_data
-  privateData: typeof privateData
-  reports: typeof reports
-  rewards: typeof rewards
-  routes: typeof routes
-  scheduler: typeof scheduler
-  seed: typeof seed
-}>
-declare const fullApiWithMounts: typeof fullApi
+  auth: typeof auth;
+  authActions: typeof authActions;
+  cleanup: typeof cleanup;
+  cron: typeof cron;
+  gtfs: typeof gtfs;
+  gtfsCrons: typeof gtfsCrons;
+  gtfsDebug: typeof gtfsDebug;
+  healthCheck: typeof healthCheck;
+  http: typeof http;
+  incidents: typeof incidents;
+  index: typeof index;
+  journeyPlanner: typeof journeyPlanner;
+  "migrations/rewards": typeof migrations_rewards;
+  mock_data: typeof mock_data;
+  privateData: typeof privateData;
+  reports: typeof reports;
+  rewards: typeof rewards;
+  routes: typeof routes;
+  scheduler: typeof scheduler;
+  seed: typeof seed;
+  users: typeof users;
+}>;
+declare const fullApiWithMounts: typeof fullApi;
 
 export declare const api: FilterApi<
   typeof fullApiWithMounts,
-  FunctionReference<any, 'public'>
->
+  FunctionReference<any, "public">
+>;
 export declare const internal: FilterApi<
   typeof fullApiWithMounts,
-  FunctionReference<any, 'internal'>
->
+  FunctionReference<any, "internal">
+>;
 
 export declare const components: {
   betterAuth: {
     adapter: {
       create: FunctionReference<
-        'mutation',
-        'internal',
+        "mutation",
+        "internal",
         {
           input:
             | {
                 data: {
-                  createdAt: number
-                  displayUsername?: null | string
-                  email: string
-                  emailVerified: boolean
-                  image?: null | string
-                  isAnonymous?: null | boolean
-                  name: string
-                  phoneNumber?: null | string
-                  phoneNumberVerified?: null | boolean
-                  twoFactorEnabled?: null | boolean
-                  updatedAt: number
-                  userId?: null | string
-                  username?: null | string
-                }
-                model: 'user'
+                  createdAt: number;
+                  displayUsername?: null | string;
+                  email: string;
+                  emailVerified: boolean;
+                  image?: null | string;
+                  isAnonymous?: null | boolean;
+                  name: string;
+                  phoneNumber?: null | string;
+                  phoneNumberVerified?: null | boolean;
+                  twoFactorEnabled?: null | boolean;
+                  updatedAt: number;
+                  userId?: null | string;
+                  username?: null | string;
+                };
+                model: "user";
               }
             | {
                 data: {
-                  createdAt: number
-                  expiresAt: number
-                  ipAddress?: null | string
-                  token: string
-                  updatedAt: number
-                  userAgent?: null | string
-                  userId: string
-                }
-                model: 'session'
+                  createdAt: number;
+                  expiresAt: number;
+                  ipAddress?: null | string;
+                  token: string;
+                  updatedAt: number;
+                  userAgent?: null | string;
+                  userId: string;
+                };
+                model: "session";
               }
             | {
                 data: {
-                  accessToken?: null | string
-                  accessTokenExpiresAt?: null | number
-                  accountId: string
-                  createdAt: number
-                  idToken?: null | string
-                  password?: null | string
-                  providerId: string
-                  refreshToken?: null | string
-                  refreshTokenExpiresAt?: null | number
-                  scope?: null | string
-                  updatedAt: number
-                  userId: string
-                }
-                model: 'account'
+                  accessToken?: null | string;
+                  accessTokenExpiresAt?: null | number;
+                  accountId: string;
+                  createdAt: number;
+                  idToken?: null | string;
+                  password?: null | string;
+                  providerId: string;
+                  refreshToken?: null | string;
+                  refreshTokenExpiresAt?: null | number;
+                  scope?: null | string;
+                  updatedAt: number;
+                  userId: string;
+                };
+                model: "account";
               }
             | {
                 data: {
-                  createdAt: number
-                  expiresAt: number
-                  identifier: string
-                  updatedAt: number
-                  value: string
-                }
-                model: 'verification'
+                  createdAt: number;
+                  expiresAt: number;
+                  identifier: string;
+                  updatedAt: number;
+                  value: string;
+                };
+                model: "verification";
               }
             | {
-                data: { backupCodes: string; secret: string; userId: string }
-                model: 'twoFactor'
-              }
-            | {
-                data: {
-                  aaguid?: null | string
-                  backedUp: boolean
-                  counter: number
-                  createdAt?: null | number
-                  credentialID: string
-                  deviceType: string
-                  name?: null | string
-                  publicKey: string
-                  transports?: null | string
-                  userId: string
-                }
-                model: 'passkey'
+                data: { backupCodes: string; secret: string; userId: string };
+                model: "twoFactor";
               }
             | {
                 data: {
-                  clientId?: null | string
-                  clientSecret?: null | string
-                  createdAt?: null | number
-                  disabled?: null | boolean
-                  icon?: null | string
-                  metadata?: null | string
-                  name?: null | string
-                  redirectURLs?: null | string
-                  type?: null | string
-                  updatedAt?: null | number
-                  userId?: null | string
-                }
-                model: 'oauthApplication'
+                  aaguid?: null | string;
+                  backedUp: boolean;
+                  counter: number;
+                  createdAt?: null | number;
+                  credentialID: string;
+                  deviceType: string;
+                  name?: null | string;
+                  publicKey: string;
+                  transports?: null | string;
+                  userId: string;
+                };
+                model: "passkey";
               }
             | {
                 data: {
-                  accessToken?: null | string
-                  accessTokenExpiresAt?: null | number
-                  clientId?: null | string
-                  createdAt?: null | number
-                  refreshToken?: null | string
-                  refreshTokenExpiresAt?: null | number
-                  scopes?: null | string
-                  updatedAt?: null | number
-                  userId?: null | string
-                }
-                model: 'oauthAccessToken'
+                  clientId?: null | string;
+                  clientSecret?: null | string;
+                  createdAt?: null | number;
+                  disabled?: null | boolean;
+                  icon?: null | string;
+                  metadata?: null | string;
+                  name?: null | string;
+                  redirectURLs?: null | string;
+                  type?: null | string;
+                  updatedAt?: null | number;
+                  userId?: null | string;
+                };
+                model: "oauthApplication";
               }
             | {
                 data: {
-                  clientId?: null | string
-                  consentGiven?: null | boolean
-                  createdAt?: null | number
-                  scopes?: null | string
-                  updatedAt?: null | number
-                  userId?: null | string
-                }
-                model: 'oauthConsent'
+                  accessToken?: null | string;
+                  accessTokenExpiresAt?: null | number;
+                  clientId?: null | string;
+                  createdAt?: null | number;
+                  refreshToken?: null | string;
+                  refreshTokenExpiresAt?: null | number;
+                  scopes?: null | string;
+                  updatedAt?: null | number;
+                  userId?: null | string;
+                };
+                model: "oauthAccessToken";
               }
             | {
                 data: {
-                  createdAt: number
-                  name: string
-                  organizationId: string
-                  updatedAt?: null | number
-                }
-                model: 'team'
+                  clientId?: null | string;
+                  consentGiven?: null | boolean;
+                  createdAt?: null | number;
+                  scopes?: null | string;
+                  updatedAt?: null | number;
+                  userId?: null | string;
+                };
+                model: "oauthConsent";
               }
             | {
                 data: {
-                  createdAt?: null | number
-                  teamId: string
-                  userId: string
-                }
-                model: 'teamMember'
+                  createdAt: number;
+                  name: string;
+                  organizationId: string;
+                  updatedAt?: null | number;
+                };
+                model: "team";
               }
             | {
                 data: {
-                  createdAt: number
-                  logo?: null | string
-                  metadata?: null | string
-                  name: string
-                  slug?: null | string
-                }
-                model: 'organization'
+                  createdAt?: null | number;
+                  teamId: string;
+                  userId: string;
+                };
+                model: "teamMember";
               }
             | {
                 data: {
-                  createdAt: number
-                  organizationId: string
-                  role: string
-                  userId: string
-                }
-                model: 'member'
+                  createdAt: number;
+                  logo?: null | string;
+                  metadata?: null | string;
+                  name: string;
+                  slug?: null | string;
+                };
+                model: "organization";
               }
             | {
                 data: {
-                  email: string
-                  expiresAt: number
-                  inviterId: string
-                  organizationId: string
-                  role?: null | string
-                  status: string
-                  teamId?: null | string
-                }
-                model: 'invitation'
+                  createdAt: number;
+                  organizationId: string;
+                  role: string;
+                  userId: string;
+                };
+                model: "member";
               }
             | {
                 data: {
-                  domain: string
-                  issuer: string
-                  oidcConfig?: null | string
-                  organizationId?: null | string
-                  providerId: string
-                  samlConfig?: null | string
-                  userId?: null | string
-                }
-                model: 'ssoProvider'
+                  email: string;
+                  expiresAt: number;
+                  inviterId: string;
+                  organizationId: string;
+                  role?: null | string;
+                  status: string;
+                  teamId?: null | string;
+                };
+                model: "invitation";
               }
             | {
                 data: {
-                  createdAt: number
-                  privateKey: string
-                  publicKey: string
-                }
-                model: 'jwks'
+                  domain: string;
+                  issuer: string;
+                  oidcConfig?: null | string;
+                  organizationId?: null | string;
+                  providerId: string;
+                  samlConfig?: null | string;
+                  userId?: null | string;
+                };
+                model: "ssoProvider";
               }
             | {
                 data: {
-                  cancelAtPeriodEnd?: null | boolean
-                  periodEnd?: null | number
-                  periodStart?: null | number
-                  plan: string
-                  referenceId: string
-                  seats?: null | number
-                  status?: null | string
-                  stripeCustomerId?: null | string
-                  stripeSubscriptionId?: null | string
-                  trialEnd?: null | number
-                  trialStart?: null | number
-                }
-                model: 'subscription'
+                  createdAt: number;
+                  privateKey: string;
+                  publicKey: string;
+                };
+                model: "jwks";
               }
             | {
                 data: {
-                  address: string
-                  chainId: number
-                  createdAt: number
-                  isPrimary?: null | boolean
-                  userId: string
-                }
-                model: 'walletAddress'
+                  cancelAtPeriodEnd?: null | boolean;
+                  periodEnd?: null | number;
+                  periodStart?: null | number;
+                  plan: string;
+                  referenceId: string;
+                  seats?: null | number;
+                  status?: null | string;
+                  stripeCustomerId?: null | string;
+                  stripeSubscriptionId?: null | string;
+                  trialEnd?: null | number;
+                  trialStart?: null | number;
+                };
+                model: "subscription";
               }
             | {
                 data: {
-                  count?: null | number
-                  key?: null | string
-                  lastRequest?: null | number
-                }
-                model: 'rateLimit'
+                  address: string;
+                  chainId: number;
+                  createdAt: number;
+                  isPrimary?: null | boolean;
+                  userId: string;
+                };
+                model: "walletAddress";
               }
             | {
-                data: { count: number; key: string; lastRequest: number }
-                model: 'ratelimit'
+                data: {
+                  count?: null | number;
+                  key?: null | string;
+                  lastRequest?: null | number;
+                };
+                model: "rateLimit";
               }
-          onCreateHandle?: string
-          select?: Array<string>
+            | {
+                data: { count: number; key: string; lastRequest: number };
+                model: "ratelimit";
+              };
+          onCreateHandle?: string;
+          select?: Array<string>;
         },
         any
-      >
+      >;
       deleteMany: FunctionReference<
-        'mutation',
-        'internal',
+        "mutation",
+        "internal",
         {
           input:
             | {
-                model: 'user'
+                model: "user";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'email'
-                    | 'emailVerified'
-                    | 'image'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'twoFactorEnabled'
-                    | 'isAnonymous'
-                    | 'username'
-                    | 'displayUsername'
-                    | 'phoneNumber'
-                    | 'phoneNumberVerified'
-                    | 'userId'
-                    | 'id'
+                    | "name"
+                    | "email"
+                    | "emailVerified"
+                    | "image"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "twoFactorEnabled"
+                    | "isAnonymous"
+                    | "username"
+                    | "displayUsername"
+                    | "phoneNumber"
+                    | "phoneNumberVerified"
+                    | "userId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'session'
+                model: "session";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'expiresAt'
-                    | 'token'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'ipAddress'
-                    | 'userAgent'
-                    | 'userId'
-                    | 'id'
+                    | "expiresAt"
+                    | "token"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "ipAddress"
+                    | "userAgent"
+                    | "userId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'account'
+                model: "account";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'accountId'
-                    | 'providerId'
-                    | 'userId'
-                    | 'accessToken'
-                    | 'refreshToken'
-                    | 'idToken'
-                    | 'accessTokenExpiresAt'
-                    | 'refreshTokenExpiresAt'
-                    | 'scope'
-                    | 'password'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "accountId"
+                    | "providerId"
+                    | "userId"
+                    | "accessToken"
+                    | "refreshToken"
+                    | "idToken"
+                    | "accessTokenExpiresAt"
+                    | "refreshTokenExpiresAt"
+                    | "scope"
+                    | "password"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'verification'
+                model: "verification";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'identifier'
-                    | 'value'
-                    | 'expiresAt'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "identifier"
+                    | "value"
+                    | "expiresAt"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'twoFactor'
+                model: "twoFactor";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'secret' | 'backupCodes' | 'userId' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "secret" | "backupCodes" | "userId" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'passkey'
+                model: "passkey";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'publicKey'
-                    | 'userId'
-                    | 'credentialID'
-                    | 'counter'
-                    | 'deviceType'
-                    | 'backedUp'
-                    | 'transports'
-                    | 'createdAt'
-                    | 'aaguid'
-                    | 'id'
+                    | "name"
+                    | "publicKey"
+                    | "userId"
+                    | "credentialID"
+                    | "counter"
+                    | "deviceType"
+                    | "backedUp"
+                    | "transports"
+                    | "createdAt"
+                    | "aaguid"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthApplication'
+                model: "oauthApplication";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'icon'
-                    | 'metadata'
-                    | 'clientId'
-                    | 'clientSecret'
-                    | 'redirectURLs'
-                    | 'type'
-                    | 'disabled'
-                    | 'userId'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "name"
+                    | "icon"
+                    | "metadata"
+                    | "clientId"
+                    | "clientSecret"
+                    | "redirectURLs"
+                    | "type"
+                    | "disabled"
+                    | "userId"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthAccessToken'
+                model: "oauthAccessToken";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'accessToken'
-                    | 'refreshToken'
-                    | 'accessTokenExpiresAt'
-                    | 'refreshTokenExpiresAt'
-                    | 'clientId'
-                    | 'userId'
-                    | 'scopes'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "accessToken"
+                    | "refreshToken"
+                    | "accessTokenExpiresAt"
+                    | "refreshTokenExpiresAt"
+                    | "clientId"
+                    | "userId"
+                    | "scopes"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthConsent'
+                model: "oauthConsent";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'clientId'
-                    | 'userId'
-                    | 'scopes'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'consentGiven'
-                    | 'id'
+                    | "clientId"
+                    | "userId"
+                    | "scopes"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "consentGiven"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'team'
+                model: "team";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'organizationId'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "name"
+                    | "organizationId"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'teamMember'
+                model: "teamMember";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'teamId' | 'userId' | 'createdAt' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "teamId" | "userId" | "createdAt" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'organization'
+                model: "organization";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'slug'
-                    | 'logo'
-                    | 'createdAt'
-                    | 'metadata'
-                    | 'id'
+                    | "name"
+                    | "slug"
+                    | "logo"
+                    | "createdAt"
+                    | "metadata"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'member'
+                model: "member";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'organizationId'
-                    | 'userId'
-                    | 'role'
-                    | 'createdAt'
-                    | 'id'
+                    | "organizationId"
+                    | "userId"
+                    | "role"
+                    | "createdAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'invitation'
+                model: "invitation";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'organizationId'
-                    | 'email'
-                    | 'role'
-                    | 'teamId'
-                    | 'status'
-                    | 'expiresAt'
-                    | 'inviterId'
-                    | 'id'
+                    | "organizationId"
+                    | "email"
+                    | "role"
+                    | "teamId"
+                    | "status"
+                    | "expiresAt"
+                    | "inviterId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'ssoProvider'
+                model: "ssoProvider";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'issuer'
-                    | 'oidcConfig'
-                    | 'samlConfig'
-                    | 'userId'
-                    | 'providerId'
-                    | 'organizationId'
-                    | 'domain'
-                    | 'id'
+                    | "issuer"
+                    | "oidcConfig"
+                    | "samlConfig"
+                    | "userId"
+                    | "providerId"
+                    | "organizationId"
+                    | "domain"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'jwks'
+                model: "jwks";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'publicKey' | 'privateKey' | 'createdAt' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "publicKey" | "privateKey" | "createdAt" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'subscription'
+                model: "subscription";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'plan'
-                    | 'referenceId'
-                    | 'stripeCustomerId'
-                    | 'stripeSubscriptionId'
-                    | 'status'
-                    | 'periodStart'
-                    | 'periodEnd'
-                    | 'trialStart'
-                    | 'trialEnd'
-                    | 'cancelAtPeriodEnd'
-                    | 'seats'
-                    | 'id'
+                    | "plan"
+                    | "referenceId"
+                    | "stripeCustomerId"
+                    | "stripeSubscriptionId"
+                    | "status"
+                    | "periodStart"
+                    | "periodEnd"
+                    | "trialStart"
+                    | "trialEnd"
+                    | "cancelAtPeriodEnd"
+                    | "seats"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'walletAddress'
+                model: "walletAddress";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'userId'
-                    | 'address'
-                    | 'chainId'
-                    | 'isPrimary'
-                    | 'createdAt'
-                    | 'id'
+                    | "userId"
+                    | "address"
+                    | "chainId"
+                    | "isPrimary"
+                    | "createdAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'rateLimit'
+                model: "rateLimit";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'key' | 'count' | 'lastRequest' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "key" | "count" | "lastRequest" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'ratelimit'
+                model: "ratelimit";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'key' | 'count' | 'lastRequest' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "key" | "count" | "lastRequest" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
-              }
-          onDeleteHandle?: string
+                    | null;
+                }>;
+              };
+          onDeleteHandle?: string;
           paginationOpts: {
-            cursor: string | null
-            endCursor?: string | null
-            id?: number
-            maximumBytesRead?: number
-            maximumRowsRead?: number
-            numItems: number
-          }
+            cursor: string | null;
+            endCursor?: string | null;
+            id?: number;
+            maximumBytesRead?: number;
+            maximumRowsRead?: number;
+            numItems: number;
+          };
         },
         any
-      >
+      >;
       deleteOne: FunctionReference<
-        'mutation',
-        'internal',
+        "mutation",
+        "internal",
         {
           input:
             | {
-                model: 'user'
+                model: "user";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'email'
-                    | 'emailVerified'
-                    | 'image'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'twoFactorEnabled'
-                    | 'isAnonymous'
-                    | 'username'
-                    | 'displayUsername'
-                    | 'phoneNumber'
-                    | 'phoneNumberVerified'
-                    | 'userId'
-                    | 'id'
+                    | "name"
+                    | "email"
+                    | "emailVerified"
+                    | "image"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "twoFactorEnabled"
+                    | "isAnonymous"
+                    | "username"
+                    | "displayUsername"
+                    | "phoneNumber"
+                    | "phoneNumberVerified"
+                    | "userId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'session'
+                model: "session";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'expiresAt'
-                    | 'token'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'ipAddress'
-                    | 'userAgent'
-                    | 'userId'
-                    | 'id'
+                    | "expiresAt"
+                    | "token"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "ipAddress"
+                    | "userAgent"
+                    | "userId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'account'
+                model: "account";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'accountId'
-                    | 'providerId'
-                    | 'userId'
-                    | 'accessToken'
-                    | 'refreshToken'
-                    | 'idToken'
-                    | 'accessTokenExpiresAt'
-                    | 'refreshTokenExpiresAt'
-                    | 'scope'
-                    | 'password'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "accountId"
+                    | "providerId"
+                    | "userId"
+                    | "accessToken"
+                    | "refreshToken"
+                    | "idToken"
+                    | "accessTokenExpiresAt"
+                    | "refreshTokenExpiresAt"
+                    | "scope"
+                    | "password"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'verification'
+                model: "verification";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'identifier'
-                    | 'value'
-                    | 'expiresAt'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "identifier"
+                    | "value"
+                    | "expiresAt"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'twoFactor'
+                model: "twoFactor";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'secret' | 'backupCodes' | 'userId' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "secret" | "backupCodes" | "userId" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'passkey'
+                model: "passkey";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'publicKey'
-                    | 'userId'
-                    | 'credentialID'
-                    | 'counter'
-                    | 'deviceType'
-                    | 'backedUp'
-                    | 'transports'
-                    | 'createdAt'
-                    | 'aaguid'
-                    | 'id'
+                    | "name"
+                    | "publicKey"
+                    | "userId"
+                    | "credentialID"
+                    | "counter"
+                    | "deviceType"
+                    | "backedUp"
+                    | "transports"
+                    | "createdAt"
+                    | "aaguid"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthApplication'
+                model: "oauthApplication";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'icon'
-                    | 'metadata'
-                    | 'clientId'
-                    | 'clientSecret'
-                    | 'redirectURLs'
-                    | 'type'
-                    | 'disabled'
-                    | 'userId'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "name"
+                    | "icon"
+                    | "metadata"
+                    | "clientId"
+                    | "clientSecret"
+                    | "redirectURLs"
+                    | "type"
+                    | "disabled"
+                    | "userId"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthAccessToken'
+                model: "oauthAccessToken";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'accessToken'
-                    | 'refreshToken'
-                    | 'accessTokenExpiresAt'
-                    | 'refreshTokenExpiresAt'
-                    | 'clientId'
-                    | 'userId'
-                    | 'scopes'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "accessToken"
+                    | "refreshToken"
+                    | "accessTokenExpiresAt"
+                    | "refreshTokenExpiresAt"
+                    | "clientId"
+                    | "userId"
+                    | "scopes"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthConsent'
+                model: "oauthConsent";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'clientId'
-                    | 'userId'
-                    | 'scopes'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'consentGiven'
-                    | 'id'
+                    | "clientId"
+                    | "userId"
+                    | "scopes"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "consentGiven"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'team'
+                model: "team";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'organizationId'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "name"
+                    | "organizationId"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'teamMember'
+                model: "teamMember";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'teamId' | 'userId' | 'createdAt' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "teamId" | "userId" | "createdAt" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'organization'
+                model: "organization";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'slug'
-                    | 'logo'
-                    | 'createdAt'
-                    | 'metadata'
-                    | 'id'
+                    | "name"
+                    | "slug"
+                    | "logo"
+                    | "createdAt"
+                    | "metadata"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'member'
+                model: "member";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'organizationId'
-                    | 'userId'
-                    | 'role'
-                    | 'createdAt'
-                    | 'id'
+                    | "organizationId"
+                    | "userId"
+                    | "role"
+                    | "createdAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'invitation'
+                model: "invitation";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'organizationId'
-                    | 'email'
-                    | 'role'
-                    | 'teamId'
-                    | 'status'
-                    | 'expiresAt'
-                    | 'inviterId'
-                    | 'id'
+                    | "organizationId"
+                    | "email"
+                    | "role"
+                    | "teamId"
+                    | "status"
+                    | "expiresAt"
+                    | "inviterId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'ssoProvider'
+                model: "ssoProvider";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'issuer'
-                    | 'oidcConfig'
-                    | 'samlConfig'
-                    | 'userId'
-                    | 'providerId'
-                    | 'organizationId'
-                    | 'domain'
-                    | 'id'
+                    | "issuer"
+                    | "oidcConfig"
+                    | "samlConfig"
+                    | "userId"
+                    | "providerId"
+                    | "organizationId"
+                    | "domain"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'jwks'
+                model: "jwks";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'publicKey' | 'privateKey' | 'createdAt' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "publicKey" | "privateKey" | "createdAt" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'subscription'
+                model: "subscription";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'plan'
-                    | 'referenceId'
-                    | 'stripeCustomerId'
-                    | 'stripeSubscriptionId'
-                    | 'status'
-                    | 'periodStart'
-                    | 'periodEnd'
-                    | 'trialStart'
-                    | 'trialEnd'
-                    | 'cancelAtPeriodEnd'
-                    | 'seats'
-                    | 'id'
+                    | "plan"
+                    | "referenceId"
+                    | "stripeCustomerId"
+                    | "stripeSubscriptionId"
+                    | "status"
+                    | "periodStart"
+                    | "periodEnd"
+                    | "trialStart"
+                    | "trialEnd"
+                    | "cancelAtPeriodEnd"
+                    | "seats"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'walletAddress'
+                model: "walletAddress";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'userId'
-                    | 'address'
-                    | 'chainId'
-                    | 'isPrimary'
-                    | 'createdAt'
-                    | 'id'
+                    | "userId"
+                    | "address"
+                    | "chainId"
+                    | "isPrimary"
+                    | "createdAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'rateLimit'
+                model: "rateLimit";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'key' | 'count' | 'lastRequest' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "key" | "count" | "lastRequest" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'ratelimit'
+                model: "ratelimit";
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'key' | 'count' | 'lastRequest' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "key" | "count" | "lastRequest" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
-              }
-          onDeleteHandle?: string
+                    | null;
+                }>;
+              };
+          onDeleteHandle?: string;
         },
         any
-      >
+      >;
       findMany: FunctionReference<
-        'query',
-        'internal',
+        "query",
+        "internal",
         {
-          limit?: number
+          limit?: number;
           model:
-            | 'user'
-            | 'session'
-            | 'account'
-            | 'verification'
-            | 'twoFactor'
-            | 'passkey'
-            | 'oauthApplication'
-            | 'oauthAccessToken'
-            | 'oauthConsent'
-            | 'team'
-            | 'teamMember'
-            | 'organization'
-            | 'member'
-            | 'invitation'
-            | 'ssoProvider'
-            | 'jwks'
-            | 'subscription'
-            | 'walletAddress'
-            | 'rateLimit'
-            | 'ratelimit'
-          offset?: number
+            | "user"
+            | "session"
+            | "account"
+            | "verification"
+            | "twoFactor"
+            | "passkey"
+            | "oauthApplication"
+            | "oauthAccessToken"
+            | "oauthConsent"
+            | "team"
+            | "teamMember"
+            | "organization"
+            | "member"
+            | "invitation"
+            | "ssoProvider"
+            | "jwks"
+            | "subscription"
+            | "walletAddress"
+            | "rateLimit"
+            | "ratelimit";
+          offset?: number;
           paginationOpts: {
-            cursor: string | null
-            endCursor?: string | null
-            id?: number
-            maximumBytesRead?: number
-            maximumRowsRead?: number
-            numItems: number
-          }
-          sortBy?: { direction: 'asc' | 'desc'; field: string }
+            cursor: string | null;
+            endCursor?: string | null;
+            id?: number;
+            maximumBytesRead?: number;
+            maximumRowsRead?: number;
+            numItems: number;
+          };
+          sortBy?: { direction: "asc" | "desc"; field: string };
           where?: Array<{
-            connector?: 'AND' | 'OR'
-            field: string
+            connector?: "AND" | "OR";
+            field: string;
             operator?:
-              | 'lt'
-              | 'lte'
-              | 'gt'
-              | 'gte'
-              | 'eq'
-              | 'in'
-              | 'ne'
-              | 'contains'
-              | 'starts_with'
-              | 'ends_with'
+              | "lt"
+              | "lte"
+              | "gt"
+              | "gte"
+              | "eq"
+              | "in"
+              | "ne"
+              | "contains"
+              | "starts_with"
+              | "ends_with";
             value:
               | string
               | number
               | boolean
               | Array<string>
               | Array<number>
-              | null
-          }>
+              | null;
+          }>;
         },
         any
-      >
+      >;
       findOne: FunctionReference<
-        'query',
-        'internal',
+        "query",
+        "internal",
         {
           model:
-            | 'user'
-            | 'session'
-            | 'account'
-            | 'verification'
-            | 'twoFactor'
-            | 'passkey'
-            | 'oauthApplication'
-            | 'oauthAccessToken'
-            | 'oauthConsent'
-            | 'team'
-            | 'teamMember'
-            | 'organization'
-            | 'member'
-            | 'invitation'
-            | 'ssoProvider'
-            | 'jwks'
-            | 'subscription'
-            | 'walletAddress'
-            | 'rateLimit'
-            | 'ratelimit'
-          select?: Array<string>
+            | "user"
+            | "session"
+            | "account"
+            | "verification"
+            | "twoFactor"
+            | "passkey"
+            | "oauthApplication"
+            | "oauthAccessToken"
+            | "oauthConsent"
+            | "team"
+            | "teamMember"
+            | "organization"
+            | "member"
+            | "invitation"
+            | "ssoProvider"
+            | "jwks"
+            | "subscription"
+            | "walletAddress"
+            | "rateLimit"
+            | "ratelimit";
+          select?: Array<string>;
           where?: Array<{
-            connector?: 'AND' | 'OR'
-            field: string
+            connector?: "AND" | "OR";
+            field: string;
             operator?:
-              | 'lt'
-              | 'lte'
-              | 'gt'
-              | 'gte'
-              | 'eq'
-              | 'in'
-              | 'ne'
-              | 'contains'
-              | 'starts_with'
-              | 'ends_with'
+              | "lt"
+              | "lte"
+              | "gt"
+              | "gte"
+              | "eq"
+              | "in"
+              | "ne"
+              | "contains"
+              | "starts_with"
+              | "ends_with";
             value:
               | string
               | number
               | boolean
               | Array<string>
               | Array<number>
-              | null
-          }>
+              | null;
+          }>;
         },
         any
-      >
+      >;
       updateMany: FunctionReference<
-        'mutation',
-        'internal',
+        "mutation",
+        "internal",
         {
           input:
             | {
-                model: 'user'
+                model: "user";
                 update: {
-                  createdAt?: number
-                  displayUsername?: null | string
-                  email?: string
-                  emailVerified?: boolean
-                  image?: null | string
-                  isAnonymous?: null | boolean
-                  name?: string
-                  phoneNumber?: null | string
-                  phoneNumberVerified?: null | boolean
-                  twoFactorEnabled?: null | boolean
-                  updatedAt?: number
-                  userId?: null | string
-                  username?: null | string
-                }
+                  createdAt?: number;
+                  displayUsername?: null | string;
+                  email?: string;
+                  emailVerified?: boolean;
+                  image?: null | string;
+                  isAnonymous?: null | boolean;
+                  name?: string;
+                  phoneNumber?: null | string;
+                  phoneNumberVerified?: null | boolean;
+                  twoFactorEnabled?: null | boolean;
+                  updatedAt?: number;
+                  userId?: null | string;
+                  username?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'email'
-                    | 'emailVerified'
-                    | 'image'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'twoFactorEnabled'
-                    | 'isAnonymous'
-                    | 'username'
-                    | 'displayUsername'
-                    | 'phoneNumber'
-                    | 'phoneNumberVerified'
-                    | 'userId'
-                    | 'id'
+                    | "name"
+                    | "email"
+                    | "emailVerified"
+                    | "image"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "twoFactorEnabled"
+                    | "isAnonymous"
+                    | "username"
+                    | "displayUsername"
+                    | "phoneNumber"
+                    | "phoneNumberVerified"
+                    | "userId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'session'
+                model: "session";
                 update: {
-                  createdAt?: number
-                  expiresAt?: number
-                  ipAddress?: null | string
-                  token?: string
-                  updatedAt?: number
-                  userAgent?: null | string
-                  userId?: string
-                }
+                  createdAt?: number;
+                  expiresAt?: number;
+                  ipAddress?: null | string;
+                  token?: string;
+                  updatedAt?: number;
+                  userAgent?: null | string;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'expiresAt'
-                    | 'token'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'ipAddress'
-                    | 'userAgent'
-                    | 'userId'
-                    | 'id'
+                    | "expiresAt"
+                    | "token"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "ipAddress"
+                    | "userAgent"
+                    | "userId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'account'
+                model: "account";
                 update: {
-                  accessToken?: null | string
-                  accessTokenExpiresAt?: null | number
-                  accountId?: string
-                  createdAt?: number
-                  idToken?: null | string
-                  password?: null | string
-                  providerId?: string
-                  refreshToken?: null | string
-                  refreshTokenExpiresAt?: null | number
-                  scope?: null | string
-                  updatedAt?: number
-                  userId?: string
-                }
+                  accessToken?: null | string;
+                  accessTokenExpiresAt?: null | number;
+                  accountId?: string;
+                  createdAt?: number;
+                  idToken?: null | string;
+                  password?: null | string;
+                  providerId?: string;
+                  refreshToken?: null | string;
+                  refreshTokenExpiresAt?: null | number;
+                  scope?: null | string;
+                  updatedAt?: number;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'accountId'
-                    | 'providerId'
-                    | 'userId'
-                    | 'accessToken'
-                    | 'refreshToken'
-                    | 'idToken'
-                    | 'accessTokenExpiresAt'
-                    | 'refreshTokenExpiresAt'
-                    | 'scope'
-                    | 'password'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "accountId"
+                    | "providerId"
+                    | "userId"
+                    | "accessToken"
+                    | "refreshToken"
+                    | "idToken"
+                    | "accessTokenExpiresAt"
+                    | "refreshTokenExpiresAt"
+                    | "scope"
+                    | "password"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'verification'
+                model: "verification";
                 update: {
-                  createdAt?: number
-                  expiresAt?: number
-                  identifier?: string
-                  updatedAt?: number
-                  value?: string
-                }
+                  createdAt?: number;
+                  expiresAt?: number;
+                  identifier?: string;
+                  updatedAt?: number;
+                  value?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'identifier'
-                    | 'value'
-                    | 'expiresAt'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "identifier"
+                    | "value"
+                    | "expiresAt"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'twoFactor'
+                model: "twoFactor";
                 update: {
-                  backupCodes?: string
-                  secret?: string
-                  userId?: string
-                }
+                  backupCodes?: string;
+                  secret?: string;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'secret' | 'backupCodes' | 'userId' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "secret" | "backupCodes" | "userId" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'passkey'
+                model: "passkey";
                 update: {
-                  aaguid?: null | string
-                  backedUp?: boolean
-                  counter?: number
-                  createdAt?: null | number
-                  credentialID?: string
-                  deviceType?: string
-                  name?: null | string
-                  publicKey?: string
-                  transports?: null | string
-                  userId?: string
-                }
+                  aaguid?: null | string;
+                  backedUp?: boolean;
+                  counter?: number;
+                  createdAt?: null | number;
+                  credentialID?: string;
+                  deviceType?: string;
+                  name?: null | string;
+                  publicKey?: string;
+                  transports?: null | string;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'publicKey'
-                    | 'userId'
-                    | 'credentialID'
-                    | 'counter'
-                    | 'deviceType'
-                    | 'backedUp'
-                    | 'transports'
-                    | 'createdAt'
-                    | 'aaguid'
-                    | 'id'
+                    | "name"
+                    | "publicKey"
+                    | "userId"
+                    | "credentialID"
+                    | "counter"
+                    | "deviceType"
+                    | "backedUp"
+                    | "transports"
+                    | "createdAt"
+                    | "aaguid"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthApplication'
+                model: "oauthApplication";
                 update: {
-                  clientId?: null | string
-                  clientSecret?: null | string
-                  createdAt?: null | number
-                  disabled?: null | boolean
-                  icon?: null | string
-                  metadata?: null | string
-                  name?: null | string
-                  redirectURLs?: null | string
-                  type?: null | string
-                  updatedAt?: null | number
-                  userId?: null | string
-                }
+                  clientId?: null | string;
+                  clientSecret?: null | string;
+                  createdAt?: null | number;
+                  disabled?: null | boolean;
+                  icon?: null | string;
+                  metadata?: null | string;
+                  name?: null | string;
+                  redirectURLs?: null | string;
+                  type?: null | string;
+                  updatedAt?: null | number;
+                  userId?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'icon'
-                    | 'metadata'
-                    | 'clientId'
-                    | 'clientSecret'
-                    | 'redirectURLs'
-                    | 'type'
-                    | 'disabled'
-                    | 'userId'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "name"
+                    | "icon"
+                    | "metadata"
+                    | "clientId"
+                    | "clientSecret"
+                    | "redirectURLs"
+                    | "type"
+                    | "disabled"
+                    | "userId"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthAccessToken'
+                model: "oauthAccessToken";
                 update: {
-                  accessToken?: null | string
-                  accessTokenExpiresAt?: null | number
-                  clientId?: null | string
-                  createdAt?: null | number
-                  refreshToken?: null | string
-                  refreshTokenExpiresAt?: null | number
-                  scopes?: null | string
-                  updatedAt?: null | number
-                  userId?: null | string
-                }
+                  accessToken?: null | string;
+                  accessTokenExpiresAt?: null | number;
+                  clientId?: null | string;
+                  createdAt?: null | number;
+                  refreshToken?: null | string;
+                  refreshTokenExpiresAt?: null | number;
+                  scopes?: null | string;
+                  updatedAt?: null | number;
+                  userId?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'accessToken'
-                    | 'refreshToken'
-                    | 'accessTokenExpiresAt'
-                    | 'refreshTokenExpiresAt'
-                    | 'clientId'
-                    | 'userId'
-                    | 'scopes'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "accessToken"
+                    | "refreshToken"
+                    | "accessTokenExpiresAt"
+                    | "refreshTokenExpiresAt"
+                    | "clientId"
+                    | "userId"
+                    | "scopes"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthConsent'
+                model: "oauthConsent";
                 update: {
-                  clientId?: null | string
-                  consentGiven?: null | boolean
-                  createdAt?: null | number
-                  scopes?: null | string
-                  updatedAt?: null | number
-                  userId?: null | string
-                }
+                  clientId?: null | string;
+                  consentGiven?: null | boolean;
+                  createdAt?: null | number;
+                  scopes?: null | string;
+                  updatedAt?: null | number;
+                  userId?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'clientId'
-                    | 'userId'
-                    | 'scopes'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'consentGiven'
-                    | 'id'
+                    | "clientId"
+                    | "userId"
+                    | "scopes"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "consentGiven"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'team'
+                model: "team";
                 update: {
-                  createdAt?: number
-                  name?: string
-                  organizationId?: string
-                  updatedAt?: null | number
-                }
+                  createdAt?: number;
+                  name?: string;
+                  organizationId?: string;
+                  updatedAt?: null | number;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'organizationId'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "name"
+                    | "organizationId"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'teamMember'
+                model: "teamMember";
                 update: {
-                  createdAt?: null | number
-                  teamId?: string
-                  userId?: string
-                }
+                  createdAt?: null | number;
+                  teamId?: string;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'teamId' | 'userId' | 'createdAt' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "teamId" | "userId" | "createdAt" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'organization'
+                model: "organization";
                 update: {
-                  createdAt?: number
-                  logo?: null | string
-                  metadata?: null | string
-                  name?: string
-                  slug?: null | string
-                }
+                  createdAt?: number;
+                  logo?: null | string;
+                  metadata?: null | string;
+                  name?: string;
+                  slug?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'slug'
-                    | 'logo'
-                    | 'createdAt'
-                    | 'metadata'
-                    | 'id'
+                    | "name"
+                    | "slug"
+                    | "logo"
+                    | "createdAt"
+                    | "metadata"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'member'
+                model: "member";
                 update: {
-                  createdAt?: number
-                  organizationId?: string
-                  role?: string
-                  userId?: string
-                }
+                  createdAt?: number;
+                  organizationId?: string;
+                  role?: string;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'organizationId'
-                    | 'userId'
-                    | 'role'
-                    | 'createdAt'
-                    | 'id'
+                    | "organizationId"
+                    | "userId"
+                    | "role"
+                    | "createdAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'invitation'
+                model: "invitation";
                 update: {
-                  email?: string
-                  expiresAt?: number
-                  inviterId?: string
-                  organizationId?: string
-                  role?: null | string
-                  status?: string
-                  teamId?: null | string
-                }
+                  email?: string;
+                  expiresAt?: number;
+                  inviterId?: string;
+                  organizationId?: string;
+                  role?: null | string;
+                  status?: string;
+                  teamId?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'organizationId'
-                    | 'email'
-                    | 'role'
-                    | 'teamId'
-                    | 'status'
-                    | 'expiresAt'
-                    | 'inviterId'
-                    | 'id'
+                    | "organizationId"
+                    | "email"
+                    | "role"
+                    | "teamId"
+                    | "status"
+                    | "expiresAt"
+                    | "inviterId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'ssoProvider'
+                model: "ssoProvider";
                 update: {
-                  domain?: string
-                  issuer?: string
-                  oidcConfig?: null | string
-                  organizationId?: null | string
-                  providerId?: string
-                  samlConfig?: null | string
-                  userId?: null | string
-                }
+                  domain?: string;
+                  issuer?: string;
+                  oidcConfig?: null | string;
+                  organizationId?: null | string;
+                  providerId?: string;
+                  samlConfig?: null | string;
+                  userId?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'issuer'
-                    | 'oidcConfig'
-                    | 'samlConfig'
-                    | 'userId'
-                    | 'providerId'
-                    | 'organizationId'
-                    | 'domain'
-                    | 'id'
+                    | "issuer"
+                    | "oidcConfig"
+                    | "samlConfig"
+                    | "userId"
+                    | "providerId"
+                    | "organizationId"
+                    | "domain"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'jwks'
+                model: "jwks";
                 update: {
-                  createdAt?: number
-                  privateKey?: string
-                  publicKey?: string
-                }
+                  createdAt?: number;
+                  privateKey?: string;
+                  publicKey?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'publicKey' | 'privateKey' | 'createdAt' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "publicKey" | "privateKey" | "createdAt" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'subscription'
+                model: "subscription";
                 update: {
-                  cancelAtPeriodEnd?: null | boolean
-                  periodEnd?: null | number
-                  periodStart?: null | number
-                  plan?: string
-                  referenceId?: string
-                  seats?: null | number
-                  status?: null | string
-                  stripeCustomerId?: null | string
-                  stripeSubscriptionId?: null | string
-                  trialEnd?: null | number
-                  trialStart?: null | number
-                }
+                  cancelAtPeriodEnd?: null | boolean;
+                  periodEnd?: null | number;
+                  periodStart?: null | number;
+                  plan?: string;
+                  referenceId?: string;
+                  seats?: null | number;
+                  status?: null | string;
+                  stripeCustomerId?: null | string;
+                  stripeSubscriptionId?: null | string;
+                  trialEnd?: null | number;
+                  trialStart?: null | number;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'plan'
-                    | 'referenceId'
-                    | 'stripeCustomerId'
-                    | 'stripeSubscriptionId'
-                    | 'status'
-                    | 'periodStart'
-                    | 'periodEnd'
-                    | 'trialStart'
-                    | 'trialEnd'
-                    | 'cancelAtPeriodEnd'
-                    | 'seats'
-                    | 'id'
+                    | "plan"
+                    | "referenceId"
+                    | "stripeCustomerId"
+                    | "stripeSubscriptionId"
+                    | "status"
+                    | "periodStart"
+                    | "periodEnd"
+                    | "trialStart"
+                    | "trialEnd"
+                    | "cancelAtPeriodEnd"
+                    | "seats"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'walletAddress'
+                model: "walletAddress";
                 update: {
-                  address?: string
-                  chainId?: number
-                  createdAt?: number
-                  isPrimary?: null | boolean
-                  userId?: string
-                }
+                  address?: string;
+                  chainId?: number;
+                  createdAt?: number;
+                  isPrimary?: null | boolean;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'userId'
-                    | 'address'
-                    | 'chainId'
-                    | 'isPrimary'
-                    | 'createdAt'
-                    | 'id'
+                    | "userId"
+                    | "address"
+                    | "chainId"
+                    | "isPrimary"
+                    | "createdAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'rateLimit'
+                model: "rateLimit";
                 update: {
-                  count?: null | number
-                  key?: null | string
-                  lastRequest?: null | number
-                }
+                  count?: null | number;
+                  key?: null | string;
+                  lastRequest?: null | number;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'key' | 'count' | 'lastRequest' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "key" | "count" | "lastRequest" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'ratelimit'
-                update: { count?: number; key?: string; lastRequest?: number }
+                model: "ratelimit";
+                update: { count?: number; key?: string; lastRequest?: number };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'key' | 'count' | 'lastRequest' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "key" | "count" | "lastRequest" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
-              }
-          onUpdateHandle?: string
+                    | null;
+                }>;
+              };
+          onUpdateHandle?: string;
           paginationOpts: {
-            cursor: string | null
-            endCursor?: string | null
-            id?: number
-            maximumBytesRead?: number
-            maximumRowsRead?: number
-            numItems: number
-          }
+            cursor: string | null;
+            endCursor?: string | null;
+            id?: number;
+            maximumBytesRead?: number;
+            maximumRowsRead?: number;
+            numItems: number;
+          };
         },
         any
-      >
+      >;
       updateOne: FunctionReference<
-        'mutation',
-        'internal',
+        "mutation",
+        "internal",
         {
           input:
             | {
-                model: 'user'
+                model: "user";
                 update: {
-                  createdAt?: number
-                  displayUsername?: null | string
-                  email?: string
-                  emailVerified?: boolean
-                  image?: null | string
-                  isAnonymous?: null | boolean
-                  name?: string
-                  phoneNumber?: null | string
-                  phoneNumberVerified?: null | boolean
-                  twoFactorEnabled?: null | boolean
-                  updatedAt?: number
-                  userId?: null | string
-                  username?: null | string
-                }
+                  createdAt?: number;
+                  displayUsername?: null | string;
+                  email?: string;
+                  emailVerified?: boolean;
+                  image?: null | string;
+                  isAnonymous?: null | boolean;
+                  name?: string;
+                  phoneNumber?: null | string;
+                  phoneNumberVerified?: null | boolean;
+                  twoFactorEnabled?: null | boolean;
+                  updatedAt?: number;
+                  userId?: null | string;
+                  username?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'email'
-                    | 'emailVerified'
-                    | 'image'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'twoFactorEnabled'
-                    | 'isAnonymous'
-                    | 'username'
-                    | 'displayUsername'
-                    | 'phoneNumber'
-                    | 'phoneNumberVerified'
-                    | 'userId'
-                    | 'id'
+                    | "name"
+                    | "email"
+                    | "emailVerified"
+                    | "image"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "twoFactorEnabled"
+                    | "isAnonymous"
+                    | "username"
+                    | "displayUsername"
+                    | "phoneNumber"
+                    | "phoneNumberVerified"
+                    | "userId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'session'
+                model: "session";
                 update: {
-                  createdAt?: number
-                  expiresAt?: number
-                  ipAddress?: null | string
-                  token?: string
-                  updatedAt?: number
-                  userAgent?: null | string
-                  userId?: string
-                }
+                  createdAt?: number;
+                  expiresAt?: number;
+                  ipAddress?: null | string;
+                  token?: string;
+                  updatedAt?: number;
+                  userAgent?: null | string;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'expiresAt'
-                    | 'token'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'ipAddress'
-                    | 'userAgent'
-                    | 'userId'
-                    | 'id'
+                    | "expiresAt"
+                    | "token"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "ipAddress"
+                    | "userAgent"
+                    | "userId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'account'
+                model: "account";
                 update: {
-                  accessToken?: null | string
-                  accessTokenExpiresAt?: null | number
-                  accountId?: string
-                  createdAt?: number
-                  idToken?: null | string
-                  password?: null | string
-                  providerId?: string
-                  refreshToken?: null | string
-                  refreshTokenExpiresAt?: null | number
-                  scope?: null | string
-                  updatedAt?: number
-                  userId?: string
-                }
+                  accessToken?: null | string;
+                  accessTokenExpiresAt?: null | number;
+                  accountId?: string;
+                  createdAt?: number;
+                  idToken?: null | string;
+                  password?: null | string;
+                  providerId?: string;
+                  refreshToken?: null | string;
+                  refreshTokenExpiresAt?: null | number;
+                  scope?: null | string;
+                  updatedAt?: number;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'accountId'
-                    | 'providerId'
-                    | 'userId'
-                    | 'accessToken'
-                    | 'refreshToken'
-                    | 'idToken'
-                    | 'accessTokenExpiresAt'
-                    | 'refreshTokenExpiresAt'
-                    | 'scope'
-                    | 'password'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "accountId"
+                    | "providerId"
+                    | "userId"
+                    | "accessToken"
+                    | "refreshToken"
+                    | "idToken"
+                    | "accessTokenExpiresAt"
+                    | "refreshTokenExpiresAt"
+                    | "scope"
+                    | "password"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'verification'
+                model: "verification";
                 update: {
-                  createdAt?: number
-                  expiresAt?: number
-                  identifier?: string
-                  updatedAt?: number
-                  value?: string
-                }
+                  createdAt?: number;
+                  expiresAt?: number;
+                  identifier?: string;
+                  updatedAt?: number;
+                  value?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'identifier'
-                    | 'value'
-                    | 'expiresAt'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "identifier"
+                    | "value"
+                    | "expiresAt"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'twoFactor'
+                model: "twoFactor";
                 update: {
-                  backupCodes?: string
-                  secret?: string
-                  userId?: string
-                }
+                  backupCodes?: string;
+                  secret?: string;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'secret' | 'backupCodes' | 'userId' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "secret" | "backupCodes" | "userId" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'passkey'
+                model: "passkey";
                 update: {
-                  aaguid?: null | string
-                  backedUp?: boolean
-                  counter?: number
-                  createdAt?: null | number
-                  credentialID?: string
-                  deviceType?: string
-                  name?: null | string
-                  publicKey?: string
-                  transports?: null | string
-                  userId?: string
-                }
+                  aaguid?: null | string;
+                  backedUp?: boolean;
+                  counter?: number;
+                  createdAt?: null | number;
+                  credentialID?: string;
+                  deviceType?: string;
+                  name?: null | string;
+                  publicKey?: string;
+                  transports?: null | string;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'publicKey'
-                    | 'userId'
-                    | 'credentialID'
-                    | 'counter'
-                    | 'deviceType'
-                    | 'backedUp'
-                    | 'transports'
-                    | 'createdAt'
-                    | 'aaguid'
-                    | 'id'
+                    | "name"
+                    | "publicKey"
+                    | "userId"
+                    | "credentialID"
+                    | "counter"
+                    | "deviceType"
+                    | "backedUp"
+                    | "transports"
+                    | "createdAt"
+                    | "aaguid"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthApplication'
+                model: "oauthApplication";
                 update: {
-                  clientId?: null | string
-                  clientSecret?: null | string
-                  createdAt?: null | number
-                  disabled?: null | boolean
-                  icon?: null | string
-                  metadata?: null | string
-                  name?: null | string
-                  redirectURLs?: null | string
-                  type?: null | string
-                  updatedAt?: null | number
-                  userId?: null | string
-                }
+                  clientId?: null | string;
+                  clientSecret?: null | string;
+                  createdAt?: null | number;
+                  disabled?: null | boolean;
+                  icon?: null | string;
+                  metadata?: null | string;
+                  name?: null | string;
+                  redirectURLs?: null | string;
+                  type?: null | string;
+                  updatedAt?: null | number;
+                  userId?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'icon'
-                    | 'metadata'
-                    | 'clientId'
-                    | 'clientSecret'
-                    | 'redirectURLs'
-                    | 'type'
-                    | 'disabled'
-                    | 'userId'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "name"
+                    | "icon"
+                    | "metadata"
+                    | "clientId"
+                    | "clientSecret"
+                    | "redirectURLs"
+                    | "type"
+                    | "disabled"
+                    | "userId"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthAccessToken'
+                model: "oauthAccessToken";
                 update: {
-                  accessToken?: null | string
-                  accessTokenExpiresAt?: null | number
-                  clientId?: null | string
-                  createdAt?: null | number
-                  refreshToken?: null | string
-                  refreshTokenExpiresAt?: null | number
-                  scopes?: null | string
-                  updatedAt?: null | number
-                  userId?: null | string
-                }
+                  accessToken?: null | string;
+                  accessTokenExpiresAt?: null | number;
+                  clientId?: null | string;
+                  createdAt?: null | number;
+                  refreshToken?: null | string;
+                  refreshTokenExpiresAt?: null | number;
+                  scopes?: null | string;
+                  updatedAt?: null | number;
+                  userId?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'accessToken'
-                    | 'refreshToken'
-                    | 'accessTokenExpiresAt'
-                    | 'refreshTokenExpiresAt'
-                    | 'clientId'
-                    | 'userId'
-                    | 'scopes'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "accessToken"
+                    | "refreshToken"
+                    | "accessTokenExpiresAt"
+                    | "refreshTokenExpiresAt"
+                    | "clientId"
+                    | "userId"
+                    | "scopes"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'oauthConsent'
+                model: "oauthConsent";
                 update: {
-                  clientId?: null | string
-                  consentGiven?: null | boolean
-                  createdAt?: null | number
-                  scopes?: null | string
-                  updatedAt?: null | number
-                  userId?: null | string
-                }
+                  clientId?: null | string;
+                  consentGiven?: null | boolean;
+                  createdAt?: null | number;
+                  scopes?: null | string;
+                  updatedAt?: null | number;
+                  userId?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'clientId'
-                    | 'userId'
-                    | 'scopes'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'consentGiven'
-                    | 'id'
+                    | "clientId"
+                    | "userId"
+                    | "scopes"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "consentGiven"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'team'
+                model: "team";
                 update: {
-                  createdAt?: number
-                  name?: string
-                  organizationId?: string
-                  updatedAt?: null | number
-                }
+                  createdAt?: number;
+                  name?: string;
+                  organizationId?: string;
+                  updatedAt?: null | number;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'organizationId'
-                    | 'createdAt'
-                    | 'updatedAt'
-                    | 'id'
+                    | "name"
+                    | "organizationId"
+                    | "createdAt"
+                    | "updatedAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'teamMember'
+                model: "teamMember";
                 update: {
-                  createdAt?: null | number
-                  teamId?: string
-                  userId?: string
-                }
+                  createdAt?: null | number;
+                  teamId?: string;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'teamId' | 'userId' | 'createdAt' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "teamId" | "userId" | "createdAt" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'organization'
+                model: "organization";
                 update: {
-                  createdAt?: number
-                  logo?: null | string
-                  metadata?: null | string
-                  name?: string
-                  slug?: null | string
-                }
+                  createdAt?: number;
+                  logo?: null | string;
+                  metadata?: null | string;
+                  name?: string;
+                  slug?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'name'
-                    | 'slug'
-                    | 'logo'
-                    | 'createdAt'
-                    | 'metadata'
-                    | 'id'
+                    | "name"
+                    | "slug"
+                    | "logo"
+                    | "createdAt"
+                    | "metadata"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'member'
+                model: "member";
                 update: {
-                  createdAt?: number
-                  organizationId?: string
-                  role?: string
-                  userId?: string
-                }
+                  createdAt?: number;
+                  organizationId?: string;
+                  role?: string;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'organizationId'
-                    | 'userId'
-                    | 'role'
-                    | 'createdAt'
-                    | 'id'
+                    | "organizationId"
+                    | "userId"
+                    | "role"
+                    | "createdAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'invitation'
+                model: "invitation";
                 update: {
-                  email?: string
-                  expiresAt?: number
-                  inviterId?: string
-                  organizationId?: string
-                  role?: null | string
-                  status?: string
-                  teamId?: null | string
-                }
+                  email?: string;
+                  expiresAt?: number;
+                  inviterId?: string;
+                  organizationId?: string;
+                  role?: null | string;
+                  status?: string;
+                  teamId?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'organizationId'
-                    | 'email'
-                    | 'role'
-                    | 'teamId'
-                    | 'status'
-                    | 'expiresAt'
-                    | 'inviterId'
-                    | 'id'
+                    | "organizationId"
+                    | "email"
+                    | "role"
+                    | "teamId"
+                    | "status"
+                    | "expiresAt"
+                    | "inviterId"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'ssoProvider'
+                model: "ssoProvider";
                 update: {
-                  domain?: string
-                  issuer?: string
-                  oidcConfig?: null | string
-                  organizationId?: null | string
-                  providerId?: string
-                  samlConfig?: null | string
-                  userId?: null | string
-                }
+                  domain?: string;
+                  issuer?: string;
+                  oidcConfig?: null | string;
+                  organizationId?: null | string;
+                  providerId?: string;
+                  samlConfig?: null | string;
+                  userId?: null | string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'issuer'
-                    | 'oidcConfig'
-                    | 'samlConfig'
-                    | 'userId'
-                    | 'providerId'
-                    | 'organizationId'
-                    | 'domain'
-                    | 'id'
+                    | "issuer"
+                    | "oidcConfig"
+                    | "samlConfig"
+                    | "userId"
+                    | "providerId"
+                    | "organizationId"
+                    | "domain"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'jwks'
+                model: "jwks";
                 update: {
-                  createdAt?: number
-                  privateKey?: string
-                  publicKey?: string
-                }
+                  createdAt?: number;
+                  privateKey?: string;
+                  publicKey?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'publicKey' | 'privateKey' | 'createdAt' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "publicKey" | "privateKey" | "createdAt" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'subscription'
+                model: "subscription";
                 update: {
-                  cancelAtPeriodEnd?: null | boolean
-                  periodEnd?: null | number
-                  periodStart?: null | number
-                  plan?: string
-                  referenceId?: string
-                  seats?: null | number
-                  status?: null | string
-                  stripeCustomerId?: null | string
-                  stripeSubscriptionId?: null | string
-                  trialEnd?: null | number
-                  trialStart?: null | number
-                }
+                  cancelAtPeriodEnd?: null | boolean;
+                  periodEnd?: null | number;
+                  periodStart?: null | number;
+                  plan?: string;
+                  referenceId?: string;
+                  seats?: null | number;
+                  status?: null | string;
+                  stripeCustomerId?: null | string;
+                  stripeSubscriptionId?: null | string;
+                  trialEnd?: null | number;
+                  trialStart?: null | number;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'plan'
-                    | 'referenceId'
-                    | 'stripeCustomerId'
-                    | 'stripeSubscriptionId'
-                    | 'status'
-                    | 'periodStart'
-                    | 'periodEnd'
-                    | 'trialStart'
-                    | 'trialEnd'
-                    | 'cancelAtPeriodEnd'
-                    | 'seats'
-                    | 'id'
+                    | "plan"
+                    | "referenceId"
+                    | "stripeCustomerId"
+                    | "stripeSubscriptionId"
+                    | "status"
+                    | "periodStart"
+                    | "periodEnd"
+                    | "trialStart"
+                    | "trialEnd"
+                    | "cancelAtPeriodEnd"
+                    | "seats"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'walletAddress'
+                model: "walletAddress";
                 update: {
-                  address?: string
-                  chainId?: number
-                  createdAt?: number
-                  isPrimary?: null | boolean
-                  userId?: string
-                }
+                  address?: string;
+                  chainId?: number;
+                  createdAt?: number;
+                  isPrimary?: null | boolean;
+                  userId?: string;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
+                  connector?: "AND" | "OR";
                   field:
-                    | 'userId'
-                    | 'address'
-                    | 'chainId'
-                    | 'isPrimary'
-                    | 'createdAt'
-                    | 'id'
+                    | "userId"
+                    | "address"
+                    | "chainId"
+                    | "isPrimary"
+                    | "createdAt"
+                    | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'rateLimit'
+                model: "rateLimit";
                 update: {
-                  count?: null | number
-                  key?: null | string
-                  lastRequest?: null | number
-                }
+                  count?: null | number;
+                  key?: null | string;
+                  lastRequest?: null | number;
+                };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'key' | 'count' | 'lastRequest' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "key" | "count" | "lastRequest" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
+                    | null;
+                }>;
               }
             | {
-                model: 'ratelimit'
-                update: { count?: number; key?: string; lastRequest?: number }
+                model: "ratelimit";
+                update: { count?: number; key?: string; lastRequest?: number };
                 where?: Array<{
-                  connector?: 'AND' | 'OR'
-                  field: 'key' | 'count' | 'lastRequest' | 'id'
+                  connector?: "AND" | "OR";
+                  field: "key" | "count" | "lastRequest" | "id";
                   operator?:
-                    | 'lt'
-                    | 'lte'
-                    | 'gt'
-                    | 'gte'
-                    | 'eq'
-                    | 'in'
-                    | 'ne'
-                    | 'contains'
-                    | 'starts_with'
-                    | 'ends_with'
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
                   value:
                     | string
                     | number
                     | boolean
                     | Array<string>
                     | Array<number>
-                    | null
-                }>
-              }
-          onUpdateHandle?: string
+                    | null;
+                }>;
+              };
+          onUpdateHandle?: string;
         },
         any
-      >
-    }
+      >;
+    };
     adapterTest: {
-      count: FunctionReference<'query', 'internal', any, any>
-      create: FunctionReference<'mutation', 'internal', any, any>
-      delete: FunctionReference<'mutation', 'internal', any, any>
-      deleteMany: FunctionReference<'mutation', 'internal', any, any>
-      findMany: FunctionReference<'query', 'internal', any, any>
-      findOne: FunctionReference<'query', 'internal', any, any>
-      update: FunctionReference<'mutation', 'internal', any, any>
-      updateMany: FunctionReference<'mutation', 'internal', any, any>
-    }
-  }
+      count: FunctionReference<"query", "internal", any, any>;
+      create: FunctionReference<"mutation", "internal", any, any>;
+      delete: FunctionReference<"mutation", "internal", any, any>;
+      deleteMany: FunctionReference<"mutation", "internal", any, any>;
+      findMany: FunctionReference<"query", "internal", any, any>;
+      findOne: FunctionReference<"query", "internal", any, any>;
+      update: FunctionReference<"mutation", "internal", any, any>;
+      updateMany: FunctionReference<"mutation", "internal", any, any>;
+    };
+  };
   geospatial: {
     document: {
       get: FunctionReference<
-        'query',
-        'internal',
+        "query",
+        "internal",
         { key: string },
         {
-          coordinates: { latitude: number; longitude: number }
+          coordinates: { latitude: number; longitude: number };
           filterKeys: Record<
             string,
             | string
@@ -3361,17 +3364,17 @@ export declare const components: {
             | null
             | bigint
             | Array<string | number | boolean | null | bigint>
-          >
-          key: string
-          sortKey: number
+          >;
+          key: string;
+          sortKey: number;
         } | null
-      >
+      >;
       insert: FunctionReference<
-        'mutation',
-        'internal',
+        "mutation",
+        "internal",
         {
           document: {
-            coordinates: { latitude: number; longitude: number }
+            coordinates: { latitude: number; longitude: number };
             filterKeys: Record<
               string,
               | string
@@ -3380,157 +3383,157 @@ export declare const components: {
               | null
               | bigint
               | Array<string | number | boolean | null | bigint>
-            >
-            key: string
-            sortKey: number
-          }
-          levelMod: number
-          maxCells: number
-          maxLevel: number
-          minLevel: number
+            >;
+            key: string;
+            sortKey: number;
+          };
+          levelMod: number;
+          maxCells: number;
+          maxLevel: number;
+          minLevel: number;
         },
         null
-      >
+      >;
       remove: FunctionReference<
-        'mutation',
-        'internal',
+        "mutation",
+        "internal",
         {
-          key: string
-          levelMod: number
-          maxCells: number
-          maxLevel: number
-          minLevel: number
+          key: string;
+          levelMod: number;
+          maxCells: number;
+          maxLevel: number;
+          minLevel: number;
         },
         boolean
-      >
-    }
+      >;
+    };
     query: {
       debugCells: FunctionReference<
-        'query',
-        'internal',
+        "query",
+        "internal",
         {
-          levelMod: number
-          maxCells: number
-          maxLevel: number
-          minLevel: number
+          levelMod: number;
+          maxCells: number;
+          maxLevel: number;
+          minLevel: number;
           rectangle: {
-            east: number
-            north: number
-            south: number
-            west: number
-          }
+            east: number;
+            north: number;
+            south: number;
+            west: number;
+          };
         },
         Array<{
-          token: string
-          vertices: Array<{ latitude: number; longitude: number }>
+          token: string;
+          vertices: Array<{ latitude: number; longitude: number }>;
         }>
-      >
+      >;
       execute: FunctionReference<
-        'query',
-        'internal',
+        "query",
+        "internal",
         {
-          cursor?: string
-          levelMod: number
-          logLevel: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
-          maxCells: number
-          maxLevel: number
-          minLevel: number
+          cursor?: string;
+          levelMod: number;
+          logLevel: "DEBUG" | "INFO" | "WARN" | "ERROR";
+          maxCells: number;
+          maxLevel: number;
+          minLevel: number;
           query: {
             filtering: Array<{
-              filterKey: string
-              filterValue: string | number | boolean | null | bigint
-              occur: 'should' | 'must'
-            }>
-            maxResults: number
+              filterKey: string;
+              filterValue: string | number | boolean | null | bigint;
+              occur: "should" | "must";
+            }>;
+            maxResults: number;
             rectangle: {
-              east: number
-              north: number
-              south: number
-              west: number
-            }
+              east: number;
+              north: number;
+              south: number;
+              west: number;
+            };
             sorting: {
-              interval: { endExclusive?: number; startInclusive?: number }
-            }
-          }
+              interval: { endExclusive?: number; startInclusive?: number };
+            };
+          };
         },
         {
-          nextCursor?: string
+          nextCursor?: string;
           results: Array<{
-            coordinates: { latitude: number; longitude: number }
-            key: string
-          }>
+            coordinates: { latitude: number; longitude: number };
+            key: string;
+          }>;
         }
-      >
+      >;
       nearestPoints: FunctionReference<
-        'query',
-        'internal',
+        "query",
+        "internal",
         {
-          levelMod: number
-          logLevel: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
-          maxDistance?: number
-          maxLevel: number
-          maxResults: number
-          minLevel: number
-          nextCursor?: string
-          point: { latitude: number; longitude: number }
+          levelMod: number;
+          logLevel: "DEBUG" | "INFO" | "WARN" | "ERROR";
+          maxDistance?: number;
+          maxLevel: number;
+          maxResults: number;
+          minLevel: number;
+          nextCursor?: string;
+          point: { latitude: number; longitude: number };
         },
         Array<{
-          coordinates: { latitude: number; longitude: number }
-          distance: number
-          key: string
+          coordinates: { latitude: number; longitude: number };
+          distance: number;
+          key: string;
         }>
-      >
-    }
-  }
+      >;
+    };
+  };
   crons: {
     public: {
       del: FunctionReference<
-        'mutation',
-        'internal',
+        "mutation",
+        "internal",
         { identifier: { id: string } | { name: string } },
         null
-      >
+      >;
       get: FunctionReference<
-        'query',
-        'internal',
+        "query",
+        "internal",
         { identifier: { id: string } | { name: string } },
         {
-          args: Record<string, any>
-          functionHandle: string
-          id: string
-          name?: string
+          args: Record<string, any>;
+          functionHandle: string;
+          id: string;
+          name?: string;
           schedule:
-            | { kind: 'interval'; ms: number }
-            | { cronspec: string; kind: 'cron'; tz?: string }
+            | { kind: "interval"; ms: number }
+            | { cronspec: string; kind: "cron"; tz?: string };
         } | null
-      >
+      >;
       list: FunctionReference<
-        'query',
-        'internal',
+        "query",
+        "internal",
         {},
         Array<{
-          args: Record<string, any>
-          functionHandle: string
-          id: string
-          name?: string
+          args: Record<string, any>;
+          functionHandle: string;
+          id: string;
+          name?: string;
           schedule:
-            | { kind: 'interval'; ms: number }
-            | { cronspec: string; kind: 'cron'; tz?: string }
+            | { kind: "interval"; ms: number }
+            | { cronspec: string; kind: "cron"; tz?: string };
         }>
-      >
+      >;
       register: FunctionReference<
-        'mutation',
-        'internal',
+        "mutation",
+        "internal",
         {
-          args: Record<string, any>
-          functionHandle: string
-          name?: string
+          args: Record<string, any>;
+          functionHandle: string;
+          name?: string;
           schedule:
-            | { kind: 'interval'; ms: number }
-            | { cronspec: string; kind: 'cron'; tz?: string }
+            | { kind: "interval"; ms: number }
+            | { cronspec: string; kind: "cron"; tz?: string };
         },
         string
-      >
-    }
-  }
-}
+      >;
+    };
+  };
+};

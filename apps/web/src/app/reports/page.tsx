@@ -4,9 +4,8 @@ import { api } from '@journey-radar/backend/convex/_generated/api'
 import { useMutation, useQuery } from 'convex/react'
 import { ChevronUp, Database, Loader2, Menu } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
-import { toast } from 'sonner'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,

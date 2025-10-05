@@ -25,44 +25,20 @@ export default function RegisterPage() {
     const name = formData.get('name') as string
 
     try {
-      // Add timeout to prevent infinite loading
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Registration timed out')), 30000) // 30 second timeout
+      const result = await authClient.signUp.email({
+        email,
+        password,
+        name,
+        callbackURL: '/map'
       })
 
-      const response = await Promise.race([
-        fetch('/api/auth/sign-up/email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            name,
-          }),
-        }),
-        timeoutPromise
-      ])
-
-      if (!response.ok) {
-        throw new Error('Registration failed')
-      }
-
-      const result = await response.json()
-
-      // If registration is successful, redirect to login or map
-      if (result.user) {
-        window.location.href = '/login'
-      } else {
+      if (result.error) {
         setError('Failed to create account. Please try again.')
+      } else {
+        window.location.href = '/map'
       }
     } catch (err: any) {
-      if (err.message === 'Registration timed out') {
-        setError('Registration is taking longer than expected. Please try again or contact support.')
-      } else {
-        setError('Failed to create account. Please try again.')
-      }
+      setError('Failed to create account. Please try again.')
     } finally {
       setIsLoading(false)
     }
