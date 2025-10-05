@@ -70,6 +70,7 @@ export default defineSchema({
     .index('by_incident', ['incidentId'])
     .index('by_cluster', ['clusterId'])
     .index('by_verification_score', ['verificationScore'])
+    .index('by_transport_mode', ['transportMode'])
     .index('by_route', ['route'])
     .index('by_gtfs_route', ['gtfsRouteId'])
     .index('by_gtfs_trip', ['gtfsTripId'])
@@ -226,4 +227,79 @@ export default defineSchema({
     .index('by_report', ['reportId'])
     .index('by_user', ['userId'])
     .index('by_report_user', ['reportId', 'userId']), // Prevent duplicate votes
+
+  // =================================================================
+  // POINT TRANSACTIONS TABLE - Tracks all point transactions for users
+  // =================================================================
+  pointTransactions: defineTable({
+    userId: v.id('users'), // The user who earned/spent points
+    points: v.number(), // Positive for earning, negative for spending
+    type: v.union(
+      v.literal('REPORT_SUBMITTED'),
+      v.literal('REPORT_VERIFIED'),
+      v.literal('REPORT_CONFIRMED'),
+      v.literal('WEEKLY_STREAK'),
+      v.literal('REPUTATION_BONUS'),
+      v.literal('ADMIN_ADJUSTMENT'),
+      v.literal('VOUCHER_REDEEMED'),
+    ),
+    description: v.string(), // Human-readable description
+    relatedReportId: v.optional(v.id('reports')), // Related report if applicable
+    relatedIncidentId: v.optional(v.id('incidents')), // Related incident if applicable
+    timestamp: v.number(), // Unix timestamp when transaction occurred
+  })
+    .index('by_user', ['userId'])
+    .index('by_timestamp', ['timestamp'])
+    .index('by_user_timestamp', ['userId', 'timestamp']),
+
+  // =================================================================
+  // REWARDS TABLE - Available rewards for redemption
+  // =================================================================
+  rewards: defineTable({
+    name: v.string(), // Reward name
+    description: v.string(), // Detailed description
+    pointsCost: v.number(), // Points required to redeem
+    category: v.union(
+      v.literal('DISCOUNT'),
+      v.literal('VOUCHER'),
+      v.literal('EXPERIENCE'),
+      v.literal('MERCHANDISE'),
+      v.literal('DIGITAL'),
+    ),
+    imageUrl: v.optional(v.string()), // Image URL for the reward
+    termsAndConditions: v.optional(v.string()), // Terms and conditions
+    maxRedemptions: v.optional(v.number()), // Maximum times this reward can be redeemed
+    currentRedemptions: v.number(), // Current number of redemptions
+    validUntil: v.optional(v.number()), // Expiration timestamp (optional)
+    isActive: v.boolean(), // Whether this reward is currently available
+    createdAt: v.number(), // When this reward was created
+  })
+    .index('by_active', ['isActive'])
+    .index('by_category', ['category'])
+    .index('by_points_cost', ['pointsCost'])
+    .index('by_created', ['createdAt']),
+
+  // =================================================================
+  // REWARD REDEMPTIONS TABLE - Tracks user reward redemptions
+  // =================================================================
+  rewardRedemptions: defineTable({
+    userId: v.id('users'), // User who redeemed the reward
+    rewardId: v.id('rewards'), // The reward that was redeemed
+    pointsUsed: v.number(), // Points spent on this redemption
+    status: v.union(
+      v.literal('PENDING'), // Redemption created, waiting for completion
+      v.literal('COMPLETED'), // Reward has been delivered/used
+      v.literal('CANCELLED'), // Redemption was cancelled
+      v.literal('EXPIRED'), // Redemption expired
+    ),
+    redemptionCode: v.string(), // Unique code for this redemption
+    timestamp: v.number(), // When the redemption was created
+    completedAt: v.optional(v.number()), // When the redemption was completed
+    notes: v.optional(v.string()), // Additional notes about the redemption
+  })
+    .index('by_user', ['userId'])
+    .index('by_reward', ['rewardId'])
+    .index('by_status', ['status'])
+    .index('by_timestamp', ['timestamp'])
+    .index('by_user_timestamp', ['userId', 'timestamp'])
 })

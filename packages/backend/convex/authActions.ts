@@ -1,6 +1,6 @@
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
-import { createAuthForMutation } from './auth'
+import { createAuth } from './auth'
 
 export const signUp = mutation({
   args: {
@@ -9,7 +9,7 @@ export const signUp = mutation({
     name: v.string(),
   },
   handler: async (ctx, args) => {
-    const auth = createAuthForMutation(ctx)
+    const auth = createAuth(ctx)
     const result = await auth.api.signUpEmail({
       body: args,
     })
@@ -23,7 +23,7 @@ export const signIn = mutation({
     password: v.string(),
   },
   handler: async (ctx, args) => {
-    const auth = createAuthForMutation(ctx)
+    const auth = createAuth(ctx)
     const result = await auth.api.signInEmail({
       body: args,
     })
@@ -34,7 +34,7 @@ export const signIn = mutation({
 export const signOut = mutation({
   args: {},
   handler: async (ctx) => {
-    const auth = createAuthForMutation(ctx)
+    const auth = createAuth(ctx)
     const result = await auth.api.signOut({})
     return result
   },

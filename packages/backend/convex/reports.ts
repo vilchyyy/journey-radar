@@ -530,7 +530,7 @@ export const getTransportReports = query({
     // Get all reports for this transport mode
     const reports = await ctx.db
       .query('reports')
-      .filter((q) => q.eq(q.field('transportMode'), mode))
+      .withIndex('by_transport_mode', (q) => q.eq('transportMode', mode))
       .collect()
 
     const results = []

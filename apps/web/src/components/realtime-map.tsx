@@ -1,5 +1,6 @@
 'use client'
 
+import { useQuery } from 'convex/react'
 import {
   AlertTriangle,
   ArrowRightLeft,
@@ -17,7 +18,6 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useQuery } from 'convex/react'
 import MapGL, { Layer, Source } from 'react-map-gl/maplibre'
 import { ReportVoting } from '@/components/report-voting'
 import { Button } from '@/components/ui/button'
@@ -32,9 +32,9 @@ import { Input } from '@/components/ui/input'
 import { useLocationSearch } from '@/hooks/use-location-search'
 import { useRealtimeReports } from '@/hooks/use-realtime-reports'
 import { useVehiclePositions } from '@/hooks/use-vehicle-positions'
+import { api } from '@/lib/convex-client'
 import type { RouteCoordinate } from '@/lib/route-service'
 import { cn } from '@/lib/utils'
-import { api } from '@/lib/convex-client'
 
 type ModeFilter = 'bus' | 'tram'
 
@@ -150,24 +150,58 @@ export default function RealtimeMap({
   // Get transport reports using useQuery when a vehicle is selected
   const transportReportsQuery = useQuery(
     api.reports.getTripReports,
-    selectedTransport ? {
-      tripId: selectedTransport.tripId || undefined,
-      routeNumber: selectedTransport.routeNumber || undefined,
-      mode: selectedTransport.mode?.toUpperCase() || undefined,
-      routeId: selectedTransport.routeId || undefined,
-      vehicleId: selectedTransport.vehicleId || undefined,
-    } : 'skip'
+    selectedTransport
+      ? {
+          tripId: selectedTransport.tripId || undefined,
+          routeNumber: selectedTransport.routeNumber || undefined,
+          mode: selectedTransport.mode?.toUpperCase() || undefined,
+          routeId: selectedTransport.routeId || undefined,
+          vehicleId: selectedTransport.vehicleId || undefined,
+        }
+      : 'skip',
   )
 
   // Get all GTFS trip updates and filter for the selected vehicle
   const allTripUpdates = useQuery(api.gtfs.getTripUpdates)
   const selectedVehicleTripUpdate = useMemo(() => {
     if (!selectedTransport || !allTripUpdates) return null
-    return allTripUpdates.find(update =>
-      update.vehicleId === selectedTransport.vehicleId ||
-      update.tripId === selectedTransport.tripId ||
-      update.routeId === selectedTransport.routeId
+
+    const tripUpdate = allTripUpdates.find(
+      (update: any) =>
+        update.vehicleId === selectedTransport.vehicleId ||
+        update.tripId === selectedTransport.tripId ||
+        update.routeId === selectedTransport.routeId,
     )
+
+    if (!tripUpdate) return null
+
+    // Calculate expected delay from stop updates
+    const delays = tripUpdate.stopUpdates
+      .map((stop) => stop.arrivalDelay || stop.departureDelay)
+      .filter((delay) => delay !== undefined && delay !== null) as number[]
+
+    const averageDelay =
+      delays.length > 0
+        ? delays.reduce((sum, delay) => sum + delay, 0) / delays.length
+        : 0
+
+    const expectedDelay = Math.round(averageDelay / 60) // Convert seconds to minutes
+
+    // Determine delay status
+    let delayStatus = 'On Time'
+    if (expectedDelay > 5) {
+      delayStatus = 'Significant Delay'
+    } else if (expectedDelay > 2) {
+      delayStatus = 'Minor Delay'
+    } else if (expectedDelay < -2) {
+      delayStatus = 'Early'
+    }
+
+    return {
+      ...tripUpdate,
+      expectedDelay,
+      delayStatus,
+    }
   }, [selectedTransport, allTripUpdates])
 
   const vehiclesSourceId = 'vehicles-layer'
@@ -177,7 +211,6 @@ export default function RealtimeMap({
     setShowTransportDrawer(true)
   }
 
-  
   const vehicleGeoJSON = useMemo(
     () => {
       
@@ -2111,14 +2144,14 @@ export default function RealtimeMap({
                               <span>Status:</span>
                               <span
                                 className={`font-medium ${
-                                  selectedVehicleTripUpdate
-                                    .delayStatus === 'Significant Delay'
+                                  selectedVehicleTripUpdate.delayStatus ===
+                                  'Significant Delay'
                                     ? 'text-red-600'
-                                    : selectedVehicleTripUpdate
-                                          .delayStatus === 'Minor Delay'
+                                    : selectedVehicleTripUpdate.delayStatus ===
+                                        'Minor Delay'
                                       ? 'text-orange-600'
-                                      : selectedVehicleTripUpdate
-                                            .delayStatus === 'Early'
+                                      : selectedVehicleTripUpdate.delayStatus ===
+                                          'Early'
                                         ? 'text-green-600'
                                         : 'text-blue-600'
                                 }`}
@@ -2126,30 +2159,23 @@ export default function RealtimeMap({
                                 {selectedVehicleTripUpdate.delayStatus}
                               </span>
                             </p>
-                            {selectedVehicleTripUpdate.expectedDelay !==
-                              0 && (
+                            {selectedVehicleTripUpdate.expectedDelay !== 0 && (
                               <p className="flex items-center justify-between mb-1">
                                 <span>Expected Delay:</span>
                                 <span
                                   className={`font-medium ${
-                                    selectedVehicleTripUpdate
-                                      .expectedDelay > 5
+                                    selectedVehicleTripUpdate.expectedDelay > 5
                                       ? 'text-red-600'
-                                      : selectedVehicleTripUpdate
-                                            .expectedDelay > 2
+                                      : selectedVehicleTripUpdate.expectedDelay >
+                                          2
                                         ? 'text-orange-600'
                                         : 'text-green-600'
                                   }`}
                                 >
-                                  {selectedVehicleTripUpdate
-                                    .expectedDelay > 0
+                                  {selectedVehicleTripUpdate.expectedDelay > 0
                                     ? '+'
                                     : ''}
-                                  {
-                                    selectedVehicleTripUpdate
-                                      .expectedDelay
-                                  }{' '}
-                                  min
+                                  {selectedVehicleTripUpdate.expectedDelay} min
                                 </span>
                               </p>
                             )}
@@ -2243,12 +2269,10 @@ export default function RealtimeMap({
                                         size="sm"
                                         onUpdate={(newScore) => {
                                           // Update the score in local state
-                                          setTransportReportsScores(
-                                            (prev) => ({
-                                              ...prev,
-                                              [report._id]: newScore,
-                                            }),
-                                          )
+                                          setTransportReportsScores((prev) => ({
+                                            ...prev,
+                                            [report._id]: newScore,
+                                          }))
                                         }}
                                       />
                                     </div>

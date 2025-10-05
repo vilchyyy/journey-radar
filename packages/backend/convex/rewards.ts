@@ -1,17 +1,36 @@
 import { getAuthUserId } from '@convex-dev/auth/server'
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
+import { authComponent } from './auth'
 
 // Get user's current points balance and stats
 export const getUserPointsStats = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx)
-    if (!userId) {
+    const authUser = await authComponent.getAuthUser(ctx)
+    if (!authUser || !authUser.userId) {
       return null
     }
 
-    const user = await ctx.db.get(userId)
+    const userId = authUser.userId
+    let user = await ctx.db.get(userId)
+
+    // If user doesn't exist in our users table, create a basic record
+    if (!user) {
+      // Create a minimal user record for Better Auth users
+      const userIdRecord = await ctx.db.insert('users', {
+        name: authUser.name || 'User',
+        tokenIdentifier: authUser.email || `user-${userId}`,
+        points: 0,
+        avatarUrl: authUser.image,
+        reportsSubmitted: 0,
+        verifiedReports: 0,
+        reputationScore: 50,
+        receivedUpvotes: 0,
+      })
+      user = await ctx.db.get(userIdRecord)
+    }
+
     if (!user) {
       return null
     }
@@ -94,7 +113,8 @@ export const getAvailableRewards = query({
 export const getUserRedemptions = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx)
+    const authUser = await authComponent.getAuthUser(ctx)
+    const userId = authUser?.userId
     if (!userId) {
       return []
     }
@@ -144,9 +164,31 @@ export const awardPoints = mutation({
     relatedIncidentId: v.optional(v.id('incidents')),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (!userId) {
+    const authUser = await authComponent.getAuthUser(ctx)
+    if (!authUser || !authUser.userId) {
       throw new Error('User not authenticated')
+    }
+
+    const userId = authUser.userId
+    let user = await ctx.db.get(userId)
+
+    // If user doesn't exist in our users table, create a basic record
+    if (!user) {
+      const userIdRecord = await ctx.db.insert('users', {
+        name: authUser.name || 'User',
+        tokenIdentifier: authUser.email || `user-${userId}`,
+        points: 0,
+        avatarUrl: authUser.image,
+        reportsSubmitted: 0,
+        verifiedReports: 0,
+        reputationScore: 50,
+        receivedUpvotes: 0,
+      })
+      user = await ctx.db.get(userIdRecord)
+    }
+
+    if (!user) {
+      throw new Error('Failed to create user record')
     }
 
     // Create point transaction
@@ -177,9 +219,31 @@ export const redeemReward = mutation({
     rewardId: v.id('rewards'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (!userId) {
+    const authUser = await authComponent.getAuthUser(ctx)
+    if (!authUser || !authUser.userId) {
       throw new Error('User not authenticated')
+    }
+
+    const userId = authUser.userId
+    let user = await ctx.db.get(userId)
+
+    // If user doesn't exist in our users table, create a basic record
+    if (!user) {
+      const userIdRecord = await ctx.db.insert('users', {
+        name: authUser.name || 'User',
+        tokenIdentifier: authUser.email || `user-${userId}`,
+        points: 0,
+        avatarUrl: authUser.image,
+        reportsSubmitted: 0,
+        verifiedReports: 0,
+        reputationScore: 50,
+        receivedUpvotes: 0,
+      })
+      user = await ctx.db.get(userIdRecord)
+    }
+
+    if (!user) {
+      throw new Error('Failed to create user record')
     }
 
     // Get the reward
@@ -257,7 +321,8 @@ export const getTransactionHistory = query({
     cursor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
+    const authUser = await authComponent.getAuthUser(ctx)
+    const userId = authUser?.userId
     if (!userId) {
       return []
     }

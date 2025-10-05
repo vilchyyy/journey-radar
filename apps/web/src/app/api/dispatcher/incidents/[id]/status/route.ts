@@ -1,5 +1,5 @@
 import { api } from '@journey-radar/backend/convex/_generated/api'
-import { Id } from '@journey-radar/backend/convex/_generated/dataModel'
+import type { Id } from '@journey-radar/backend/convex/_generated/dataModel'
 import { fetchMutation } from 'convex/nextjs'
 import { type NextRequest, NextResponse } from 'next/server'
 
@@ -28,14 +28,14 @@ export async function PUT(request: NextRequest, { params }: Params) {
     }
 
     const incidentId = await fetchMutation(api.incidents.updateIncidentStatus, {
-      incidentId: Id('incidents', id),
+      incidentId: { table: 'incidents', id },
       status: body.status,
       dispatcherId: body.dispatcherId,
     })
 
     return NextResponse.json({
       success: true,
-      data: { incidentId: id, status: body.status },
+      data: { incidentId },
       message: `Incident status updated to ${body.status}`,
     })
   } catch (error) {

@@ -1,8 +1,8 @@
 import { internal } from './_generated/api'
-import { action } from './_generated/server'
+import { internalAction } from './_generated/server'
 
 // Daily GTFS schedule loading (runs at 2 AM)
-export const dailyGTFSLoad = action({
+export const dailyGTFSLoad = internalAction({
   args: {},
   handler: async (ctx) => {
     console.log('Starting daily GTFS schedule loading...')
@@ -13,7 +13,7 @@ export const dailyGTFSLoad = action({
 })
 
 // Real-time vehicle position loading (runs every 15 seconds)
-export const vehiclePositionRefresh = action({
+export const vehiclePositionRefresh = internalAction({
   args: {},
   handler: async (ctx) => {
     console.log('Refreshing vehicle positions...')
@@ -24,7 +24,7 @@ export const vehiclePositionRefresh = action({
 })
 
 // Real-time trip updates loading (runs every 15 seconds)
-export const tripUpdateRefresh = action({
+export const tripUpdateRefresh = internalAction({
   args: {},
   handler: async (ctx) => {
     console.log('Refreshing trip updates...')
@@ -35,7 +35,7 @@ export const tripUpdateRefresh = action({
 })
 
 // Combined refresh for real-time data
-export const realTimeDataRefresh = action({
+export const realTimeDataRefresh = internalAction({
   args: {},
   handler: async (ctx) => {
     console.log('Starting real-time data refresh...')

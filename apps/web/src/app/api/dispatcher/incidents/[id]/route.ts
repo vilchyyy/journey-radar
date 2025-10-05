@@ -1,5 +1,5 @@
 import { api } from '@journey-radar/backend/convex/_generated/api'
-import { Id } from '@journey-radar/backend/convex/_generated/dataModel'
+import type { Id } from '@journey-radar/backend/convex/_generated/dataModel'
 import { fetchMutation, fetchQuery } from 'convex/nextjs'
 import { type NextRequest, NextResponse } from 'next/server'
 
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const { id } = await params
 
     const incident = await fetchQuery(api.incidents.getIncidentById, {
-      incidentId: Id('incidents', id),
+      incidentId: { table: 'incidents', id },
     })
 
     return NextResponse.json({
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const body = await request.json()
 
     const updateData = {
-      incidentId: Id('incidents', id),
+      incidentId: { table: 'incidents', id },
       type: body.type,
       description: body.description,
       validUntil: body.validUntil,
@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     return NextResponse.json({
       success: true,
-      data: { incidentId: id },
+      data: { incidentId },
       message: 'Incident updated successfully',
     })
   } catch (error) {
@@ -70,13 +70,13 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     const dispatcherId = searchParams.get('dispatcherId')
 
     const incidentId = await fetchMutation(api.incidents.deleteIncident, {
-      incidentId: Id('incidents', id),
+      incidentId: { table: 'incidents', id },
       dispatcherId: dispatcherId || undefined,
     })
 
     return NextResponse.json({
       success: true,
-      data: { incidentId: id },
+      data: { incidentId },
       message: 'Incident deleted successfully',
     })
   } catch (error) {

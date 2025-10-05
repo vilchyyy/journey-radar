@@ -31,52 +31,16 @@ export default function LoginPage() {
     const password = formData.get('password') as string
 
     try {
-      // Add timeout to prevent infinite loading
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Login timed out')), 30000) // 30 second timeout
+      await authClient.signIn.email({
+        email,
+        password,
       })
 
-      const response = await Promise.race([
-        fetch('/api/auth/sign-in/email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            callbackURL: '/map',
-          }),
-        }),
-        timeoutPromise,
-      ])
-
-      if (!response.ok) {
-        throw new Error('Login failed')
-      }
-
-      const result = await response.json()
-
-      // If we get a redirect response, handle it
-      if (response.redirected) {
-        window.location.href = response.url
-        return
-      }
-
-      // If we get a successful response with user data, redirect manually
-      if (result.user) {
-        window.location.href = '/map'
-      } else {
-        setError('Invalid email or password')
-      }
+      // Redirect will be handled automatically by the callbackURL
+      // or you can redirect manually if needed
+      window.location.href = '/map'
     } catch (err: any) {
-      if (err.message === 'Login timed out') {
-        setError(
-          'Login is taking longer than expected. Please try again or contact support.',
-        )
-      } else {
-        setError('Invalid email or password')
-      }
+      setError('Invalid email or password')
     } finally {
       setIsLoading(false)
     }
@@ -122,7 +86,7 @@ export default function LoginPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="mt-6 w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Sign in
             </Button>
