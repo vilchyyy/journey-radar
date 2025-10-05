@@ -39,6 +39,8 @@ export function SidebarNavigation() {
         side="left"
         className="w-80 p-0 rounded-r-2xl"
       >
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+
         {/* Header Section */}
         <div className="bg-teal-400 py-8 px-6">
           <div className="flex flex-col items-center">
