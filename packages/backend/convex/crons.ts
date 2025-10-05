@@ -11,6 +11,13 @@ crons.interval(
   {}, // args
 )
 
+crons.interval(
+  'seeding-refresh',
+  { hours: 1 },
+  internal.seed_realistic.seedRealisticReports,
+  { count: 50 }, // args
+)
+
 // GTFS schedule loading - load ZIP files every hour
 crons.hourly(
   'gtfs-schedule-load',

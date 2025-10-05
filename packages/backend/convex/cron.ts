@@ -44,3 +44,5 @@ export const realTimeDataRefresh = internalAction({
       ctx.runAction(internal.gtfs.loadVehiclePositions),
       ctx.runAction(internal.gtfs.loadTripUpdates),
     ])
+  },
+})
