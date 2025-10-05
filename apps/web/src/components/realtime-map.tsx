@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { useLocationSearch } from '@/hooks/use-location-search'
+import { useRealtimeReports } from '@/hooks/use-realtime-reports'
 import { useVehiclePositions } from '@/hooks/use-vehicle-positions'
 import type { RouteCoordinate } from '@/lib/route-service'
 import { cn } from '@/lib/utils'
@@ -129,12 +130,12 @@ export default function RealtimeMap({
 
   // Reports drawer state
   const [showReportsDrawer, setShowReportsDrawer] = useState(false)
-  const [nearbyReports, setNearbyReports] = useState<any[]>([])
-  const [reportsLoading, setReportsLoading] = useState(false)
+  const { reports: nearbyReports, isLoading: isReportsLoading } = useRealtimeReports()
   const [nearbyReportsScores, setNearbyReportsScores] = useState<
     Record<string, number>
   >({})
 
+  
   // Transport details drawer state
   const [showTransportDrawer, setShowTransportDrawer] = useState(false)
   const [selectedTransport, setSelectedTransport] = useState<any>(null)
@@ -178,22 +179,60 @@ export default function RealtimeMap({
 
   
   const vehicleGeoJSON = useMemo(
-    () => ({
-      type: 'FeatureCollection' as const,
-      features: vehicles.map((vehicle) => ({
-        type: 'Feature' as const,
-        geometry: {
-          type: 'Point' as const,
-          coordinates: [vehicle.longitude, vehicle.latitude] as const,
-        },
-        properties: {
-          id: vehicle.vehicleId,
-          routeShortName: vehicle.routeNumber,
-          mode: vehicle.mode.toLowerCase(),
-        },
-      })),
-    }),
-    [vehicles],
+    () => {
+      
+      const vehiclesWithReports = vehicles.map((vehicle) => {
+        // Check if this vehicle has associated reports - try multiple matching strategies
+        const hasReports = nearbyReports.some((report: any) => {
+          // Priority 1: Exact vehicle ID match (most accurate)
+          if (report.gtfsVehicleId && report.gtfsVehicleId === vehicle.vehicleId) {
+            return true
+          }
+
+          // Priority 2: Exact trip ID match (very accurate)
+          if (report.gtfsTripId && vehicle.tripId && report.gtfsTripId === vehicle.tripId) {
+            return true
+          }
+
+          // Priority 3: Route match with additional criteria (less accurate, only use if above fail)
+          // Only match by route if the report is recent (within last 30 minutes)
+          const reportAge = Date.now() - (report._creationTime ? report._creationTime : 0)
+          const isRecentReport = reportAge < (30 * 60 * 1000) // 30 minutes
+
+          if (isRecentReport && report.routeShortName && vehicle.routeNumber) {
+            const reportRouteNum = String(report.routeShortName)
+            const vehicleRouteNum = String(vehicle.routeNumber)
+            if (reportRouteNum === vehicleRouteNum) {
+              return true
+            }
+          }
+
+          return false
+        })
+
+        
+        return {
+          type: 'Feature' as const,
+          geometry: {
+            type: 'Point' as const,
+            coordinates: [vehicle.longitude, vehicle.latitude] as const,
+          },
+          properties: {
+            id: vehicle.vehicleId,
+            routeShortName: vehicle.routeNumber,
+            mode: vehicle.mode.toLowerCase(),
+            hasReports, // Use actual matching logic now
+          },
+        }
+      })
+
+      
+      return {
+        type: 'FeatureCollection' as const,
+        features: vehiclesWithReports,
+      }
+    },
+    [vehicles, nearbyReports],
   )
 
   const journeyMarkersGeoJSON = useMemo(
@@ -231,6 +270,7 @@ export default function RealtimeMap({
     [fromLocation, toLocation],
   )
 
+  
   const routeSections = useMemo(() => {
     if (!routeData?.routes) return []
     return routeData.routes.flatMap((route: any, routeIndex: number) =>
@@ -571,42 +611,7 @@ export default function RealtimeMap({
     }
   }, [centerOn, fromLocation, toLocation])
 
-  const fetchNearbyReports = useCallback(async () => {
-    setReportsLoading(true)
-    setShowReportsDrawer(true)
-
-    try {
-      // Get current map center
-      const centerLat = viewState.latitude
-      const centerLng = viewState.longitude
-      const radius = 2000 // 2km radius
-
-      const response = await fetch('/api/reports/list', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          latitude: centerLat,
-          longitude: centerLng,
-          radiusKm: radius / 1000, // Convert meters to km
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch nearby reports')
-      }
-
-      const data = await response.json()
-      setNearbyReports(data.reports || [])
-    } catch (err) {
-      console.error('Error fetching nearby reports:', err)
-      setNearbyReports([])
-    } finally {
-      setReportsLoading(false)
-    }
-  }, [viewState])
-
+  
   const formattedTimestamp = useMemo(
     () =>
       new Date().toLocaleTimeString([], {
@@ -638,7 +643,7 @@ export default function RealtimeMap({
           }
         }}
         onClick={handleMapClick}
-        interactiveLayerIds={['vehicle-points', 'vehicle-labels']}
+        interactiveLayerIds={['vehicle-points', 'vehicle-labels', 'vehicle-glow']}
         mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
         style={{ width: '100%', height: '100%' }}
         cursor={isSelectingPoint ? 'crosshair' : 'grab'}
@@ -647,21 +652,48 @@ export default function RealtimeMap({
       >
         {vehicleGeoJSON.features.length > 0 && (
           <Source id={vehiclesSourceId} type="geojson" data={vehicleGeoJSON}>
+            {/* Glow effect for vehicles with reports */}
+            <Layer
+              id="vehicle-glow"
+              type="circle"
+              paint={{
+                'circle-radius': 15,
+                'circle-color': [
+                  'case',
+                  ['get', 'hasReports'],
+                  '#fb923c', // Orange glow for vehicles with reports
+                  'transparent', // No glow for vehicles without reports
+                ],
+                'circle-opacity': 0.4,
+                'circle-blur': 1,
+              }}
+              filter={['==', ['get', 'hasReports'], true]}
+            />
             <Layer
               id="vehicle-points"
               type="circle"
               paint={{
                 'circle-radius': 6,
                 'circle-color': [
-                  'match',
-                  ['get', 'mode'],
-                  'tram',
-                  '#22c55e',
-                  'bus',
-                  '#38bdf8',
-                  '#94a3b8',
+                  'case',
+                  ['get', 'hasReports'],
+                  '#f97316', // Orange color for vehicles with reports
+                  [
+                    'match',
+                    ['get', 'mode'],
+                    'tram',
+                    '#22c55e',
+                    'bus',
+                    '#38bdf8',
+                    '#94a3b8',
+                  ],
                 ],
-                'circle-stroke-width': 2,
+                'circle-stroke-width': [
+                  'case',
+                  ['get', 'hasReports'],
+                  3, // Thicker stroke for vehicles with reports
+                  2,
+                ],
                 'circle-stroke-color': '#ffffff',
               }}
             />
@@ -733,6 +765,7 @@ export default function RealtimeMap({
           </Source>
         )}
 
+  
         {routeSections.map((section) => (
           <Source
             key={section.id}
@@ -915,7 +948,7 @@ export default function RealtimeMap({
                                 if (label === 'Report congestion') {
                                   window.location.href = '/reports/register'
                                 } else if (label === 'Nearby transit updates') {
-                                  fetchNearbyReports()
+                                  setShowReportsDrawer(true)
                                 }
                               }}
                               className="flex w-full items-start gap-3 rounded-2xl border border-border bg-muted/30 px-4 py-3 text-left hover:bg-muted/50"
@@ -1857,7 +1890,7 @@ export default function RealtimeMap({
                     </span>
                   </div>
 
-                  {reportsLoading ? (
+                  {isReportsLoading ? (
                     <div className="flex justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                     </div>
@@ -1909,12 +1942,7 @@ export default function RealtimeMap({
                                     size="sm"
                                     onUpdate={(newScore, deleted) => {
                                       if (deleted) {
-                                        // Remove the report from the list
-                                        setNearbyReports((prev) =>
-                                          prev.filter(
-                                            (r) => r._id !== report._id,
-                                          ),
-                                        )
+                                        // Note: Report removal is handled automatically by the hook's real-time updates
                                       } else {
                                         // Update the score in local state
                                         setNearbyReportsScores((prev) => ({
