@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // First, try to get public transport routes (buses and trams only) - request more alternatives
+    // First, try to get public transport routes (all modes) - request more alternatives
     const publicTransportResponse = await calculateRoute({
       origin,
       destination,
@@ -223,20 +223,11 @@ export async function POST(request: NextRequest) {
 
     console.log('Processing routes:', routeResponse.routes.length)
 
-    // Exclude any route that contains unsupported transit (e.g., trains). Keep ONLY walk/bus/tram routes.
-    const filteredRoutes = routeResponse.routes.filter((route) =>
-      route.sections.every((section) => {
-        const transportMode = section.transport?.mode?.toLowerCase()
-        const isPedestrian =
-          (section as any).type === 'pedestrian' || !section.transport
-        return (
-          isPedestrian || transportMode === 'bus' || transportMode === 'tram'
-        )
-      }),
-    )
+    // Use all routes without filtering - include trains, buses, trams, etc.
+    const filteredRoutes = routeResponse.routes
 
     console.log(
-      `Filtered to ${filteredRoutes.length} valid routes (bus/tram/walk only)`,
+      `Processing ${filteredRoutes.length} routes (all transit modes)`,
     )
 
     // Process each route
@@ -252,7 +243,7 @@ export async function POST(request: NextRequest) {
                 section.transport?.shortName || section.transport?.name,
               hasGeometry: !!(section.geometry && section.geometry.length > 0),
             })
-            // Match vehicle with transport section (only buses and trams)
+            // Match vehicle with transport section (all transit modes)
             let matchedVehicle: VehicleInfo | null = null
             let matchConfidence = 0
             let matchReason = ''
@@ -366,7 +357,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Find vehicle that matches the transport section (only buses and trams)
+// Find vehicle that matches the transport section (all transit modes)
 function findVehicleForSection(section: any, vehicles: VehicleInfo[]) {
   const transportMode = section.transport?.mode?.toLowerCase()
   const transportName = section.transport?.shortName || section.transport?.name
@@ -379,21 +370,15 @@ function findVehicleForSection(section: any, vehicles: VehicleInfo[]) {
     totalVehicles: vehicles.length,
   })
 
-  // Only process buses and trams, ignore everything else
-  if (
-    !transportMode ||
-    !transportName ||
-    (transportMode !== 'bus' && transportMode !== 'tram')
-  ) {
-    console.log('Skipping section - not bus/tram or missing data')
+  // Skip if missing essential data, but accept all transit modes (bus, tram, train, etc.)
+  if (!transportMode || !transportName) {
+    console.log('Skipping section - missing transport mode or name')
     return null
   }
 
-  // Filter vehicles to only include buses and trams
-  const relevantVehicles = vehicles.filter(
-    (v) => v.mode === 'bus' || v.mode === 'tram',
-  )
-  console.log('Relevant vehicles (bus/tram only):', relevantVehicles.length)
+  // Filter vehicles to match the transport mode
+  const relevantVehicles = vehicles.filter((v) => v.mode === transportMode)
+  console.log(`Relevant vehicles (${transportMode}):`, relevantVehicles.length)
 
   // Priority 1: Exact route name match
   const exactMatch = relevantVehicles.find(
@@ -454,7 +439,7 @@ function findVehicleForSection(section: any, vehicles: VehicleInfo[]) {
   return null
 }
 
-// Find vehicles near route geometry (only buses and trams)
+// Find vehicles near route geometry (all transit modes)
 function findNearbyVehicles(
   geometry: RouteCoordinate[],
   vehicles: VehicleInfo[],
@@ -469,12 +454,8 @@ function findNearbyVehicles(
     reason: string
   }> = []
 
-  // Only consider buses and trams, ignore other vehicle types
-  const busesAndTrams = vehicles.filter(
-    (v) => v.mode === 'bus' || v.mode === 'tram',
-  )
-
-  busesAndTrams.forEach((vehicle) => {
+  // Consider all vehicle types (buses, trams, trains, etc.)
+  vehicles.forEach((vehicle) => {
     // Find closest point on route to vehicle
     let minDistance = Infinity
     let closestPoint: RouteCoordinate | null = null

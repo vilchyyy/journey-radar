@@ -130,12 +130,12 @@ export default function RealtimeMap({
 
   // Reports drawer state
   const [showReportsDrawer, setShowReportsDrawer] = useState(false)
-  const { reports: nearbyReports, isLoading: isReportsLoading } = useRealtimeReports()
+  const { reports: nearbyReports, isLoading: isReportsLoading } =
+    useRealtimeReports()
   const [nearbyReportsScores, setNearbyReportsScores] = useState<
     Record<string, number>
   >({})
 
-  
   // Transport details drawer state
   const [showTransportDrawer, setShowTransportDrawer] = useState(false)
   const [selectedTransport, setSelectedTransport] = useState<any>(null)
@@ -211,62 +211,64 @@ export default function RealtimeMap({
     setShowTransportDrawer(true)
   }
 
-  const vehicleGeoJSON = useMemo(
-    () => {
-      
-      const vehiclesWithReports = vehicles.map((vehicle) => {
-        // Check if this vehicle has associated reports - try multiple matching strategies
-        const hasReports = nearbyReports.some((report: any) => {
-          // Priority 1: Exact vehicle ID match (most accurate)
-          if (report.gtfsVehicleId && report.gtfsVehicleId === vehicle.vehicleId) {
-            return true
-          }
-
-          // Priority 2: Exact trip ID match (very accurate)
-          if (report.gtfsTripId && vehicle.tripId && report.gtfsTripId === vehicle.tripId) {
-            return true
-          }
-
-          // Priority 3: Route match with additional criteria (less accurate, only use if above fail)
-          // Only match by route if the report is recent (within last 30 minutes)
-          const reportAge = Date.now() - (report._creationTime ? report._creationTime : 0)
-          const isRecentReport = reportAge < (30 * 60 * 1000) // 30 minutes
-
-          if (isRecentReport && report.routeShortName && vehicle.routeNumber) {
-            const reportRouteNum = String(report.routeShortName)
-            const vehicleRouteNum = String(vehicle.routeNumber)
-            if (reportRouteNum === vehicleRouteNum) {
-              return true
-            }
-          }
-
-          return false
-        })
-
-        
-        return {
-          type: 'Feature' as const,
-          geometry: {
-            type: 'Point' as const,
-            coordinates: [vehicle.longitude, vehicle.latitude] as const,
-          },
-          properties: {
-            id: vehicle.vehicleId,
-            routeShortName: vehicle.routeNumber,
-            mode: vehicle.mode.toLowerCase(),
-            hasReports, // Use actual matching logic now
-          },
+  const vehicleGeoJSON = useMemo(() => {
+    const vehiclesWithReports = vehicles.map((vehicle) => {
+      // Check if this vehicle has associated reports - try multiple matching strategies
+      const hasReports = nearbyReports.some((report: any) => {
+        // Priority 1: Exact vehicle ID match (most accurate)
+        if (
+          report.gtfsVehicleId &&
+          report.gtfsVehicleId === vehicle.vehicleId
+        ) {
+          return true
         }
+
+        // Priority 2: Exact trip ID match (very accurate)
+        if (
+          report.gtfsTripId &&
+          vehicle.tripId &&
+          report.gtfsTripId === vehicle.tripId
+        ) {
+          return true
+        }
+
+        // Priority 3: Route match with additional criteria (less accurate, only use if above fail)
+        // Only match by route if the report is recent (within last 30 minutes)
+        const reportAge =
+          Date.now() - (report._creationTime ? report._creationTime : 0)
+        const isRecentReport = reportAge < 30 * 60 * 1000 // 30 minutes
+
+        if (isRecentReport && report.routeShortName && vehicle.routeNumber) {
+          const reportRouteNum = String(report.routeShortName)
+          const vehicleRouteNum = String(vehicle.routeNumber)
+          if (reportRouteNum === vehicleRouteNum) {
+            return true
+          }
+        }
+
+        return false
       })
 
-      
       return {
-        type: 'FeatureCollection' as const,
-        features: vehiclesWithReports,
+        type: 'Feature' as const,
+        geometry: {
+          type: 'Point' as const,
+          coordinates: [vehicle.longitude, vehicle.latitude] as const,
+        },
+        properties: {
+          id: vehicle.vehicleId,
+          routeShortName: vehicle.routeNumber,
+          mode: vehicle.mode.toLowerCase(),
+          hasReports, // Use actual matching logic now
+        },
       }
-    },
-    [vehicles, nearbyReports],
-  )
+    })
+
+    return {
+      type: 'FeatureCollection' as const,
+      features: vehiclesWithReports,
+    }
+  }, [vehicles, nearbyReports])
 
   const journeyMarkersGeoJSON = useMemo(
     () => ({
@@ -303,7 +305,6 @@ export default function RealtimeMap({
     [fromLocation, toLocation],
   )
 
-  
   const routeSections = useMemo(() => {
     if (!routeData?.routes) return []
     return routeData.routes.flatMap((route: any, routeIndex: number) =>
@@ -644,7 +645,6 @@ export default function RealtimeMap({
     }
   }, [centerOn, fromLocation, toLocation])
 
-  
   const formattedTimestamp = useMemo(
     () =>
       new Date().toLocaleTimeString([], {
@@ -676,7 +676,11 @@ export default function RealtimeMap({
           }
         }}
         onClick={handleMapClick}
-        interactiveLayerIds={['vehicle-points', 'vehicle-labels', 'vehicle-glow']}
+        interactiveLayerIds={[
+          'vehicle-points',
+          'vehicle-labels',
+          'vehicle-glow',
+        ]}
         mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
         style={{ width: '100%', height: '100%' }}
         cursor={isSelectingPoint ? 'crosshair' : 'grab'}
@@ -798,7 +802,6 @@ export default function RealtimeMap({
           </Source>
         )}
 
-  
         {routeSections.map((section) => (
           <Source
             key={section.id}
