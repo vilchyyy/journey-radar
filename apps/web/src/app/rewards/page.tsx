@@ -1,5 +1,7 @@
 'use client'
 
+import { useQuery } from 'convex/react'
+import { api } from '@journey-radar/backend/convex/_generated/api'
 import {
   AlertCircle,
   Calendar,
@@ -21,14 +23,40 @@ import {
 import { Separator } from '@/components/ui/separator'
 
 export default function RewardsPage() {
-  const recentActivities = [
-    {
-      id: 1,
-      type: 'earned',
-      title: 'Reported delay on Line 52',
-      timestamp: 'Today, 4:15 PM',
-      points: 10,
-      icon: Plus,
+  console.log('🎯 Rewards Page - Loading user stats...')
+
+  const userStats = useQuery(api.rewards.getUserPointsStats)
+  const userRedemptions = useQuery(api.rewards.getUserRedemptions)
+
+  console.log('📊 User stats from Convex:', userStats)
+  console.log('🎁 User redemptions from Convex:', userRedemptions)
+
+  // Helper function to get icon for transaction type
+  const getTransactionIcon = (type: string) => {
+    switch (type) {
+      case 'REPORT_SUBMITTED':
+      case 'REPORT_VERIFIED':
+      case 'REPORT_CONFIRMED':
+        return Plus
+      case 'WEEKLY_STREAK':
+      case 'REPUTATION_BONUS':
+        return TrendingUp
+      case 'VOUCHER_REDEEMED':
+        return Gift
+      default:
+        return Plus
+    }
+  }
+
+  // Helper function to get icon styling for transaction type
+  const getTransactionIconStyle = (type: string, points: number) => {
+    if (points < 0) {
+      return {
+        iconBg: 'bg-blue-100',
+        iconColor: 'text-blue-600',
+      }
+    }
+    return {
       iconBg: 'bg-green-100',
       iconColor: 'text-green-600',
     },
@@ -74,6 +102,22 @@ export default function RewardsPage() {
     },
   ]
 
+  // Format timestamp
+  const formatTimestamp = (timestamp: number) => {
+    return formatDistanceToNow(timestamp, { addSuffix: true })
+  }
+
+  // Combine recent transactions and redemptions for activity feed
+  const recentActivities = userStats?.recentTransactions?.slice(0, 5).map(transaction => ({
+    id: transaction.id,
+    type: transaction.points > 0 ? 'earned' : 'redeemed',
+    title: transaction.description,
+    timestamp: formatTimestamp(transaction.timestamp),
+    points: transaction.points,
+    icon: getTransactionIcon(transaction.type),
+    ...getTransactionIconStyle(transaction.type, transaction.points),
+  })) || []
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -111,23 +155,33 @@ export default function RewardsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              {/* Points Balance */}
-              <Card className="bg-teal-400 border-none shadow-md">
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-white mb-1">1000</div>
-                  <div className="text-sm text-white/90">Points</div>
-                </CardContent>
-              </Card>
+            {userStats ? (
+              <div className="grid grid-cols-2 gap-4">
+                {/* Points Balance */}
+                <Card className="bg-teal-400 border-none shadow-md">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-white mb-1">{userStats.totalPoints}</div>
+                    <div className="text-sm text-white/90">Points</div>
+                  </CardContent>
+                </Card>
 
-              {/* Verification Score */}
-              <Card className="bg-teal-400 border-none shadow-md">
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-white mb-1">97%</div>
-                  <div className="text-sm text-white/90">verified</div>
-                </CardContent>
-              </Card>
-            </div>
+                {/* Verification Score */}
+                <Card className="bg-teal-400 border-none shadow-md">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-white mb-1">{userStats.verificationRate}%</div>
+                    <div className="text-sm text-white/90">verified</div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mb-2"></div>
+                  <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto"></div>
+                </div>
+                <p className="text-sm text-gray-500 mt-4">Loading your rewards data...</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -182,6 +236,27 @@ export default function RewardsPage() {
                               <Clock className="w-3 h-3" />
                               <span>{activity.timestamp}</span>
                             </div>
+                            <div>
+                              <p className="font-medium text-foreground">
+                                {activity.title}
+                              </p>
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Clock className="w-3 h-3" />
+                                <span>{activity.timestamp}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Right Side - Points */}
+                          <div
+                            className={`font-semibold ${
+                              activity.type === 'earned'
+                                ? 'text-green-600'
+                                : 'text-gray-600'
+                            }`}
+                          >
+                            {activity.type === 'earned' ? '+' : ''}
+                            {activity.points} Points
                           </div>
                         </div>
 
@@ -197,6 +272,18 @@ export default function RewardsPage() {
                           {activity.points} Points
                         </div>
                       </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 font-medium">No activity yet</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Start reporting disruptions to earn points!
+                  </p>
+                </div>
+              )}
 
                       {/* Add separator except for last item */}
                       {index < recentActivities.length - 1 && (

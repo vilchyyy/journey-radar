@@ -61,8 +61,7 @@ export const createReport = mutation({
       latitude: v.number(),
       longitude: v.number(),
     }),
-    transportInfo: v.optional(v.id('transports')),
-    transportMode: v.union(
+      transportMode: v.union(
       v.literal('BUS'),
       v.literal('TRAIN'),
       v.literal('TRAM'),
@@ -96,8 +95,7 @@ export const createReport = mutation({
       isAnonymous,
       status: 'UNVERIFIED',
       type: args.type,
-      transportId: args.transportInfo,
-      transportMode: args.transportMode,
+        transportMode: args.transportMode,
       route: args.route,
       gtfsRouteId: args.gtfsRouteId,
       gtfsTripId: args.gtfsTripId,

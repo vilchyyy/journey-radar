@@ -9,21 +9,26 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as cleanup from "../cleanup.js";
 import type * as cron from "../cron.js";
 import type * as gtfs from "../gtfs.js";
 import type * as gtfsCrons from "../gtfsCrons.js";
 import type * as gtfsDebug from "../gtfsDebug.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
+import type * as incidents from "../incidents.js";
 import type * as index from "../index.js";
 import type * as journeyPlanner from "../journeyPlanner.js";
+import type * as migrations_rewards from "../migrations/rewards.js";
 import type * as mock_data from "../mock_data.js";
 import type * as privateData from "../privateData.js";
 import type * as reports from "../reports.js";
+import type * as rewards from "../rewards.js";
 import type * as routes from "../routes.js";
 import type * as scheduler from "../scheduler.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
+import type * as simpleAuth from "../simpleAuth.js";
 
 import type {
   ApiFromModules,
@@ -41,21 +46,26 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  cleanup: typeof cleanup;
   cron: typeof cron;
   gtfs: typeof gtfs;
   gtfsCrons: typeof gtfsCrons;
   gtfsDebug: typeof gtfsDebug;
   healthCheck: typeof healthCheck;
   http: typeof http;
+  incidents: typeof incidents;
   index: typeof index;
   journeyPlanner: typeof journeyPlanner;
+  "migrations/rewards": typeof migrations_rewards;
   mock_data: typeof mock_data;
   privateData: typeof privateData;
   reports: typeof reports;
+  rewards: typeof rewards;
   routes: typeof routes;
   scheduler: typeof scheduler;
   seed: typeof seed;
   users: typeof users;
+  simpleAuth: typeof simpleAuth;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

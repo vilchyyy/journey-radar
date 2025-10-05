@@ -24,6 +24,7 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
@@ -841,7 +842,8 @@ export default function RealtimeMap({
         )}
 
         <DrawerContent className="border-none bg-transparent shadow-none data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:border-none">
-          <div className="pointer-events-auto mx-auto w-full max-w-2xl px-4 pb-6">
+          <DrawerTitle className="sr-only">Map Search</DrawerTitle>
+          <div className="pointer-events-auto mx-auto w-full max-w-md px-4 pb-6">
             <div className="rounded-3xl border border-border bg-card/95 shadow-2xl">
               <DrawerClose asChild>
                 <button
