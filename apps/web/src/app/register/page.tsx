@@ -1,14 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { authClient } from '@/lib/auth-client'
+import { useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2 } from 'lucide-react'
+import { authClient } from '@/lib/auth-client'
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -42,7 +49,7 @@ export default function RegisterPage() {
             name,
           }),
         }),
-        timeoutPromise
+        timeoutPromise,
       ])
 
       if (!response.ok) {
@@ -59,7 +66,9 @@ export default function RegisterPage() {
       }
     } catch (err: any) {
       if (err.message === 'Registration timed out') {
-        setError('Registration is taking longer than expected. Please try again or contact support.')
+        setError(
+          'Registration is taking longer than expected. Please try again or contact support.',
+        )
       } else {
         setError('Failed to create account. Please try again.')
       }
@@ -120,17 +129,16 @@ export default function RegisterPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create account
             </Button>
             <div className="text-sm text-center text-gray-600">
               Already have an account?{' '}
-              <Link href="/login" className="text-teal-600 hover:text-teal-500 font-medium">
+              <Link
+                href="/login"
+                className="text-teal-600 hover:text-teal-500 font-medium"
+              >
                 Sign in
               </Link>
             </div>

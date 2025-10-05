@@ -10,7 +10,7 @@ export const auth = async () => {
   const session = await authInstance.api.getSession({
     headers: {
       // Get headers from request context if needed
-    }
+    },
   })
   return session
 }

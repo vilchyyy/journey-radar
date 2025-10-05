@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { api, convex } from '@/lib/convex-client'
 import { authClient } from '@/lib/auth-client'
+import { api, convex } from '@/lib/convex-client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     if (!session?.data?.user?.id) {
       return NextResponse.json(
         { error: 'Authentication required' },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -24,27 +24,24 @@ export async function POST(request: NextRequest) {
     if (!reportId || !voteType) {
       return NextResponse.json(
         { error: 'Missing required fields: reportId, voteType' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     if (!['UPVOTE', 'DOWNVOTE'].includes(voteType)) {
       return NextResponse.json(
         { error: 'Invalid voteType. Must be UPVOTE or DOWNVOTE' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     // Get the user from Convex using the auth session
     const user = await convex.query(api.users.getUserByToken, {
-      tokenIdentifier: session.data.user.email || session.data.user.id
+      tokenIdentifier: session.data.user.email || session.data.user.id,
     })
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
     // Cast the vote
@@ -64,7 +61,7 @@ export async function POST(request: NextRequest) {
     console.error('Error voting on report:', error)
     return NextResponse.json(
       { error: 'Failed to vote on report' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

@@ -1,6 +1,6 @@
+import { getAuthUserId } from '@convex-dev/auth/server'
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
-import { getAuthUserId } from '@convex-dev/auth/server'
 
 // Get user's current points balance and stats
 export const getUserPointsStats = query({
@@ -22,7 +22,10 @@ export const getUserPointsStats = query({
       .withIndex('by_user', (q) => q.eq('userId', userId))
       .collect()
 
-    const totalPoints = pointTransactions.reduce((sum, transaction) => sum + transaction.points, 0)
+    const totalPoints = pointTransactions.reduce(
+      (sum, transaction) => sum + transaction.points,
+      0,
+    )
 
     // Get recent transactions
     const recentTransactions = await ctx.db
@@ -32,9 +35,10 @@ export const getUserPointsStats = query({
       .take(10)
 
     // Calculate verification rate
-    const verificationRate = user.reportsSubmitted > 0
-      ? Math.round((user.verifiedReports / user.reportsSubmitted) * 100)
-      : 0
+    const verificationRate =
+      user.reportsSubmitted > 0
+        ? Math.round((user.verifiedReports / user.reportsSubmitted) * 100)
+        : 0
 
     return {
       totalPoints,
@@ -42,13 +46,13 @@ export const getUserPointsStats = query({
       reportsSubmitted: user.reportsSubmitted,
       verifiedReports: user.verifiedReports,
       reputationScore: user.reputationScore,
-      recentTransactions: recentTransactions.map(t => ({
+      recentTransactions: recentTransactions.map((t) => ({
         id: t._id,
         type: t.type,
         description: t.description,
         points: t.points,
         timestamp: t.timestamp,
-      }))
+      })),
     }
   },
 })
@@ -64,11 +68,11 @@ export const getAvailableRewards = query({
 
     // Filter out expired rewards
     const now = Date.now()
-    const validRewards = rewards.filter(reward =>
-      !reward.validUntil || reward.validUntil > now
+    const validRewards = rewards.filter(
+      (reward) => !reward.validUntil || reward.validUntil > now,
     )
 
-    return validRewards.map(reward => ({
+    return validRewards.map((reward) => ({
       id: reward._id,
       name: reward.name,
       description: reward.description,
@@ -79,7 +83,9 @@ export const getAvailableRewards = query({
       maxRedemptions: reward.maxRedemptions,
       currentRedemptions: reward.currentRedemptions,
       validUntil: reward.validUntil,
-      isAvailable: !reward.maxRedemptions || reward.currentRedemptions < reward.maxRedemptions,
+      isAvailable:
+        !reward.maxRedemptions ||
+        reward.currentRedemptions < reward.maxRedemptions,
     }))
   },
 })
@@ -114,7 +120,7 @@ export const getUserRedemptions = query({
           completedAt: redemption.completedAt,
           notes: redemption.notes,
         }
-      })
+      }),
     )
 
     return redemptionsWithDetails
@@ -188,7 +194,10 @@ export const redeemReward = mutation({
     }
 
     // Check max redemptions
-    if (reward.maxRedemptions && reward.currentRedemptions >= reward.maxRedemptions) {
+    if (
+      reward.maxRedemptions &&
+      reward.currentRedemptions >= reward.maxRedemptions
+    ) {
       throw new Error('Reward is no longer available')
     }
 
@@ -198,7 +207,10 @@ export const redeemReward = mutation({
       .withIndex('by_user', (q) => q.eq('userId', userId))
       .collect()
 
-    const userPoints = pointTransactions.reduce((sum, transaction) => sum + transaction.points, 0)
+    const userPoints = pointTransactions.reduce(
+      (sum, transaction) => sum + transaction.points,
+      0,
+    )
 
     // Check if user has enough points
     if (userPoints < reward.pointsCost) {
@@ -261,7 +273,7 @@ export const getTransactionHistory = query({
 
     const transactions = await query.collect()
 
-    return transactions.map(t => ({
+    return transactions.map((t) => ({
       id: t._id,
       type: t.type,
       description: t.description,

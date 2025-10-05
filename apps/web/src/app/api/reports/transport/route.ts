@@ -3,7 +3,8 @@ import { api, convex } from '@/lib/convex-client'
 
 export async function POST(request: NextRequest) {
   try {
-    const { tripId, routeId, routeNumber, mode, vehicleId } = await request.json()
+    const { tripId, routeId, routeNumber, mode, vehicleId } =
+      await request.json()
 
     if (!tripId && !routeNumber && !mode) {
       return NextResponse.json(
@@ -21,12 +22,15 @@ export async function POST(request: NextRequest) {
       vehicleId: vehicleId || undefined,
     })
 
-    return NextResponse.json({ reports }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'no-store, max-age=0',
+    return NextResponse.json(
+      { reports },
+      {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-store, max-age=0',
+        },
       },
-    })
+    )
   } catch (error) {
     console.error('Error fetching transport reports:', error)
     return NextResponse.json(

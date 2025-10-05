@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     if (!latitude || !longitude) {
       return NextResponse.json(
         { error: 'Missing required fields: latitude and longitude' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 

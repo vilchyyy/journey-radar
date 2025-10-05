@@ -14,9 +14,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       enableSystem={false}
       disableTransitionOnChange
     >
-      <ConvexProvider client={convex}>
-        {children}
-      </ConvexProvider>
+      <ConvexProvider client={convex}>{children}</ConvexProvider>
       <Toaster richColors />
     </ThemeProvider>
   )

@@ -1,9 +1,9 @@
 'use client'
 
-import { ArrowBigUp, ArrowBigDown } from 'lucide-react'
+import { ArrowBigDown, ArrowBigUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { useReportVoting } from '@/hooks/use-report-voting'
+import { cn } from '@/lib/utils'
 
 interface ReportVotingProps {
   reportId: string
@@ -24,7 +24,8 @@ export function ReportVoting({
   size = 'md',
   onUpdate,
 }: ReportVotingProps) {
-  const { userVote, isAuthenticated, isLoading, upvote, downvote } = useReportVoting(reportId)
+  const { userVote, isAuthenticated, isLoading, upvote, downvote } =
+    useReportVoting(reportId)
 
   const handleVote = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
     try {
@@ -60,7 +61,7 @@ export function ReportVoting({
           'p-0 hover:bg-transparent',
           buttonSizes[size],
           userVote === 'UPVOTE' && 'text-green-600',
-          !isAuthenticated && 'opacity-50'
+          !isAuthenticated && 'opacity-50',
         )}
         onClick={() => handleVote('UPVOTE')}
         disabled={isLoading || !isAuthenticated}
@@ -72,11 +73,16 @@ export function ReportVoting({
       <span
         className={cn(
           'font-medium min-w-[2rem] text-center',
-          voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-600' : 'text-muted-foreground',
-          sizeClasses[size]
+          voteScore > 0
+            ? 'text-green-600'
+            : voteScore < 0
+              ? 'text-red-600'
+              : 'text-muted-foreground',
+          sizeClasses[size],
         )}
       >
-        {voteScore > 0 ? '+' : ''}{voteScore}
+        {voteScore > 0 ? '+' : ''}
+        {voteScore}
       </span>
 
       <Button
@@ -86,7 +92,7 @@ export function ReportVoting({
           'p-0 hover:bg-transparent',
           buttonSizes[size],
           userVote === 'DOWNVOTE' && 'text-red-600',
-          !isAuthenticated && 'opacity-50'
+          !isAuthenticated && 'opacity-50',
         )}
         onClick={() => handleVote('DOWNVOTE')}
         disabled={isLoading || !isAuthenticated}

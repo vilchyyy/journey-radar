@@ -1,5 +1,6 @@
 'use client'
 
+import { useQuery } from 'convex/react'
 import {
   Edit,
   FileText,
@@ -12,6 +13,7 @@ import {
   Wallet,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,11 +24,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { cn } from '@/lib/utils'
-import { authClient } from '@/lib/auth-client'
-import { useQuery } from 'convex/react'
 import { api } from '@/convex/_generated/api'
-import { useEffect, useState } from 'react'
+import { authClient } from '@/lib/auth-client'
+import { cn } from '@/lib/utils'
 
 export function SidebarNavigation() {
   const [user, setUser] = useState<any>(null)
@@ -60,17 +60,19 @@ export function SidebarNavigation() {
     }
   }
 
-  const navigationItems = user ? [
-    { icon: Map, label: 'Map', href: '/map' },
-    { icon: Wallet, label: 'Rewards', href: '/rewards' },
-    { icon: FileText, label: 'Reports', href: '/reports' },
-    { icon: User, label: 'Profile', href: '/profile' },
-    { icon: Settings, label: 'Settings', href: '/settings' },
-  ] : [
-    { icon: Map, label: 'Map', href: '/map' },
-    { icon: Wallet, label: 'Rewards', href: '/rewards' },
-    { icon: FileText, label: 'Reports', href: '/reports' },
-  ]
+  const navigationItems = user
+    ? [
+        { icon: Map, label: 'Map', href: '/map' },
+        { icon: Wallet, label: 'Rewards', href: '/rewards' },
+        { icon: FileText, label: 'Reports', href: '/reports' },
+        { icon: User, label: 'Profile', href: '/profile' },
+        { icon: Settings, label: 'Settings', href: '/settings' },
+      ]
+    : [
+        { icon: Map, label: 'Map', href: '/map' },
+        { icon: Wallet, label: 'Rewards', href: '/rewards' },
+        { icon: FileText, label: 'Reports', href: '/reports' },
+      ]
 
   if (isLoading) {
     return (
@@ -107,12 +109,13 @@ export function SidebarNavigation() {
               <>
                 {/* Profile Image */}
                 <Avatar className="w-16 h-16 border-3 border-white">
-                  <AvatarImage
-                    src={user.image || undefined}
-                    alt="Profile"
-                  />
+                  <AvatarImage src={user.image || undefined} alt="Profile" />
                   <AvatarFallback>
-                    {user.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'U'}
+                    {user.name
+                      ?.split(' ')
+                      .map((n: string) => n[0])
+                      .join('')
+                      .toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
 
@@ -148,7 +151,9 @@ export function SidebarNavigation() {
                 {/* Guest Message */}
                 <div className="text-center mt-4">
                   <h2 className="text-xl font-bold text-white">Welcome!</h2>
-                  <p className="text-sm text-white/90">Sign in to access all features</p>
+                  <p className="text-sm text-white/90">
+                    Sign in to access all features
+                  </p>
                 </div>
 
                 {/* Sign In Button */}

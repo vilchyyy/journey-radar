@@ -60,9 +60,9 @@ export default defineSchema({
     // Link to the cluster this report belongs to
     clusterId: v.optional(v.id('reportClusters')),
     // Voting fields
-    upvotes: v.optional(v.number()), // Number of upvotes (optional for backwards compatibility)
-    downvotes: v.optional(v.number()), // Number of downvotes (optional for backwards compatibility)
-    voteScore: v.optional(v.number()), // Net score (upvotes - downvotes) (optional for backwards compatibility)
+    upvotes: v.number(), // Number of upvotes (optional for backwards compatibility)
+    downvotes: v.number(), // Number of downvotes (optional for backwards compatibility)
+    voteScore: v.number(), // Net score (upvotes - downvotes) (optional for backwards compatibility)
   })
     // CRITICAL: Geospatial index for "find reports in map view" queries
     .index('by_user', ['userId'])
@@ -70,7 +70,6 @@ export default defineSchema({
     .index('by_incident', ['incidentId'])
     .index('by_cluster', ['clusterId'])
     .index('by_verification_score', ['verificationScore'])
-    .index('by_transport', ['transportId'])
     .index('by_route', ['route'])
     .index('by_gtfs_route', ['gtfsRouteId'])
     .index('by_gtfs_trip', ['gtfsTripId'])

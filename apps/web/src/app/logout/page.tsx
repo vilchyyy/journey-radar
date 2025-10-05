@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { authClient } from '@/lib/auth-client'
 import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { authClient } from '@/lib/auth-client'
 
 export default function LogoutPage() {
   const router = useRouter()

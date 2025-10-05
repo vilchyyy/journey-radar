@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { api } from '@journey-radar/backend/convex/_generated/api'
-import { fetchQuery } from 'convex/nextjs'
 import { Id } from '@journey-radar/backend/convex/_generated/dataModel'
+import { fetchQuery } from 'convex/nextjs'
+import { type NextRequest, NextResponse } from 'next/server'
 
 interface Params {
   params: Promise<{ routeId: string }>
@@ -12,9 +12,12 @@ export async function GET(request: NextRequest, { params }: Params) {
   try {
     const { routeId } = await params
 
-    const incidents = await fetchQuery(api.incidents.getActiveIncidentsForRoute, {
-      routeId: Id('routes', routeId),
-    })
+    const incidents = await fetchQuery(
+      api.incidents.getActiveIncidentsForRoute,
+      {
+        routeId: Id('routes', routeId),
+      },
+    )
 
     return NextResponse.json({
       success: true,
@@ -25,7 +28,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     console.error('Error fetching route incidents:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch route incidents' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

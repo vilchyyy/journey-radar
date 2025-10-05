@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 // Simple dispatcher authentication for development
 // In production, this should be replaced with proper authentication (JWT, OAuth, etc.)
@@ -13,16 +13,24 @@ const MOCK_DISPATCHERS = {
   'dispatcher-001': {
     id: 'dispatcher-001',
     role: 'DISPATCHER' as const,
-    permissions: ['create_incident', 'update_incident', 'view_incidents']
+    permissions: ['create_incident', 'update_incident', 'view_incidents'],
   },
   'dispatcher-admin': {
     id: 'dispatcher-admin',
     role: 'ADMIN' as const,
-    permissions: ['create_incident', 'update_incident', 'delete_incident', 'view_incidents', 'manage_dispatchers']
-  }
+    permissions: [
+      'create_incident',
+      'update_incident',
+      'delete_incident',
+      'view_incidents',
+      'manage_dispatchers',
+    ],
+  },
 }
 
-export function verifyDispatcherAuth(request: NextRequest): DispatcherAuth | null {
+export function verifyDispatcherAuth(
+  request: NextRequest,
+): DispatcherAuth | null {
   // Get authorization header
   const authHeader = request.headers.get('authorization')
 
@@ -49,25 +57,38 @@ export function verifyDispatcherAuth(request: NextRequest): DispatcherAuth | nul
   return null
 }
 
-export function requirePermission(auth: DispatcherAuth, permission: string): boolean {
+export function requirePermission(
+  auth: DispatcherAuth,
+  permission: string,
+): boolean {
   return auth.permissions.includes(permission)
 }
 
-export function requireRole(auth: DispatcherAuth, role: 'DISPATCHER' | 'ADMIN'): boolean {
+export function requireRole(
+  auth: DispatcherAuth,
+  role: 'DISPATCHER' | 'ADMIN',
+): boolean {
   return auth.role === role
 }
 
 // Middleware to protect dispatcher endpoints
 export function withDispatcherAuth(
-  handler: (request: NextRequest, auth: DispatcherAuth, ...args: any[]) => Promise<NextResponse>
+  handler: (
+    request: NextRequest,
+    auth: DispatcherAuth,
+    ...args: any[]
+  ) => Promise<NextResponse>,
 ) {
   return async (request: NextRequest, ...args: any[]) => {
     const auth = verifyDispatcherAuth(request)
 
     if (!auth) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized - Invalid or missing authentication' },
-        { status: 401 }
+        {
+          success: false,
+          error: 'Unauthorized - Invalid or missing authentication',
+        },
+        { status: 401 },
       )
     }
 
@@ -79,14 +100,14 @@ export function withDispatcherAuth(
 export const AUTH_ERRORS = {
   UNAUTHORIZED: {
     success: false,
-    error: 'Unauthorized - Invalid or missing authentication'
+    error: 'Unauthorized - Invalid or missing authentication',
   },
   FORBIDDEN: {
     success: false,
-    error: 'Forbidden - Insufficient permissions'
+    error: 'Forbidden - Insufficient permissions',
   },
   INVALID_TOKEN: {
     success: false,
-    error: 'Invalid authentication token'
-  }
+    error: 'Invalid authentication token',
+  },
 }

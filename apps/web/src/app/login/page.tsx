@@ -1,14 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { authClient } from '@/lib/auth-client'
+import { useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2 } from 'lucide-react'
+import { authClient } from '@/lib/auth-client'
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -38,10 +45,10 @@ export default function LoginPage() {
           body: JSON.stringify({
             email,
             password,
-            callbackURL: '/map'
+            callbackURL: '/map',
           }),
         }),
-        timeoutPromise
+        timeoutPromise,
       ])
 
       if (!response.ok) {
@@ -64,7 +71,9 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       if (err.message === 'Login timed out') {
-        setError('Login is taking longer than expected. Please try again or contact support.')
+        setError(
+          'Login is taking longer than expected. Please try again or contact support.',
+        )
       } else {
         setError('Invalid email or password')
       }
@@ -113,17 +122,16 @@ export default function LoginPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Sign in
             </Button>
             <div className="text-sm text-center text-gray-600">
               Don't have an account?{' '}
-              <Link href="/register" className="text-teal-600 hover:text-teal-500 font-medium">
+              <Link
+                href="/register"
+                className="text-teal-600 hover:text-teal-500 font-medium"
+              >
                 Sign up
               </Link>
             </div>

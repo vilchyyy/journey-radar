@@ -1,14 +1,20 @@
 'use client'
 
-import { dispatcherAPI } from '@/lib/dispatcher-api'
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
 import { AlertTriangle, CheckCircle, Plus, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { dispatcherAPI } from '@/lib/dispatcher-api'
 
 interface Incident {
   _id: string
@@ -42,10 +48,15 @@ export default function DispatcherTest() {
     type: 'DELAY' as const,
     description: '',
     transportMode: 'BUS' as const,
-    routeId: 'test-route-id'
+    routeId: 'test-route-id',
   })
 
-  console.log('📊 Current state:', { incidentsCount: incidents.length, hasStats: !!stats, loading, hasError: !!error })
+  console.log('📊 Current state:', {
+    incidentsCount: incidents.length,
+    hasStats: !!stats,
+    loading,
+    hasError: !!error,
+  })
 
   const handleLogin = () => {
     console.log('🔐 Logging in as dispatcher')
@@ -69,7 +80,11 @@ export default function DispatcherTest() {
       console.log('📦 API response received:', response)
 
       if (response.success) {
-        console.log('✅ Successfully fetched incidents:', response.data?.length || 0, 'incidents')
+        console.log(
+          '✅ Successfully fetched incidents:',
+          response.data?.length || 0,
+          'incidents',
+        )
         console.log('📝 Incidents data:', response.data)
         setIncidents(response.data || [])
       } else {
@@ -121,7 +136,7 @@ export default function DispatcherTest() {
       const incidentData = {
         ...formData,
         validFrom: Date.now(),
-        validUntil: Date.now() + 3600000 // 1 hour from now
+        validUntil: Date.now() + 3600000, // 1 hour from now
       }
       console.log('📤 Sending incident data:', incidentData)
 
@@ -140,7 +155,7 @@ export default function DispatcherTest() {
           type: 'DELAY',
           description: '',
           transportMode: 'BUS',
-          routeId: 'test-route-id'
+          routeId: 'test-route-id',
         })
       } else {
         console.log('❌ Create incident failed:', response.error)
@@ -160,7 +175,7 @@ export default function DispatcherTest() {
       DELAY: 'bg-yellow-500',
       CANCELLED: 'bg-red-500',
       ACCIDENT: 'bg-orange-500',
-      INFO: 'bg-blue-500'
+      INFO: 'bg-blue-500',
     }
     return colors[type as keyof typeof colors] || 'bg-gray-500'
   }
@@ -179,14 +194,16 @@ export default function DispatcherTest() {
   // Add form change handler with logging
   const handleFormChange = (field: string, value: any) => {
     console.log(`📝 Form field changed: ${field} =`, value)
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dispatcher API Test</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Dispatcher API Test
+          </h1>
           <p className="text-gray-600">Test the dispatcher API endpoints</p>
         </div>
 
@@ -194,12 +211,16 @@ export default function DispatcherTest() {
         <Card>
           <CardHeader>
             <CardTitle>Authentication</CardTitle>
-            <CardDescription>Set authentication token for API calls</CardDescription>
+            <CardDescription>
+              Set authentication token for API calls
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-4">
               <Button onClick={handleLogin}>Login as Dispatcher</Button>
-              <Button variant="outline" onClick={handleLogout}>Logout</Button>
+              <Button variant="outline" onClick={handleLogout}>
+                Logout
+              </Button>
             </div>
             <p className="text-sm text-gray-500">Token: dispatcher-token-dev</p>
           </CardContent>
@@ -248,7 +269,9 @@ export default function DispatcherTest() {
               <Label>Transport Mode</Label>
               <select
                 value={formData.transportMode}
-                onChange={(e) => handleFormChange('transportMode', e.target.value)}
+                onChange={(e) =>
+                  handleFormChange('transportMode', e.target.value)
+                }
                 className="w-full p-2 border rounded"
               >
                 <option value="BUS">Bus</option>
@@ -260,11 +283,16 @@ export default function DispatcherTest() {
               <Label>Description</Label>
               <Textarea
                 value={formData.description}
-                onChange={(e) => handleFormChange('description', e.target.value)}
+                onChange={(e) =>
+                  handleFormChange('description', e.target.value)
+                }
                 placeholder="Describe the incident..."
               />
             </div>
-            <Button onClick={createIncident} disabled={loading || !formData.description}>
+            <Button
+              onClick={createIncident}
+              disabled={loading || !formData.description}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Create Incident
             </Button>
@@ -289,19 +317,27 @@ export default function DispatcherTest() {
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-red-600">{stats.totalActive}</p>
+                  <p className="text-2xl font-bold text-red-600">
+                    {stats.totalActive}
+                  </p>
                   <p className="text-sm text-gray-600">Active</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">{stats.resolvedToday}</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {stats.resolvedToday}
+                  </p>
                   <p className="text-sm text-gray-600">Resolved Today</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-600">{stats.byTransportMode.BUS}</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {stats.byTransportMode.BUS}
+                  </p>
                   <p className="text-sm text-gray-600">Bus</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-600">{stats.totalIncidents}</p>
+                  <p className="text-2xl font-bold text-gray-600">
+                    {stats.totalIncidents}
+                  </p>
                   <p className="text-sm text-gray-600">Total</p>
                 </div>
               </div>
@@ -322,21 +358,41 @@ export default function DispatcherTest() {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         {getStatusIcon(incident.status)}
-                        <Badge className={`${getIncidentTypeColor(incident.type)} text-white`}>
+                        <Badge
+                          className={`${getIncidentTypeColor(incident.type)} text-white`}
+                        >
                           {incident.type}
                         </Badge>
-                        <Badge variant="outline">{incident.transportMode}</Badge>
+                        <Badge variant="outline">
+                          {incident.transportMode}
+                        </Badge>
                       </div>
-                      <Badge variant={incident.status === 'ACTIVE' ? 'destructive' : 'secondary'}>
+                      <Badge
+                        variant={
+                          incident.status === 'ACTIVE'
+                            ? 'destructive'
+                            : 'secondary'
+                        }
+                      >
                         {incident.status}
                       </Badge>
                     </div>
-                    <h3 className="font-semibold mb-2">{incident.description}</h3>
+                    <h3 className="font-semibold mb-2">
+                      {incident.description}
+                    </h3>
                     <div className="text-sm text-gray-500">
-                      <p>Route: {incident.routeDetails?.routeNumber || 'Unknown'}</p>
-                      <p>Created: {new Date(incident._creationTime).toLocaleString()}</p>
+                      <p>
+                        Route: {incident.routeDetails?.routeNumber || 'Unknown'}
+                      </p>
+                      <p>
+                        Created:{' '}
+                        {new Date(incident._creationTime).toLocaleString()}
+                      </p>
                       {incident.validUntil && (
-                        <p>Valid until: {new Date(incident.validUntil).toLocaleString()}</p>
+                        <p>
+                          Valid until:{' '}
+                          {new Date(incident.validUntil).toLocaleString()}
+                        </p>
                       )}
                     </div>
                   </div>
