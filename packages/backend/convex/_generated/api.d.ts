@@ -9,6 +9,7 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as cleanup from "../cleanup.js";
 import type * as cron from "../cron.js";
 import type * as gtfs from "../gtfs.js";
 import type * as gtfsCrons from "../gtfsCrons.js";
@@ -40,6 +41,7 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  cleanup: typeof cleanup;
   cron: typeof cron;
   gtfs: typeof gtfs;
   gtfsCrons: typeof gtfsCrons;

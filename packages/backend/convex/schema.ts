@@ -37,9 +37,8 @@ export default defineSchema({
       v.literal('ACCIDENT'),
       v.literal('OTHER'),
     ),
-    // Transport reference - links to vehicle information
-    transportId: v.optional(v.id('transports')), // Specific vehicle if known
-    // Fallback transport info when specific vehicle not identified
+    // Transport reference - replaced by GTFS data
+    // Note: Real-time vehicle info now comes from gtfsVehiclePositions
     transportMode: v.union(
       v.literal('BUS'),
       v.literal('TRAIN'),
@@ -62,7 +61,6 @@ export default defineSchema({
     .index('by_incident', ['incidentId'])
     .index('by_cluster', ['clusterId'])
     .index('by_verification_score', ['verificationScore'])
-    .index('by_transport', ['transportId'])
     .index('by_route', ['route']),
 
   // =================================================================
@@ -78,9 +76,8 @@ export default defineSchema({
       v.literal('INFO'),
     ),
     description: v.string(), // "route 52 is cancelled due to track maintenance."
-    // Transport reference - links to vehicle information
-    transportId: v.optional(v.id('transports')), // Specific vehicle if known
-    // Fallback transport info when specific vehicle not identified
+    // Transport reference - replaced by GTFS data
+    // Note: Real-time vehicle info now comes from gtfsVehiclePositions
     transportMode: v.union(
       v.literal('BUS'),
       v.literal('TRAIN'),
@@ -94,29 +91,11 @@ export default defineSchema({
     dispatcherId: v.optional(v.string()), // ID of the dispatcher who created this
   })
     .index('by_status', ['status'])
-    .index('by_transport', ['transportId'])
     .index('by_route', ['route']),
 
-  // =================================================================
-  // TRANSPORTS TABLE - Stores all vehicle information
-  // =================================================================
-  transports: defineTable({
-    vehicleNumber: v.string(), // Unique vehicle identifier e.g., "BUS-1234", "TRAIN-567"
-    type: v.union(v.literal('BUS'), v.literal('TRAIN'), v.literal('TRAM')),
-    route: v.string(), // route number/route e.g., "52", "139", "SK1"
-    capacity: v.optional(v.number()), // Vehicle capacity
-    features: v.optional(v.array(v.string())), // e.g., ["ac", "low_floor", "wifi"]
-  })
-    .index('by_vehicle_number', ['vehicleNumber'])
-    .index('by_route', ['route']),
-
-  // =================================================================
-  // TRIPS TABLE - Stores every running vehicle
-  // =================================================================
-  trips: defineTable({
-    route: v.id('routes'),
-    transport: v.id('transports'),
-  }),
+  // Removed redundant tables - replaced by GTFS data:
+  // - transports: replaced by gtfsVehiclePositions
+  // - trips: replaced by gtfsTrips
   // =================================================================
   // HISTORICAL DELAYS TABLE - Aggregated data for predictions
   // =================================================================

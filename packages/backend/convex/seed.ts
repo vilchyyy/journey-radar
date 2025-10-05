@@ -1,7 +1,7 @@
 import type { Id } from './_generated/dataModel'
 import { internalMutation, mutation } from './_generated/server'
 import { geospatial } from './index'
-import { mockReports, mockRoutes, mockTransports, mockUsers } from './mock_data'
+import { mockReports, mockRoutes, mockUsers } from './mock_data'
 
 export const seedDatabase = internalMutation({
   args: {},
@@ -22,11 +22,7 @@ export const seedDatabase = internalMutation({
       await ctx.db.delete(route._id)
     }
 
-    const existingTransports = await ctx.db.query('transports').collect()
-    for (const transport of existingTransports) {
-      await ctx.db.delete(transport._id)
-    }
-
+  
     // Note: geospatial index clearing may not be available in current API version
 
     // Insert routes first
@@ -37,14 +33,7 @@ export const seedDatabase = internalMutation({
       routeMap.set(route.routeNumber, routeId)
     }
 
-    // Insert transports
-    const transportMap = new Map<string, Id<'transports'>>()
-    for (const transport of mockTransports) {
-      const { _id, _creationTime, ...transportData } = transport
-      const transportId = await ctx.db.insert('transports', transportData)
-      transportMap.set(transport.vehicleNumber, transportId)
-    }
-
+  
     // Insert users
     const userIdMap = new Map<string, Id<'users'>>()
     for (let i = 0; i < mockUsers.length; i++) {
@@ -63,9 +52,6 @@ export const seedDatabase = internalMutation({
         ...reportData,
         userId: userIdMap.get(report.userId as string) || report.userId,
         route: routeMap.get(getRouteKey(report.route)) || report.route,
-        transportId: report.transportId
-          ? transportMap.get(getTransportKey(report.transportId))
-          : undefined,
       }
 
       // Insert the report
@@ -92,7 +78,6 @@ export const seedDatabase = internalMutation({
     return {
       usersInserted: mockUsers.length,
       routesInserted: mockRoutes.length,
-      transportsInserted: mockTransports.length,
       reportsInserted: mockReports.length,
     }
   },
@@ -286,9 +271,3 @@ function getRouteKey(routeId: unknown): string {
   return '52' // fallback to a common route
 }
 
-function getTransportKey(transportId: unknown): string {
-  if (typeof transportId === 'string') {
-    return transportId
-  }
-  return 'TRAIN-SKM1-001' // fallback to a common transport
-}
