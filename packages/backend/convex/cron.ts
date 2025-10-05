@@ -1,13 +1,13 @@
 import { internal } from './_generated/api'
 import { internalAction } from './_generated/server'
 
-// Daily GTFS schedule loading (runs at 2 AM)
+// GTFS schedule loading (runs every hour)
 export const dailyGTFSLoad = internalAction({
   args: {},
   handler: async (ctx) => {
-    console.log('Starting daily GTFS schedule loading...')
+    console.log('Starting GTFS schedule loading...')
     const result = await ctx.runAction(internal.gtfs.loadGTFSSchedule)
-    console.log('Daily GTFS schedule loading result:', result)
+    console.log('GTFS schedule loading result:', result)
     return result
   },
 })
