@@ -1,5 +1,7 @@
 'use client'
 
+import { useQuery } from 'convex/react'
+import { api } from '@journey-radar/backend/convex/_generated/api'
 import {
   AlertCircle,
   Calendar,
@@ -19,60 +21,63 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { formatDistanceToNow } from 'date-fns'
 
 export default function RewardsPage() {
-  const recentActivities = [
-    {
-      id: 1,
-      type: 'earned',
-      title: 'Reported delay on Line 52',
-      timestamp: 'Today, 4:15 PM',
-      points: 10,
-      icon: Plus,
+  console.log('🎯 Rewards Page - Loading user stats...')
+
+  const userStats = useQuery(api.rewards.getUserPointsStats)
+  const userRedemptions = useQuery(api.rewards.getUserRedemptions)
+
+  console.log('📊 User stats from Convex:', userStats)
+  console.log('🎁 User redemptions from Convex:', userRedemptions)
+
+  // Helper function to get icon for transaction type
+  const getTransactionIcon = (type: string) => {
+    switch (type) {
+      case 'REPORT_SUBMITTED':
+      case 'REPORT_VERIFIED':
+      case 'REPORT_CONFIRMED':
+        return Plus
+      case 'WEEKLY_STREAK':
+      case 'REPUTATION_BONUS':
+        return TrendingUp
+      case 'VOUCHER_REDEEMED':
+        return Gift
+      default:
+        return Plus
+    }
+  }
+
+  // Helper function to get icon styling for transaction type
+  const getTransactionIconStyle = (type: string, points: number) => {
+    if (points < 0) {
+      return {
+        iconBg: 'bg-blue-100',
+        iconColor: 'text-blue-600',
+      }
+    }
+    return {
       iconBg: 'bg-green-100',
       iconColor: 'text-green-600',
-    },
-    {
-      id: 2,
-      type: 'earned',
-      title: 'Verified report: Train cancellation',
-      timestamp: 'Today, 2:30 PM',
-      points: 5,
-      icon: CheckCircle,
-      iconBg: 'bg-green-100',
-      iconColor: 'text-green-600',
-    },
-    {
-      id: 3,
-      type: 'earned',
-      title: 'Reported overcrowding on Bus 23',
-      timestamp: 'Yesterday, 8:45 AM',
-      points: 8,
-      icon: Plus,
-      iconBg: 'bg-green-100',
-      iconColor: 'text-green-600',
-    },
-    {
-      id: 4,
-      type: 'redeemed',
-      title: 'Redeemed: Free travel voucher',
-      timestamp: '2 days ago',
-      points: -50,
-      icon: Gift,
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600',
-    },
-    {
-      id: 5,
-      type: 'earned',
-      title: 'Weekly streak bonus',
-      timestamp: '3 days ago',
-      points: 25,
-      icon: TrendingUp,
-      iconBg: 'bg-green-100',
-      iconColor: 'text-green-600',
-    },
-  ]
+    }
+  }
+
+  // Format timestamp
+  const formatTimestamp = (timestamp: number) => {
+    return formatDistanceToNow(timestamp, { addSuffix: true })
+  }
+
+  // Combine recent transactions and redemptions for activity feed
+  const recentActivities = userStats?.recentTransactions?.slice(0, 5).map(transaction => ({
+    id: transaction.id,
+    type: transaction.points > 0 ? 'earned' : 'redeemed',
+    title: transaction.description,
+    timestamp: formatTimestamp(transaction.timestamp),
+    points: transaction.points,
+    icon: getTransactionIcon(transaction.type),
+    ...getTransactionIconStyle(transaction.type, transaction.points),
+  })) || []
 
   return (
     <div className="min-h-screen bg-background">
@@ -111,23 +116,33 @@ export default function RewardsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              {/* Points Balance */}
-              <Card className="bg-teal-400 border-none shadow-md">
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-white mb-1">1000</div>
-                  <div className="text-sm text-white/90">Points</div>
-                </CardContent>
-              </Card>
+            {userStats ? (
+              <div className="grid grid-cols-2 gap-4">
+                {/* Points Balance */}
+                <Card className="bg-teal-400 border-none shadow-md">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-white mb-1">{userStats.totalPoints}</div>
+                    <div className="text-sm text-white/90">Points</div>
+                  </CardContent>
+                </Card>
 
-              {/* Verification Score */}
-              <Card className="bg-teal-400 border-none shadow-md">
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-white mb-1">97%</div>
-                  <div className="text-sm text-white/90">verified</div>
-                </CardContent>
-              </Card>
-            </div>
+                {/* Verification Score */}
+                <Card className="bg-teal-400 border-none shadow-md">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-3xl font-bold text-white mb-1">{userStats.verificationRate}%</div>
+                    <div className="text-sm text-white/90">verified</div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mb-2"></div>
+                  <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto"></div>
+                </div>
+                <p className="text-sm text-gray-500 mt-4">Loading your rewards data...</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -161,51 +176,61 @@ export default function RewardsPage() {
           {/* Recent Activity Card */}
           <Card>
             <CardContent className="p-6">
-              <div className="space-y-4">
-                {recentActivities.map((activity, index) => {
-                  const Icon = activity.icon
-                  return (
-                    <div key={activity.id}>
-                      <div className="flex items-center justify-between">
-                        {/* Left Side - Action */}
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`w-10 h-10 ${activity.iconBg} rounded-full flex items-center justify-center`}
-                          >
-                            <Icon className={`w-5 h-5 ${activity.iconColor}`} />
-                          </div>
-                          <div>
-                            <p className="font-medium text-foreground">
-                              {activity.title}
-                            </p>
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              <Clock className="w-3 h-3" />
-                              <span>{activity.timestamp}</span>
+              {userStats && userStats.recentTransactions.length > 0 ? (
+                <div className="space-y-4">
+                  {recentActivities.map((activity, index) => {
+                    const Icon = activity.icon
+                    return (
+                      <div key={activity.id}>
+                        <div className="flex items-center justify-between">
+                          {/* Left Side - Action */}
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-10 h-10 ${activity.iconBg} rounded-full flex items-center justify-center`}
+                            >
+                              <Icon className={`w-5 h-5 ${activity.iconColor}`} />
+                            </div>
+                            <div>
+                              <p className="font-medium text-foreground">
+                                {activity.title}
+                              </p>
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Clock className="w-3 h-3" />
+                                <span>{activity.timestamp}</span>
+                              </div>
                             </div>
                           </div>
+
+                          {/* Right Side - Points */}
+                          <div
+                            className={`font-semibold ${
+                              activity.type === 'earned'
+                                ? 'text-green-600'
+                                : 'text-gray-600'
+                            }`}
+                          >
+                            {activity.type === 'earned' ? '+' : ''}
+                            {activity.points} Points
+                          </div>
                         </div>
 
-                        {/* Right Side - Points */}
-                        <div
-                          className={`font-semibold ${
-                            activity.type === 'earned'
-                              ? 'text-green-600'
-                              : 'text-gray-600'
-                          }`}
-                        >
-                          {activity.type === 'earned' ? '+' : ''}
-                          {activity.points} Points
-                        </div>
+                        {/* Add separator except for last item */}
+                        {index < recentActivities.length - 1 && (
+                          <Separator className="mt-4" />
+                        )}
                       </div>
-
-                      {/* Add separator except for last item */}
-                      {index < recentActivities.length - 1 && (
-                        <Separator className="mt-4" />
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 font-medium">No activity yet</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Start reporting disruptions to earn points!
+                  </p>
+                </div>
+              )}
 
               {/* View All Activity Link */}
               <div className="mt-6 pt-4 border-t">
