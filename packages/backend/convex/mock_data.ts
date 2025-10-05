@@ -1,4 +1,6 @@
 
+import type { Id } from './_generated/dataModel'
+
 export interface MockReport {
   _id?: string
   _creationTime?: number
@@ -7,21 +9,21 @@ export interface MockReport {
     coordinates: [number, number] // [longitude, latitude]
   }
   // Report fields matching current schema
-  userId?: any // Id<'users'> | undefined
+  userId?: Id<'users'> | undefined
   isAnonymous: boolean
   status: 'UNVERIFIED' | 'COMMUNITY_VERIFIED' | 'OFFICIAL_CONFIRMED' | 'REJECTED'
   type: 'DELAY' | 'CANCELLED' | 'CROWDED' | 'ACCIDENT' | 'OTHER'
   transportMode: 'BUS' | 'TRAIN' | 'TRAM'
-  route?: any // Id<'routes'> | undefined
-  gtfsRouteId?: string
-  gtfsTripId?: string
-  gtfsVehicleId?: string
+  route?: Id<'routes'> | undefined
+  gtfsRouteId?: Id<'gtfsRoutes'> | undefined
+  gtfsTripId?: Id<'gtfsTrips'> | undefined
+  gtfsVehicleId?: Id<'gtfsVehiclePositions'> | undefined
   routeShortName?: string
   comment?: string
   delayMinutes?: number
   verificationScore: number
-  incidentId?: any // Id<'incidents'> | undefined
-  clusterId?: any // Id<'reportClusters'> | undefined
+  incidentId?: Id<'incidents'> | undefined
+  clusterId?: Id<'reportClusters'> | undefined
   upvotes: number
   downvotes: number
   voteScore: number
@@ -171,6 +173,7 @@ export const mockReports: MockReport[] = [
     transportMode: 'TRAM',
     route: '4' as any,
     routeShortName: '4',
+    gtfsTripId: 'trip_4_delay_placeholder' as any, // Will be replaced with actual ID
     comment: 'Tram 4 is running about 15 minutes late due to traffic congestion',
     delayMinutes: 15,
     verificationScore: 0.5,
@@ -190,6 +193,8 @@ export const mockReports: MockReport[] = [
     transportMode: 'BUS',
     route: '139' as any,
     routeShortName: '139',
+    gtfsRouteId: 'route_139_placeholder' as any, // Will be replaced with actual ID
+    gtfsTripId: 'trip_139_delay_placeholder' as any, // Will be replaced with actual ID
     comment: 'Bus 139 delayed by about 20 minutes, very crowded',
     delayMinutes: 20,
     verificationScore: 0.8,
@@ -208,7 +213,8 @@ export const mockReports: MockReport[] = [
     type: 'DELAY',
     transportMode: 'TRAIN',
     routeShortName: 'SK1',
-    gtfsRouteId: 'SK1',
+    gtfsRouteId: 'route_sk1_placeholder' as any, // Will be replaced with actual ID
+    gtfsTripId: 'trip_sk1_delay_placeholder' as any, // Will be replaced with actual ID
     comment: 'SK1 train to airport is delayed, waiting on platform',
     delayMinutes: 10,
     verificationScore: 0.5,
@@ -229,6 +235,7 @@ export const mockReports: MockReport[] = [
     transportMode: 'TRAM',
     route: '18' as any,
     routeShortName: '18',
+    gtfsTripId: 'trip_18_cancelled_placeholder' as any, // Will be replaced with actual ID
     comment: 'Tram 18 cancelled due to technical issues',
     verificationScore: 0.9,
     upvotes: 12,
@@ -248,6 +255,7 @@ export const mockReports: MockReport[] = [
     transportMode: 'BUS',
     route: '502' as any,
     routeShortName: '502',
+    gtfsTripId: 'trip_502_crowded_placeholder' as any, // Will be replaced with actual ID
     comment: "Bus 502 extremely crowded, can't get on at this stop",
     verificationScore: 0.7,
     upvotes: 3,
@@ -267,6 +275,8 @@ export const mockReports: MockReport[] = [
     transportMode: 'BUS',
     route: '184' as any,
     routeShortName: '184',
+    gtfsTripId: 'trip_184_accident_placeholder' as any, // Will be replaced with actual ID
+    gtfsVehicleId: 'vehicle_184_accident_placeholder' as any, // Will be replaced with actual ID
     comment: 'Minor accident involving bus 184, traffic blocked',
     verificationScore: 0.6,
     upvotes: 8,
@@ -303,9 +313,9 @@ export const mockReports: MockReport[] = [
     status: 'COMMUNITY_VERIFIED',
     type: 'DELAY',
     transportMode: 'TRAM',
-    gtfsRouteId: '4',
-    gtfsTripId: 'trip_123',
-    gtfsVehicleId: 'vehicle_456',
+    gtfsRouteId: 'route_4_placeholder' as any, // Will be replaced with actual ID
+    gtfsTripId: 'trip_4_placeholder' as any, // Will be replaced with actual ID
+    gtfsVehicleId: 'vehicle_4_placeholder' as any, // Will be replaced with actual ID
     routeShortName: '4',
     comment: 'Multiple 4 trams running late, seems to be system-wide issue',
     delayMinutes: 25,
@@ -326,6 +336,7 @@ export const mockReports: MockReport[] = [
     transportMode: 'BUS',
     route: '605' as any,
     routeShortName: '605',
+    gtfsTripId: 'trip_605_delay_placeholder' as any, // Will be replaced with actual ID
     comment: 'Bus 605 delayed, traffic jam on Aleja Trzech Wieszczów',
     delayMinutes: 12,
     verificationScore: 0.5,
@@ -346,6 +357,7 @@ export const mockReports: MockReport[] = [
     transportMode: 'TRAIN',
     routeShortName: 'SK2',
     gtfsRouteId: 'SK2',
+    gtfsTripId: 'trip_sk2_cancelled_placeholder' as any, // Will be replaced with actual ID
     comment: 'SK2 train appears to be cancelled but no official info',
     verificationScore: 0.3,
     upvotes: 0,

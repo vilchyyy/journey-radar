@@ -46,9 +46,9 @@ export default defineSchema({
 
     route: v.optional(v.id('routes')), // Optional to support GTFS-only routes
     // GTFS route information (used when route is not in routes table)
-    gtfsRouteId: v.optional(v.string()),
-    gtfsTripId: v.optional(v.string()),
-    gtfsVehicleId: v.optional(v.string()),
+    gtfsRouteId: v.optional(v.string()), // GTFS route_id string
+    gtfsTripId: v.optional(v.string()), // GTFS trip_id string
+    gtfsVehicleId: v.optional(v.string()), // Vehicle ID string
     routeShortName: v.optional(v.string()), // e.g., "52", "139"
 
     comment: v.optional(v.string()),
@@ -147,7 +147,7 @@ export default defineSchema({
   // =================================================================
   gtfsTrips: defineTable({
     tripId: v.string(), // GTFS trip_id
-    routeId: v.string(), // GTFS route_id
+    routeId: v.string(), // GTFS route_id reference
     lastUpdated: v.number(), // Unix timestamp
   })
     .index('by_trip_id', ['tripId'])
@@ -158,8 +158,8 @@ export default defineSchema({
   // =================================================================
   gtfsVehiclePositions: defineTable({
     vehicleId: v.string(), // Vehicle identifier
-    tripId: v.string(), // GTFS trip_id
-    routeId: v.string(), // GTFS route_id (extracted from trip mapping)
+    tripId: v.optional(v.string()), // GTFS trip_id reference
+    routeId: v.optional(v.string()), // GTFS route_id reference
     routeNumber: v.string(), // Human readable route number
     latitude: v.number(),
     longitude: v.number(),
@@ -179,9 +179,9 @@ export default defineSchema({
   // =================================================================
   gtfsTripUpdates: defineTable({
     id: v.string(), // Entity ID
-    tripId: v.string(), // GTFS trip_id
-    routeId: v.string(), // GTFS route_id
-    vehicleId: v.optional(v.string()), // Vehicle ID if available
+    tripId: v.optional(v.string()), // GTFS trip_id reference
+    routeId: v.optional(v.string()), // GTFS route_id reference
+    vehicleId: v.optional(v.string()), // Vehicle ID reference
     mode: v.union(v.literal('BUS'), v.literal('TRAM')), // Transport mode
     stopUpdates: v.array(
       v.object({
