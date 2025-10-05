@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { api } from '@journey-radar/backend/convex/_generated/api'
-import { fetchMutation, fetchQuery } from 'convex/nextjs'
 import { Id } from '@journey-radar/backend/convex/_generated/dataModel'
+import { fetchMutation, fetchQuery } from 'convex/nextjs'
+import { type NextRequest, NextResponse } from 'next/server'
 
 interface Params {
   params: Promise<{ id: string }>
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     console.error('Error fetching incident:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch incident' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -43,7 +43,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
       dispatcherId: body.dispatcherId,
     }
 
-    const incidentId = await fetchMutation(api.incidents.updateIncident, updateData)
+    const incidentId = await fetchMutation(
+      api.incidents.updateIncident,
+      updateData,
+    )
 
     return NextResponse.json({
       success: true,
@@ -54,7 +57,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     console.error('Error updating incident:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update incident' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -80,7 +83,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     console.error('Error deleting incident:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to delete incident' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

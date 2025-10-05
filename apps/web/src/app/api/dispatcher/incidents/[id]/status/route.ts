@@ -1,4 +1,5 @@
 import { api } from '@journey-radar/backend/convex/_generated/api'
+import { Id } from '@journey-radar/backend/convex/_generated/dataModel'
 import { fetchMutation } from 'convex/nextjs'
 import { type NextRequest, NextResponse } from 'next/server'
 

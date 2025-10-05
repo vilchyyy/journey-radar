@@ -69,12 +69,14 @@ export const updateIncidentStatus = mutation({
 export const updateIncident = mutation({
   args: {
     incidentId: v.id('incidents'),
-    type: v.optional(v.union(
-      v.literal('DELAY'),
-      v.literal('CANCELLED'),
-      v.literal('ACCIDENT'),
-      v.literal('INFO'),
-    )),
+    type: v.optional(
+      v.union(
+        v.literal('DELAY'),
+        v.literal('CANCELLED'),
+        v.literal('ACCIDENT'),
+        v.literal('INFO'),
+      ),
+    ),
     description: v.optional(v.string()),
     validUntil: v.optional(v.number()), // Unix timestamp (ms)
     dispatcherId: v.optional(v.string()), // ID of the dispatcher making the change
@@ -118,11 +120,9 @@ export const deleteIncident = mutation({
 export const getAllIncidents = query({
   args: {
     status: v.optional(v.union(v.literal('ACTIVE'), v.literal('RESOLVED'))),
-    transportMode: v.optional(v.union(
-      v.literal('BUS'),
-      v.literal('TRAIN'),
-      v.literal('TRAM'),
-    )),
+    transportMode: v.optional(
+      v.union(v.literal('BUS'), v.literal('TRAIN'), v.literal('TRAM')),
+    ),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
@@ -130,12 +130,16 @@ export const getAllIncidents = query({
 
     // Filter by status if provided
     if (args.status) {
-      incidents = incidents.filter((incident) => incident.status === args.status)
+      incidents = incidents.filter(
+        (incident) => incident.status === args.status,
+      )
     }
 
     // Filter by transport mode if provided
     if (args.transportMode) {
-      incidents = incidents.filter((incident) => incident.transportMode === args.transportMode)
+      incidents = incidents.filter(
+        (incident) => incident.transportMode === args.transportMode,
+      )
     }
 
     // Sort by creation time (newest first)
@@ -152,13 +156,15 @@ export const getAllIncidents = query({
         const route = await ctx.db.get(incident.route)
         return {
           ...incident,
-          routeDetails: route ? {
-            routeNumber: route.routeNumber,
-            source: route.source,
-            destination: route.destination,
-          } : null,
+          routeDetails: route
+            ? {
+                routeNumber: route.routeNumber,
+                source: route.source,
+                destination: route.destination,
+              }
+            : null,
         }
-      })
+      }),
     )
 
     return incidentsWithRoutes
@@ -181,11 +187,13 @@ export const getIncidentById = query({
 
     return {
       ...incident,
-      routeDetails: route ? {
-        routeNumber: route.routeNumber,
-        source: route.source,
-        destination: route.destination,
-      } : null,
+      routeDetails: route
+        ? {
+            routeNumber: route.routeNumber,
+            source: route.source,
+            destination: route.destination,
+          }
+        : null,
     }
   },
 })
@@ -201,8 +209,8 @@ export const getActiveIncidentsForRoute = query({
       .filter((q) =>
         q.and(
           q.eq(q.field('status'), 'ACTIVE'),
-          q.eq(q.field('route'), args.routeId)
-        )
+          q.eq(q.field('route'), args.routeId),
+        ),
       )
       .collect()
 
@@ -269,16 +277,16 @@ export const getIncidentStats = query({
     })
 
     const byTransportMode = {
-      BUS: activeIncidents.filter(i => i.transportMode === 'BUS').length,
-      TRAIN: activeIncidents.filter(i => i.transportMode === 'TRAIN').length,
-      TRAM: activeIncidents.filter(i => i.transportMode === 'TRAM').length,
+      BUS: activeIncidents.filter((i) => i.transportMode === 'BUS').length,
+      TRAIN: activeIncidents.filter((i) => i.transportMode === 'TRAIN').length,
+      TRAM: activeIncidents.filter((i) => i.transportMode === 'TRAM').length,
     }
 
     const byType = {
-      DELAY: activeIncidents.filter(i => i.type === 'DELAY').length,
-      CANCELLED: activeIncidents.filter(i => i.type === 'CANCELLED').length,
-      ACCIDENT: activeIncidents.filter(i => i.type === 'ACCIDENT').length,
-      INFO: activeIncidents.filter(i => i.type === 'INFO').length,
+      DELAY: activeIncidents.filter((i) => i.type === 'DELAY').length,
+      CANCELLED: activeIncidents.filter((i) => i.type === 'CANCELLED').length,
+      ACCIDENT: activeIncidents.filter((i) => i.type === 'ACCIDENT').length,
+      INFO: activeIncidents.filter((i) => i.type === 'INFO').length,
     }
 
     return {

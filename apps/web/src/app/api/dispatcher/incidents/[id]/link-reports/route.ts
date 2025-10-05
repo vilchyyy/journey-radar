@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { api } from '@journey-radar/backend/convex/_generated/api'
-import { fetchMutation } from 'convex/nextjs'
 import { Id } from '@journey-radar/backend/convex/_generated/dataModel'
+import { fetchMutation } from 'convex/nextjs'
+import { type NextRequest, NextResponse } from 'next/server'
 
 interface Params {
   params: Promise<{ id: string }>
@@ -16,13 +16,13 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (!body.reportIds || !Array.isArray(body.reportIds)) {
       return NextResponse.json(
         { success: false, error: 'Missing required field: reportIds (array)' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     // Convert string IDs to Convex IDs
     const reportIds = body.reportIds.map((reportId: string) =>
-      Id('reports', reportId)
+      Id('reports', reportId),
     )
 
     const result = await fetchMutation(api.incidents.linkReportsToIncident, {
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     console.error('Error linking reports to incident:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to link reports to incident' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

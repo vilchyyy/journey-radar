@@ -1,52 +1,10 @@
 import { v } from 'convex/values'
 import type { Id } from './_generated/dataModel'
-import { mutation, query } from './_generated/server'
+import { internalMutation, mutation, query } from './_generated/server'
 import { geospatial } from './index'
 
-export const getReports = query({
-  args: { limit: v.optional(v.number()) },
-  handler: async (ctx, { limit }) => {
-    const query = ctx.db.query('reports')
-    if (limit) {
-      const reports = await query.take(limit)
-      return reports
-    }
-    const reports = await query.collect()
-    return reports
-  },
-})
-
-// Debug function to check geospatial index
-export const debugGeospatialIndex = query({
-  args: {},
-  handler: async (ctx) => {
-    const allReports = await ctx.db.query('reports').collect()
-    console.log('Total reports in database:', allReports.length)
-
-    // Try to find any geospatial points within a very large radius
-    const warsawCenter = { latitude: 52.2297, longitude: 21.0122 }
-    const hugeRadius = 50000 // 50km in meters
-
-    const allNearbyReports = await geospatial.queryNearest(
-      ctx,
-      warsawCenter,
-      hugeRadius,
-      100,
-    )
-
-    console.log('Geospatial query results within 50km:', allNearbyReports)
-
-    return {
-      totalReports: allReports.length,
-      geospatialResults: allNearbyReports.length,
-      sampleReport: allReports[0],
-      sampleGeospatialResult: allNearbyReports[0],
-    }
-  },
-})
-
-// Create a new report with location data (supports anonymous reporting)
-export const createReport = mutation({
+// Helper function for report creation - used by both public mutation and seeding
+export const createReportHelper = internalMutation({
   args: {
     userId: v.optional(v.id('users')),
     isAnonymous: v.optional(v.boolean()),
@@ -67,7 +25,6 @@ export const createReport = mutation({
       v.literal('TRAM'),
     ),
     route: v.optional(v.id('routes')),
-    // GTFS route information (for reports on GTFS-only routes)
     gtfsRouteId: v.optional(v.string()),
     gtfsTripId: v.optional(v.string()),
     gtfsVehicleId: v.optional(v.string()),
@@ -87,6 +44,61 @@ export const createReport = mutation({
       if (user) {
         // Higher reputation users get higher verification scores
         verificationScore = Math.min(1, user.reputationScore / 100)
+      }
+    }
+
+    // Convert GTFS string IDs to Convex ID references when available
+    let gtfsRouteIdConvex: Id<'gtfsRoutes'> | undefined
+    let gtfsTripIdConvex: Id<'gtfsTrips'> | undefined
+    let gtfsVehicleIdConvex: Id<'gtfsVehiclePositions'> | undefined
+
+    // Convert GTFS route ID
+    if (args.gtfsRouteId) {
+      const gtfsRoute = await ctx.db
+        .query('gtfsRoutes')
+        .withIndex('by_route_id', (q) => q.eq('routeId', args.gtfsRouteId))
+        .first()
+      if (gtfsRoute) {
+        gtfsRouteIdConvex = gtfsRoute._id
+        console.log(
+          `✅ Converted GTFS route ID: ${args.gtfsRouteId} -> ${gtfsRouteIdConvex}`,
+        )
+      } else {
+        console.log(`⚠️ GTFS route not found: ${args.gtfsRouteId}`)
+      }
+    }
+
+    // Convert GTFS trip ID
+    if (args.gtfsTripId) {
+      const gtfsTrip = await ctx.db
+        .query('gtfsTrips')
+        .withIndex('by_trip_id', (q) => q.eq('tripId', args.gtfsTripId))
+        .first()
+      if (gtfsTrip) {
+        gtfsTripIdConvex = gtfsTrip._id
+        console.log(
+          `✅ Converted GTFS trip ID: ${args.gtfsTripId} -> ${gtfsTripIdConvex}`,
+        )
+      } else {
+        console.log(`⚠️ GTFS trip not found: ${args.gtfsTripId}`)
+      }
+    }
+
+    // Convert GTFS vehicle ID
+    if (args.gtfsVehicleId) {
+      const gtfsVehicle = await ctx.db
+        .query('gtfsVehiclePositions')
+        .withIndex('by_vehicle_id', (q) =>
+          q.eq('vehicleId', args.gtfsVehicleId),
+        )
+        .first()
+      if (gtfsVehicle) {
+        gtfsVehicleIdConvex = gtfsVehicle._id
+        console.log(
+          `✅ Converted GTFS vehicle ID: ${args.gtfsVehicleId} -> ${gtfsVehicleIdConvex}`,
+        )
+      } else {
+        console.log(`⚠️ GTFS vehicle not found: ${args.gtfsVehicleId}`)
       }
     }
 
@@ -124,13 +136,91 @@ export const createReport = mutation({
     if (args.userId) {
       const user = await ctx.db.get(args.userId)
       if (user) {
-        await ctx.db.patch(args.userId, {
-          reportsSubmitted: (user.reportsSubmitted || 0) + 1,
+        await ctx.db.patch(user._id, {
+          points: user.points + 10,
+          reportsSubmitted: user.reportsSubmitted + 1,
         })
       }
     }
 
     return reportId
+  },
+})
+
+export const getReports = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, { limit }) => {
+    const query = ctx.db.query('reports')
+    if (limit) {
+      const reports = await query.take(limit)
+      return reports
+    }
+    const reports = await query.collect()
+    return reports
+  },
+})
+
+// Debug function to check geospatial index
+export const debugGeospatialIndex = query({
+  args: {},
+  handler: async (ctx) => {
+    const allReports = await ctx.db.query('reports').collect()
+    console.log('Total reports in database:', allReports.length)
+
+    // Try to find any geospatial points within a very large radius
+    const krakowCenter = { latitude: 50.0614, longitude: 19.9365 } // Kraków Main Market Square
+    const hugeRadius = 50000 // 50km in meters
+
+    const allNearbyReports = await geospatial.queryNearest(
+      ctx,
+      krakowCenter,
+      100,
+      hugeRadius,
+    )
+
+    console.log('Geospatial query results within 50km:', allNearbyReports)
+
+    return {
+      totalReports: allReports.length,
+      geospatialResults: allNearbyReports.length,
+      sampleReport: allReports[0],
+      sampleGeospatialResult: allNearbyReports[0],
+    }
+  },
+})
+
+// Create a new report with location data (supports anonymous reporting)
+export const createReport = mutation({
+  args: {
+    userId: v.optional(v.id('users')),
+    isAnonymous: v.optional(v.boolean()),
+    type: v.union(
+      v.literal('DELAY'),
+      v.literal('CANCELLED'),
+      v.literal('CROWDED'),
+      v.literal('ACCIDENT'),
+      v.literal('OTHER'),
+    ),
+    location: v.object({
+      latitude: v.number(),
+      longitude: v.number(),
+    }),
+    transportMode: v.union(
+      v.literal('BUS'),
+      v.literal('TRAIN'),
+      v.literal('TRAM'),
+    ),
+    route: v.optional(v.id('routes')),
+    // GTFS route information (for reports on GTFS-only routes)
+    gtfsRouteId: v.optional(v.string()), // GTFS route_id string
+    gtfsTripId: v.optional(v.string()), // GTFS trip_id string
+    gtfsVehicleId: v.optional(v.string()), // Vehicle ID string
+    routeShortName: v.optional(v.string()),
+    comment: v.optional(v.string()),
+    delayMinutes: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    return await createReportHelper(ctx, args)
   },
 })
 
@@ -483,7 +573,7 @@ export const getTripReports = query({
   },
   handler: async (ctx, args) => {
     const { tripId, routeNumber, mode, routeId, vehicleId } = args
-
+    console.log(tripId, routeNumber, mode, routeId, vehicleId)
     // Build a more efficient query with the most selective filters first
     let reportsQuery = ctx.db.query('reports')
 

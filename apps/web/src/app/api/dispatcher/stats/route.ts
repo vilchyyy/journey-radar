@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
 import { api } from '@journey-radar/backend/convex/_generated/api'
 import { fetchQuery } from 'convex/nextjs'
+import { NextResponse } from 'next/server'
 
 // GET /api/dispatcher/stats - Get incident statistics for dashboard
 export async function GET() {
@@ -15,7 +15,7 @@ export async function GET() {
     console.error('Error fetching stats:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch statistics' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

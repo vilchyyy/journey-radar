@@ -11,7 +11,9 @@ class DispatcherAPI {
     }
   }
 
-  private async handleResponse<T>(response: Response): Promise<{ success: boolean; data?: T; error?: string; message?: string }> {
+  private async handleResponse<T>(
+    response: Response,
+  ): Promise<{ success: boolean; data?: T; error?: string; message?: string }> {
     const data = await response.json()
 
     if (!response.ok) {
@@ -34,7 +36,8 @@ class DispatcherAPI {
   }) {
     const searchParams = new URLSearchParams()
     if (params?.status) searchParams.append('status', params.status)
-    if (params?.transportMode) searchParams.append('transportMode', params.transportMode)
+    if (params?.transportMode)
+      searchParams.append('transportMode', params.transportMode)
     if (params?.limit) searchParams.append('limit', params.limit.toString())
 
     const response = await fetch(`${API_BASE}/incidents?${searchParams}`, {
@@ -70,11 +73,14 @@ class DispatcherAPI {
     return this.handleResponse(response)
   }
 
-  async updateIncident(incidentId: string, data: {
-    type?: 'DELAY' | 'CANCELLED' | 'ACCIDENT' | 'INFO'
-    description?: string
-    validUntil?: number
-  }) {
+  async updateIncident(
+    incidentId: string,
+    data: {
+      type?: 'DELAY' | 'CANCELLED' | 'ACCIDENT' | 'INFO'
+      description?: string
+      validUntil?: number
+    },
+  ) {
     const response = await fetch(`${API_BASE}/incidents/${incidentId}`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
@@ -84,7 +90,10 @@ class DispatcherAPI {
     return this.handleResponse(response)
   }
 
-  async updateIncidentStatus(incidentId: string, status: 'ACTIVE' | 'RESOLVED') {
+  async updateIncidentStatus(
+    incidentId: string,
+    status: 'ACTIVE' | 'RESOLVED',
+  ) {
     const response = await fetch(`${API_BASE}/incidents/${incidentId}/status`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
@@ -104,11 +113,14 @@ class DispatcherAPI {
   }
 
   async linkReportsToIncident(incidentId: string, reportIds: string[]) {
-    const response = await fetch(`${API_BASE}/incidents/${incidentId}/link-reports`, {
-      method: 'POST',
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify({ reportIds }),
-    })
+    const response = await fetch(
+      `${API_BASE}/incidents/${incidentId}/link-reports`,
+      {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ reportIds }),
+      },
+    )
 
     return this.handleResponse(response)
   }

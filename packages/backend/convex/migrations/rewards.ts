@@ -1,29 +1,33 @@
-import { mutation } from '../_generated/server'
 import { v } from 'convex/values'
+import { mutation } from '../_generated/server'
 
 // Sample rewards data
 const sampleRewards = [
   {
     name: 'Free Travel Voucher',
-    description: 'Get a free one-day travel pass for all public transport in the city',
+    description:
+      'Get a free one-day travel pass for all public transport in the city',
     pointsCost: 100,
     category: 'TRAVEL' as const,
     isActive: true,
-    termsAndConditions: 'Valid for 24 hours from activation. Cannot be combined with other offers.',
+    termsAndConditions:
+      'Valid for 24 hours from activation. Cannot be combined with other offers.',
     maxRedemptions: 50,
     currentRedemptions: 0,
-    validUntil: Date.now() + (90 * 24 * 60 * 60 * 1000), // 90 days from now
+    validUntil: Date.now() + 90 * 24 * 60 * 60 * 1000, // 90 days from now
   },
   {
     name: 'Coffee Shop Discount',
-    description: '20% off at participating coffee shops near major transport hubs',
+    description:
+      '20% off at participating coffee shops near major transport hubs',
     pointsCost: 50,
     category: 'FOOD' as const,
     isActive: true,
-    termsAndConditions: 'Valid Monday-Friday before 10am. One use per customer.',
+    termsAndConditions:
+      'Valid Monday-Friday before 10am. One use per customer.',
     maxRedemptions: 200,
     currentRedemptions: 0,
-    validUntil: Date.now() + (60 * 24 * 60 * 60 * 1000), // 60 days from now
+    validUntil: Date.now() + 60 * 24 * 60 * 60 * 1000, // 60 days from now
   },
   {
     name: 'Monthly Travel Pass 50% Off',
@@ -31,32 +35,36 @@ const sampleRewards = [
     pointsCost: 500,
     category: 'TRAVEL' as const,
     isActive: true,
-    termsAndConditions: 'Valid for one month only. Must be redeemed within 7 days of claim.',
+    termsAndConditions:
+      'Valid for one month only. Must be redeemed within 7 days of claim.',
     maxRedemptions: 20,
     currentRedemptions: 0,
-    validUntil: Date.now() + (30 * 24 * 60 * 60 * 1000), // 30 days from now
+    validUntil: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days from now
   },
   {
     name: 'City Transport Merchandise',
-    description: 'Exclusive city transport themed merchandise (t-shirt, water bottle, or tote bag)',
+    description:
+      'Exclusive city transport themed merchandise (t-shirt, water bottle, or tote bag)',
     pointsCost: 150,
     category: 'MERCHANDISE' as const,
     isActive: true,
     termsAndConditions: 'Choose from available designs. Shipping included.',
     maxRedemptions: 100,
     currentRedemptions: 0,
-    validUntil: Date.now() + (120 * 24 * 60 * 60 * 1000), // 120 days from now
+    validUntil: Date.now() + 120 * 24 * 60 * 60 * 1000, // 120 days from now
   },
   {
     name: 'Premium App Features',
-    description: 'Unlock premium features in the Journey Radar app for 3 months',
+    description:
+      'Unlock premium features in the Journey Radar app for 3 months',
     pointsCost: 200,
     category: 'DIGITAL' as const,
     isActive: true,
-    termsAndConditions: 'Features include advanced analytics, custom alerts, and priority support.',
+    termsAndConditions:
+      'Features include advanced analytics, custom alerts, and priority support.',
     maxRedemptions: null, // unlimited
     currentRedemptions: 0,
-    validUntil: Date.now() + (180 * 24 * 60 * 60 * 1000), // 180 days from now
+    validUntil: Date.now() + 180 * 24 * 60 * 60 * 1000, // 180 days from now
   },
 ]
 

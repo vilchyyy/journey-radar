@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useQuery } from 'convex/react'
 import MapGL, { Layer, Source } from 'react-map-gl/maplibre'
 import { ReportVoting } from '@/components/report-voting'
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,7 @@ import { useLocationSearch } from '@/hooks/use-location-search'
 import { useVehiclePositions } from '@/hooks/use-vehicle-positions'
 import type { RouteCoordinate } from '@/lib/route-service'
 import { cn } from '@/lib/utils'
+import { api } from '@/lib/convex-client'
 
 type ModeFilter = 'bus' | 'tram'
 
@@ -136,8 +138,6 @@ export default function RealtimeMap({
   // Transport details drawer state
   const [showTransportDrawer, setShowTransportDrawer] = useState(false)
   const [selectedTransport, setSelectedTransport] = useState<any>(null)
-  const [transportReports, setTransportReports] = useState<any[]>([])
-  const [transportReportsLoading, setTransportReportsLoading] = useState(false)
   const [transportReportsScores, setTransportReportsScores] = useState<
     Record<string, number>
   >({})
@@ -146,70 +146,37 @@ export default function RealtimeMap({
   const toSearch = useLocationSearch({ limit: 6 })
   const searchResults = useLocationSearch({ limit: 8, debounceMs: 200 })
 
+  // Get transport reports using useQuery when a vehicle is selected
+  const transportReportsQuery = useQuery(
+    api.reports.getTripReports,
+    selectedTransport ? {
+      tripId: selectedTransport.tripId || undefined,
+      routeNumber: selectedTransport.routeNumber || undefined,
+      mode: selectedTransport.mode?.toUpperCase() || undefined,
+      routeId: selectedTransport.routeId || undefined,
+      vehicleId: selectedTransport.vehicleId || undefined,
+    } : 'skip'
+  )
+
+  // Get all GTFS trip updates and filter for the selected vehicle
+  const allTripUpdates = useQuery(api.gtfs.getTripUpdates)
+  const selectedVehicleTripUpdate = useMemo(() => {
+    if (!selectedTransport || !allTripUpdates) return null
+    return allTripUpdates.find(update =>
+      update.vehicleId === selectedTransport.vehicleId ||
+      update.tripId === selectedTransport.tripId ||
+      update.routeId === selectedTransport.routeId
+    )
+  }, [selectedTransport, allTripUpdates])
+
   const vehiclesSourceId = 'vehicles-layer'
 
-  const handleVehicleClick = useCallback((vehicle: any) => {
+  const handleVehicleClick = (vehicle: any) => {
     setSelectedTransport(vehicle)
     setShowTransportDrawer(true)
-    fetchTransportReports(vehicle)
-  }, [])
+  }
 
-  const fetchTransportReports = useCallback(async (vehicle: any) => {
-    setTransportReportsLoading(true)
-
-    try {
-      // Fetch user reports for this transport
-      const [reportsResponse, gtfsResponse] = await Promise.all([
-        fetch('/api/reports/transport', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            tripId: vehicle.tripId,
-            vehicleId: vehicle.vehicleId,
-            routeId: vehicle.routeId,
-            routeNumber: vehicle.routeNumber,
-            mode: vehicle.mode.toUpperCase(),
-          }),
-        }),
-        fetch('/api/gtfs/trip-updates', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            vehicleId: vehicle.vehicleId,
-            routeId: vehicle.routeId,
-            routeNumber: vehicle.routeNumber,
-            tripId: vehicle.tripId,
-          }),
-        }),
-      ])
-
-      if (!reportsResponse.ok) {
-        throw new Error('Failed to fetch transport reports')
-      }
-
-      const reportsData = await reportsResponse.json()
-      setTransportReports(reportsData.reports || [])
-
-      // Store GTFS delay information for display
-      if (gtfsResponse.ok) {
-        const gtfsData = await gtfsResponse.json()
-        setSelectedTransport((prev) => ({
-          ...prev,
-          gtfsDelayInfo: gtfsData,
-        }))
-      }
-    } catch (err) {
-      console.error('Error fetching transport data:', err)
-      setTransportReports([])
-    } finally {
-      setTransportReportsLoading(false)
-    }
-  }, [])
-
+  
   const vehicleGeoJSON = useMemo(
     () => ({
       type: 'FeatureCollection' as const,
@@ -2110,48 +2077,48 @@ export default function RealtimeMap({
                         <h4 className="text-sm font-semibold text-blue-900 mb-2">
                           Expected Delays (GTFS)
                         </h4>
-                        {selectedTransport.gtfsDelayInfo ? (
+                        {selectedVehicleTripUpdate ? (
                           <div className="text-xs text-blue-700">
                             <p className="flex items-center justify-between mb-1">
                               <span>Status:</span>
                               <span
                                 className={`font-medium ${
-                                  selectedTransport.gtfsDelayInfo
+                                  selectedVehicleTripUpdate
                                     .delayStatus === 'Significant Delay'
                                     ? 'text-red-600'
-                                    : selectedTransport.gtfsDelayInfo
+                                    : selectedVehicleTripUpdate
                                           .delayStatus === 'Minor Delay'
                                       ? 'text-orange-600'
-                                      : selectedTransport.gtfsDelayInfo
+                                      : selectedVehicleTripUpdate
                                             .delayStatus === 'Early'
                                         ? 'text-green-600'
                                         : 'text-blue-600'
                                 }`}
                               >
-                                {selectedTransport.gtfsDelayInfo.delayStatus}
+                                {selectedVehicleTripUpdate.delayStatus}
                               </span>
                             </p>
-                            {selectedTransport.gtfsDelayInfo.expectedDelay !==
+                            {selectedVehicleTripUpdate.expectedDelay !==
                               0 && (
                               <p className="flex items-center justify-between mb-1">
                                 <span>Expected Delay:</span>
                                 <span
                                   className={`font-medium ${
-                                    selectedTransport.gtfsDelayInfo
+                                    selectedVehicleTripUpdate
                                       .expectedDelay > 5
                                       ? 'text-red-600'
-                                      : selectedTransport.gtfsDelayInfo
+                                      : selectedVehicleTripUpdate
                                             .expectedDelay > 2
                                         ? 'text-orange-600'
                                         : 'text-green-600'
                                   }`}
                                 >
-                                  {selectedTransport.gtfsDelayInfo
+                                  {selectedVehicleTripUpdate
                                     .expectedDelay > 0
                                     ? '+'
                                     : ''}
                                   {
-                                    selectedTransport.gtfsDelayInfo
+                                    selectedVehicleTripUpdate
                                       .expectedDelay
                                   }{' '}
                                   min
@@ -2161,7 +2128,7 @@ export default function RealtimeMap({
                             <p className="text-[0.6rem] text-blue-600 mt-2">
                               Last updated:{' '}
                               {new Date(
-                                selectedTransport.gtfsDelayInfo.lastUpdated,
+                                selectedVehicleTripUpdate.lastUpdated,
                               ).toLocaleTimeString([], {
                                 hour: '2-digit',
                                 minute: '2-digit',
@@ -2184,13 +2151,13 @@ export default function RealtimeMap({
                         <h4 className="text-sm font-semibold text-foreground mb-2">
                           User Reports
                         </h4>
-                        {transportReportsLoading ? (
+                        {transportReportsQuery === undefined ? (
                           <div className="flex justify-center py-4">
                             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                           </div>
-                        ) : transportReports.length > 0 ? (
+                        ) : transportReportsQuery.length > 0 ? (
                           <div className="space-y-2">
-                            {transportReports.map((report: any) => (
+                            {transportReportsQuery.map((report: any) => (
                               <div
                                 key={report._id}
                                 className="rounded-xl border border-border bg-card/60 px-3 py-2"
@@ -2246,23 +2213,14 @@ export default function RealtimeMap({
                                             (report.downvotes || 0)
                                         }
                                         size="sm"
-                                        onUpdate={(newScore, deleted) => {
-                                          if (deleted) {
-                                            // Remove the report from the list
-                                            setTransportReports((prev) =>
-                                              prev.filter(
-                                                (r) => r._id !== report._id,
-                                              ),
-                                            )
-                                          } else {
-                                            // Update the score in local state
-                                            setTransportReportsScores(
-                                              (prev) => ({
-                                                ...prev,
-                                                [report._id]: newScore,
-                                              }),
-                                            )
-                                          }
+                                        onUpdate={(newScore) => {
+                                          // Update the score in local state
+                                          setTransportReportsScores(
+                                            (prev) => ({
+                                              ...prev,
+                                              [report._id]: newScore,
+                                            }),
+                                          )
                                         }}
                                       />
                                     </div>

@@ -158,3 +158,12 @@ Speaker 2: Okay, so last last question. This planning of the connections. Like t
 Speaker 1: Or both. Like confirm like if you have multiple users on the train and something happened, and also you have connection with the train and like there is some incident. So also there is the case to create some algorithm to confirm if those issue are really happened. Like, I don't know, some our train crew, uh, like inform that something is happened, but and some user inform the app, but there is will be also we will take a look on that how to, uh, properly assess if those communication is proper or valid because can be some fake news as well.
 Speaker 2: Okay, yeah. Dobre. Okay, I understand everything. Dziękuję. Powodzenia. Thank you.
 Speaker 1: Thank you. Powodzenia.
+
+
+# !IMPORTANTEST
+DONT RUN DEV COMMANDS!!!
+DONT RUN DEV COMMANDS!!!
+DONT RUN DEV COMMANDS!!!
+DONT RUN DEV COMMANDS!!!
+DONT RUN DEV COMMANDS!!!
+DONT RUN DEV COMMANDS!!!

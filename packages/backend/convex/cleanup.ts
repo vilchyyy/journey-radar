@@ -9,7 +9,7 @@ export const clearReports = mutation({
 
     return {
       deletedReports: existingReports.length,
-      message: 'Cleared all existing reports'
+      message: 'Cleared all existing reports',
     }
-  }
+  },
 })

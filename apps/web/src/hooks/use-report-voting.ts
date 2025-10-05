@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { authClient } from '@/lib/auth-client'
 
 interface VoteResult {
@@ -20,7 +20,9 @@ export function useReportVoting(reportId: string) {
           setIsAuthenticated(true)
 
           // Get current vote for this report
-          const response = await fetch(`/api/reports/vote/get?reportId=${reportId}`)
+          const response = await fetch(
+            `/api/reports/vote/get?reportId=${reportId}`,
+          )
           if (response.ok) {
             const data = await response.json()
             setUserVote(data.vote)
@@ -38,53 +40,56 @@ export function useReportVoting(reportId: string) {
     checkAuthAndVote()
   }, [reportId])
 
-  const handleVote = useCallback(async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
-    if (!isAuthenticated) {
-      // Redirect to sign in or show sign-in modal
-      window.location.href = '/sign-in'
-      return
-    }
-
-    setIsLoading(true)
-
-    try {
-      const response = await fetch('/api/reports/vote', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          reportId,
-          voteType,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to vote')
+  const handleVote = useCallback(
+    async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
+      if (!isAuthenticated) {
+        // Redirect to sign in or show sign-in modal
+        window.location.href = '/sign-in'
+        return
       }
 
-      const result: VoteResult = await response.json()
+      setIsLoading(true)
 
-      if (result.action === 'deleted') {
-        // Report was deleted due to low score
-        return { deleted: true, voteScore: result.voteScore }
+      try {
+        const response = await fetch('/api/reports/vote', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            reportId,
+            voteType,
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to vote')
+        }
+
+        const result: VoteResult = await response.json()
+
+        if (result.action === 'deleted') {
+          // Report was deleted due to low score
+          return { deleted: true, voteScore: result.voteScore }
+        }
+
+        // Update local state based on action
+        if (result.action === 'removed') {
+          setUserVote(null)
+        } else if (result.action === 'added' || result.action === 'changed') {
+          setUserVote(voteType)
+        }
+
+        return { deleted: false, voteScore: result.voteScore }
+      } catch (error) {
+        console.error('Error voting:', error)
+        throw error
+      } finally {
+        setIsLoading(false)
       }
-
-      // Update local state based on action
-      if (result.action === 'removed') {
-        setUserVote(null)
-      } else if (result.action === 'added' || result.action === 'changed') {
-        setUserVote(voteType)
-      }
-
-      return { deleted: false, voteScore: result.voteScore }
-    } catch (error) {
-      console.error('Error voting:', error)
-      throw error
-    } finally {
-      setIsLoading(false)
-    }
-  }, [reportId, isAuthenticated])
+    },
+    [reportId, isAuthenticated],
+  )
 
   const upvote = useCallback(() => handleVote('UPVOTE'), [handleVote])
   const downvote = useCallback(() => handleVote('DOWNVOTE'), [handleVote])
