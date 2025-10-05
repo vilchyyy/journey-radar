@@ -206,7 +206,7 @@ export async function POST(request: NextRequest) {
     let allReports: any[] = []
     try {
       const reportsResponse = await fetch(
-        'http://localhost:3001/api/reports/list',
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/reports/list`,
       )
       if (reportsResponse.ok) {
         allReports = await reportsResponse.json()
