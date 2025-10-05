@@ -1,11 +1,9 @@
 import RealtimeMap from '@/components/realtime-map'
-import RouteNavigation from '@/components/route-navigation'
 
 export default function MapPage() {
   return (
-    <div className="w-full h-screen relative">
+    <div className="relative flex h-screen w-full flex-col bg-background">
       <RealtimeMap />
-      <RouteNavigation />
     </div>
   )
 }

@@ -47,14 +47,14 @@ export async function POST(request: NextRequest) {
       limit = 10,
       types = ['place', 'address', 'poi', 'street', 'administrativeArea'],
       centerLat = 50.0614, // Default to Kraków center
-      centerLng = 19.9383
+      centerLng = 19.9383,
     } = body
 
     // Validate request
     if (!query || query.trim().length === 0) {
       return NextResponse.json(
         { error: 'Query parameter is required' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -64,44 +64,75 @@ export async function POST(request: NextRequest) {
       console.error('HERE_API_KEY/HERE_API_TOKEN not configured')
       return NextResponse.json(
         { error: 'Location search service not available' },
-        { status: 500 }
+        { status: 500 },
       )
     }
 
     // Search for locations using HERE Discover API with center position
     const searchUrl = `https://discover.search.hereapi.com/v1/discover?at=${centerLat},${centerLng}&q=${encodeURIComponent(query)}&limit=${limit}&apiKey=${HERE_API_KEY}`
 
-    const response = await fetch(searchUrl)
+    const response = await fetch(searchUrl, {
+      headers: {
+        'Accept-Language': 'en-US,en;q=0.9,pl;q=0.8',
+      },
+    })
     if (!response.ok) {
-      throw new Error(`HERE API request failed: ${response.status}`)
+      const status = response.status
+      const errorBody = await response.text()
+
+      console.error('HERE location search error', {
+        status,
+        body: errorBody,
+        url: searchUrl,
+      })
+
+      if (status === 429) {
+        return NextResponse.json(
+          {
+            error:
+              'Location provider is rate limiting requests. Please wait a bit and try again.',
+            providerStatus: status,
+          },
+          { status: 429 },
+        )
+      }
+
+      return NextResponse.json(
+        {
+          error: 'Location provider returned an error. Please try again later.',
+          providerStatus: status,
+        },
+        { status: 502 },
+      )
     }
 
     const data = await response.json()
 
     // Transform HERE API response to our format
-    const locations: Location[] = data.items?.map((item: any) => ({
-      id: item.id,
-      title: item.title,
-      address: {
-        label: item.address.label,
-        country: item.address.countryName,
-        state: item.address.state,
-        county: item.address.county,
-        city: item.address.city,
-        district: item.address.district,
-        street: item.address.street,
-        postalCode: item.address.postalCode,
-        houseNumber: item.address.houseNumber,
-      },
-      position: {
-        lat: item.position.lat,
-        lng: item.position.lng,
-      },
-      distance: item.distance,
-      categories: item.categories,
-      resultType: item.resultType,
-      contacts: item.contacts,
-    })) || []
+    const locations: Location[] =
+      data.items?.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        address: {
+          label: item.address.label,
+          country: item.address.countryName,
+          state: item.address.state,
+          county: item.address.county,
+          city: item.address.city,
+          district: item.address.district,
+          street: item.address.street,
+          postalCode: item.address.postalCode,
+          houseNumber: item.address.houseNumber,
+        },
+        position: {
+          lat: item.position.lat,
+          lng: item.position.lng,
+        },
+        distance: item.distance,
+        categories: item.categories,
+        resultType: item.resultType,
+        contacts: item.contacts,
+      })) || []
 
     return NextResponse.json({
       query,
@@ -109,12 +140,11 @@ export async function POST(request: NextRequest) {
       count: locations.length,
       center: { lat: centerLat, lng: centerLng },
     })
-
   } catch (error) {
     console.error('Location search API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -128,7 +158,7 @@ export async function GET(request: NextRequest) {
   if (!query) {
     return NextResponse.json(
       { error: 'Query parameter "q" is required' },
-      { status: 400 }
+      { status: 400 },
     )
   }
 

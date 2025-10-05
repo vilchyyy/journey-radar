@@ -16,6 +16,7 @@ import type * as gtfsDebug from "../gtfsDebug.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
 import type * as index from "../index.js";
+import type * as journeyPlanner from "../journeyPlanner.js";
 import type * as mock_data from "../mock_data.js";
 import type * as privateData from "../privateData.js";
 import type * as reports from "../reports.js";
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   healthCheck: typeof healthCheck;
   http: typeof http;
   index: typeof index;
+  journeyPlanner: typeof journeyPlanner;
   mock_data: typeof mock_data;
   privateData: typeof privateData;
   reports: typeof reports;
