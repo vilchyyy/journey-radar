@@ -3,9 +3,9 @@
 import type { Doc } from '@journey-radar/backend/convex/_generated/dataModel'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Separator } from '@/components/ui/separator'
-import { ReportVoting } from '@/components/report-voting'
 import { useState } from 'react'
+import { ReportVoting } from '@/components/report-voting'
+import { Separator } from '@/components/ui/separator'
 
 interface ReportItemProps {
   report: Doc<'reports'> & {
@@ -21,7 +21,7 @@ interface ReportItemProps {
 
 export function ReportItem({ report, onDelete }: ReportItemProps) {
   const [currentVoteScore, setCurrentVoteScore] = useState(
-    (report.upvotes || 0) - (report.downvotes || 0)
+    (report.upvotes || 0) - (report.downvotes || 0),
   )
   const router = useRouter()
   const isVerified =

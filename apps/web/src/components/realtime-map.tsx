@@ -120,7 +120,9 @@ export default function RealtimeMap({
   const [isPlanningJourney, setIsPlanningJourney] = useState(false)
   const [plannerError, setPlannerError] = useState<string | null>(null)
   const [routeData, setRouteData] = useState<any | null>(null)
-  const [selectedRouteIndex, setSelectedRouteIndex] = useState<number | null>(null)
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState<number | null>(
+    null,
+  )
   const [currentLocationLoading, setCurrentLocationLoading] = useState(false)
 
   // Reports drawer state
@@ -291,20 +293,24 @@ export default function RealtimeMap({
     }))
   }, [])
 
-  const selectRoute = useCallback((routeIndex: number) => {
-    setSelectedRouteIndex(routeIndex)
-    const route = routeData?.routes?.[routeIndex]
-    if (route?.sections?.length > 0) {
-      // Center map on the selected route
-      const firstSection = route.sections.find(
-        (section: any) => section.geometry && section.geometry.length > 0,
-      )
-      if (firstSection && firstSection.geometry?.length > 0) {
-        const midPoint = firstSection.geometry[Math.floor(firstSection.geometry.length / 2)]
-        centerOn({ lat: midPoint.lat, lng: midPoint.lng })
+  const selectRoute = useCallback(
+    (routeIndex: number) => {
+      setSelectedRouteIndex(routeIndex)
+      const route = routeData?.routes?.[routeIndex]
+      if (route?.sections?.length > 0) {
+        // Center map on the selected route
+        const firstSection = route.sections.find(
+          (section: any) => section.geometry && section.geometry.length > 0,
+        )
+        if (firstSection && firstSection.geometry?.length > 0) {
+          const midPoint =
+            firstSection.geometry[Math.floor(firstSection.geometry.length / 2)]
+          centerOn({ lat: midPoint.lat, lng: midPoint.lng })
+        }
       }
-    }
-  }, [routeData, centerOn])
+    },
+    [routeData, centerOn],
+  )
 
   const clearRouteSelection = useCallback(() => {
     setSelectedRouteIndex(null)

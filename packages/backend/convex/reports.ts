@@ -61,7 +61,7 @@ export const createReport = mutation({
       latitude: v.number(),
       longitude: v.number(),
     }),
-      transportMode: v.union(
+    transportMode: v.union(
       v.literal('BUS'),
       v.literal('TRAIN'),
       v.literal('TRAM'),
@@ -95,7 +95,7 @@ export const createReport = mutation({
       isAnonymous,
       status: 'UNVERIFIED',
       type: args.type,
-        transportMode: args.transportMode,
+      transportMode: args.transportMode,
       route: args.route,
       gtfsRouteId: args.gtfsRouteId,
       gtfsTripId: args.gtfsTripId,
@@ -153,7 +153,9 @@ export const voteOnReport = mutation({
     // Check if user has already voted on this report
     const existingVote = await ctx.db
       .query('reportVotes')
-      .withIndex('by_report_user', (q) => q.eq('reportId', reportId).eq('userId', userId))
+      .withIndex('by_report_user', (q) =>
+        q.eq('reportId', reportId).eq('userId', userId),
+      )
       .first()
 
     if (existingVote) {
@@ -180,8 +182,14 @@ export const voteOnReport = mutation({
         const newVoteScore = report.voteScore + oldVoteDiff
 
         await ctx.db.patch(reportId, {
-          upvotes: existingVote.voteType === 'UPVOTE' ? report.upvotes - 1 : report.upvotes + 1,
-          downvotes: existingVote.voteType === 'DOWNVOTE' ? report.downvotes - 1 : report.downvotes + 1,
+          upvotes:
+            existingVote.voteType === 'UPVOTE'
+              ? report.upvotes - 1
+              : report.upvotes + 1,
+          downvotes:
+            existingVote.voteType === 'DOWNVOTE'
+              ? report.downvotes - 1
+              : report.downvotes + 1,
           voteScore: newVoteScore,
         })
 
@@ -245,7 +253,9 @@ export const getUserVote = query({
   handler: async (ctx, args) => {
     const vote = await ctx.db
       .query('reportVotes')
-      .withIndex('by_report_user', (q) => q.eq('reportId', args.reportId).eq('userId', args.userId))
+      .withIndex('by_report_user', (q) =>
+        q.eq('reportId', args.reportId).eq('userId', args.userId),
+      )
       .first()
 
     return vote ? vote.voteType : null
@@ -480,7 +490,7 @@ export const getTripReports = query({
     // Filter by transport mode if specified (most selective filter)
     if (mode) {
       reportsQuery = reportsQuery.filter((q) =>
-        q.eq(q.field('transportMode'), mode)
+        q.eq(q.field('transportMode'), mode),
       )
     }
 
@@ -526,17 +536,17 @@ export const getTripReports = query({
             ctx,
             { latitude: 50.0614, longitude: 19.9383 }, // Default center, will get overridden
             100000, // Large radius to ensure we find it
-            1 // We only need the closest point which should be the report itself
+            1, // We only need the closest point which should be the report itself
           )
 
           const reportPoint = geospatialResults.find(
-            result => result.key === report._id
+            (result) => result.key === report._id,
           )
 
           if (reportPoint) {
             reportLocation = {
               latitude: reportPoint.coordinates.latitude,
-              longitude: reportPoint.coordinates.longitude
+              longitude: reportPoint.coordinates.longitude,
             }
           }
         }
