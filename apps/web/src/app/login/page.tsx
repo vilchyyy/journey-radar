@@ -29,14 +29,39 @@ export default function LoginPage() {
         setTimeout(() => reject(new Error('Login timed out')), 30000) // 30 second timeout
       })
 
-      await Promise.race([
-        authClient.signIn.email({
-          email,
-          password,
-          callbackURL: '/map'
+      const response = await Promise.race([
+        fetch('/api/auth/sign-in/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            callbackURL: '/map'
+          }),
         }),
         timeoutPromise
       ])
+
+      if (!response.ok) {
+        throw new Error('Login failed')
+      }
+
+      const result = await response.json()
+
+      // If we get a redirect response, handle it
+      if (response.redirected) {
+        window.location.href = response.url
+        return
+      }
+
+      // If we get a successful response with user data, redirect manually
+      if (result.user) {
+        window.location.href = '/map'
+      } else {
+        setError('Invalid email or password')
+      }
     } catch (err: any) {
       if (err.message === 'Login timed out') {
         setError('Login is taking longer than expected. Please try again or contact support.')

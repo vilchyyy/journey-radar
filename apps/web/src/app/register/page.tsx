@@ -30,15 +30,33 @@ export default function RegisterPage() {
         setTimeout(() => reject(new Error('Registration timed out')), 30000) // 30 second timeout
       })
 
-      await Promise.race([
-        authClient.signUp.email({
-          email,
-          password,
-          name,
-          callbackURL: '/map'
+      const response = await Promise.race([
+        fetch('/api/auth/sign-up/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            name,
+          }),
         }),
         timeoutPromise
       ])
+
+      if (!response.ok) {
+        throw new Error('Registration failed')
+      }
+
+      const result = await response.json()
+
+      // If registration is successful, redirect to login or map
+      if (result.user) {
+        window.location.href = '/login'
+      } else {
+        setError('Failed to create account. Please try again.')
+      }
     } catch (err: any) {
       if (err.message === 'Registration timed out') {
         setError('Registration is taking longer than expected. Please try again or contact support.')

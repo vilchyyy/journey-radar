@@ -1,8 +1,6 @@
 'use client'
 
-import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react'
 import { ConvexProvider, ConvexReactClient } from 'convex/react'
-import { authClient } from '@/lib/auth-client'
 import { ThemeProvider } from './theme-provider'
 import { Toaster } from './ui/sonner'
 
@@ -16,9 +14,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       enableSystem={false}
       disableTransitionOnChange
     >
-      <ConvexBetterAuthProvider client={convex} authClient={authClient}>
+      <ConvexProvider client={convex}>
         {children}
-      </ConvexBetterAuthProvider>
+      </ConvexProvider>
       <Toaster richColors />
     </ThemeProvider>
   )

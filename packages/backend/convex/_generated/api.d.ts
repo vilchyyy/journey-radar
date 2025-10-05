@@ -9,6 +9,7 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as authActions from "../authActions.js";
 import type * as cleanup from "../cleanup.js";
 import type * as cron from "../cron.js";
 import type * as gtfs from "../gtfs.js";
@@ -27,7 +28,6 @@ import type * as rewards from "../rewards.js";
 import type * as routes from "../routes.js";
 import type * as scheduler from "../scheduler.js";
 import type * as seed from "../seed.js";
-import type * as simpleAuth from "../simpleAuth.js";
 
 import type {
   ApiFromModules,
@@ -45,6 +45,7 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  authActions: typeof authActions;
   cleanup: typeof cleanup;
   cron: typeof cron;
   gtfs: typeof gtfs;
@@ -63,7 +64,6 @@ declare const fullApi: ApiFromModules<{
   routes: typeof routes;
   scheduler: typeof scheduler;
   seed: typeof seed;
-  simpleAuth: typeof simpleAuth;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 
