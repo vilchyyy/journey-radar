@@ -1,3 +1,4 @@
+import { cronJobs } from 'convex/server'
 import { internal } from './_generated/api'
 import { internalAction } from './_generated/server'
 
@@ -43,25 +44,3 @@ export const realTimeDataRefresh = internalAction({
       ctx.runAction(internal.gtfs.loadVehiclePositions),
       ctx.runAction(internal.gtfs.loadTripUpdates),
     ])
-
-    const successes = results.filter(
-      (r) => r.status === 'fulfilled' && r.value.success,
-    ).length
-    const failures = results.length - successes
-
-    console.log(
-      `Real-time data refresh completed: ${successes} successes, ${failures} failures`,
-    )
-
-    return {
-      total: results.length,
-      successes,
-      failures,
-      results: results.map((r) =>
-        r.status === 'fulfilled'
-          ? r.value
-          : { success: false, error: String(r.reason) },
-      ),
-    }
-  },
-})
