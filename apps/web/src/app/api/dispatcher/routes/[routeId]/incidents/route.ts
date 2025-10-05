@@ -1,5 +1,5 @@
 import { api } from '@journey-radar/backend/convex/_generated/api'
-import { Id } from '@journey-radar/backend/convex/_generated/dataModel'
+import type { Id } from '@journey-radar/backend/convex/_generated/dataModel'
 import { fetchQuery } from 'convex/nextjs'
 import { type NextRequest, NextResponse } from 'next/server'
 
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const incidents = await fetchQuery(
       api.incidents.getActiveIncidentsForRoute,
       {
-        routeId: Id('routes', routeId),
+        routeId: { table: 'routes', id: routeId },
       },
     )
 

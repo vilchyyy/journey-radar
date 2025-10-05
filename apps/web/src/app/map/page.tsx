@@ -1,9 +1,10 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import RealtimeMap from '@/components/realtime-map'
 
-export default function MapPage() {
+function MapPageContent() {
   const searchParams = useSearchParams()
 
   // Extract vehicle identification params from URL
@@ -33,5 +34,21 @@ export default function MapPage() {
         }
       />
     </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="relative flex h-screen w-full flex-col bg-background items-center justify-center">
+      <div className="text-muted-foreground">Loading map...</div>
+    </div>
+  )
+}
+
+export default function MapPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <MapPageContent />
+    </Suspense>
   )
 }

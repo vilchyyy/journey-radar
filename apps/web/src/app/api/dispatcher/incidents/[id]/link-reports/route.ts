@@ -1,5 +1,5 @@
 import { api } from '@journey-radar/backend/convex/_generated/api'
-import { Id } from '@journey-radar/backend/convex/_generated/dataModel'
+import type { Id } from '@journey-radar/backend/convex/_generated/dataModel'
 import { fetchMutation } from 'convex/nextjs'
 import { type NextRequest, NextResponse } from 'next/server'
 
@@ -21,12 +21,13 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
 
     // Convert string IDs to Convex IDs
-    const reportIds = body.reportIds.map((reportId: string) =>
-      Id('reports', reportId),
-    )
+    const reportIds = body.reportIds.map((reportId: string) => ({
+      table: 'reports',
+      id: reportId,
+    }))
 
     const result = await fetchMutation(api.incidents.linkReportsToIncident, {
-      incidentId: Id('incidents', id),
+      incidentId: { table: 'incidents', id },
       reportIds,
       dispatcherId: body.dispatcherId,
     })

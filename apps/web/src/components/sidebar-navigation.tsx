@@ -13,8 +13,7 @@ import {
   Wallet,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -25,8 +24,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { api } from '@/convex/_generated/api'
-import { authClient } from '@/lib/auth-client'
 
 // Define navigation item type
 type NavigationItem = {
