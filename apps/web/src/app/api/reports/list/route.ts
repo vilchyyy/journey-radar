@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { convex, api } from '@/lib/convex-client'
+import { api, convex } from '@/lib/convex-client'
 
 export const runtime = 'nodejs'
 
@@ -16,7 +16,7 @@ export async function GET() {
       description: report.description,
       userPoints: report.userPoints,
       location: report.location,
-      _creationTime: report._creationTime
+      _creationTime: report._creationTime,
     }))
 
     return NextResponse.json(transformedReports, {
@@ -31,7 +31,7 @@ export async function GET() {
     console.error('Error fetching reports:', error)
     return NextResponse.json(
       { error: 'Failed to fetch reports' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

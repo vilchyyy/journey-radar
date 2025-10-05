@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { convex, api } from '@/lib/convex-client'
+import { api, convex } from '@/lib/convex-client'
 
 export const runtime = 'nodejs'
 
@@ -34,7 +34,7 @@ export async function GET() {
     console.error('Error fetching GTFS trip updates:', error)
     return NextResponse.json(
       { error: 'Failed to fetch trip updates' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

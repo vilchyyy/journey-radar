@@ -23,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -47,15 +48,11 @@ const TRANSPORT_MODES = [
   { value: 'TRAIN', label: 'Train' },
   { value: 'TRAM', label: 'Tram' },
 ] as const
-const TRANSPORTS = [
-  { type: 'BUS', label: 'Bus', id: '123' },
-  { type: 'TRAIN', label: 'Train', id: '132' },
-  { type: 'TRAM', label: 'Tram', id: '321' },
-] as const
 
 export default function ReportsPage() {
   const [isGettingLocation, setIsGettingLocation] = useState(false)
   const [searchRadius, setSearchRadius] = useState(5)
+  const [searchTerm, setSearchTerm] = useState('')
 
   // Queries and mutations
   const reports = useQuery(api.reports.findNearbyReports, {
@@ -65,15 +62,26 @@ export default function ReportsPage() {
   })
 
   const createReportMutation = useMutation(api.reports.createReport)
+  const routes = useQuery(api.routes.getActiveRoutes)
+  const searchResults = useQuery(
+    api.routes.searchRoutes,
+    searchTerm ? { searchTerm } : 'skip',
+  )
+
+  // Prepare route options for combobox
+  const displayRoutes = searchTerm ? searchResults || [] : routes || []
+  const routeOptions =
+    displayRoutes?.map((route) => ({
+      value: route.routeNumber,
+      label: `${route.routeNumber} - ${route.source} to ${route.destination}`,
+    })) || []
 
   // TanStack Form
   const form = useForm({
     defaultValues: {
       type: '',
-      transport: '',
       transportMode: '',
       route: '',
-      destination: '',
       comment: '',
       delayMinutes: '',
       latitude: '',
@@ -94,6 +102,13 @@ export default function ReportsPage() {
         // Mock user ID - in real app this would come from auth
         const userId = 'j97cg73v7qd09gfyj2e412h49s7rtqf0' as Id<'users'>
 
+        // Find route ID from route number
+        const selectedRoute = routes?.find((r) => r.routeNumber === value.route)
+        if (!selectedRoute) {
+          toast.error('Please select a valid route')
+          return
+        }
+
         await createReportMutation({
           userId,
           type: value.type as
@@ -106,9 +121,8 @@ export default function ReportsPage() {
             latitude: parseFloat(value.latitude),
             longitude: parseFloat(value.longitude),
           },
-          transportInfo: value.transportMode as Id<'transports'>,
           transportMode: value.transportMode as 'BUS' | 'TRAIN' | 'TRAM',
-          route: value.route as Id<'routes'>,
+          route: selectedRoute._id,
           comment: value.comment || undefined,
           delayMinutes: value.delayMinutes
             ? parseInt(value.delayMinutes, 10)
@@ -293,64 +307,20 @@ export default function ReportsPage() {
                 />
               </div>
 
-              {/* Transport Info */}
-              <div className="space-y-2">
-                <Label>Transport ID</Label>
-                <form.Field
-                  name="transport"
-                  validators={{ onChangeListenTo: ['transportMode'] }}
-                  children={(field) => (
-                    <Select
-                      value={field.state.value}
-                      onValueChange={(value) => field.handleChange(value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select exact transport" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {TRANSPORTS.filter((t) => {
-                          console.log(field.form.getFieldValue('transportMode'))
-                          return field.form.getFieldValue('transportMode')
-                            ? t.type ===
-                                field.form.getFieldValue('transportMode')
-                            : true
-                        }).map((mode) => (
-                          <SelectItem key={mode.id} value={mode.id}>
-                            {mode.id}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-
               {/* Route */}
               <div className="space-y-2">
                 <Label>Route</Label>
                 <form.Field
                   name="route"
                   children={(field) => (
-                    <Input
-                      placeholder="e.g., 52, 139, SK1"
+                    <Combobox
+                      options={routeOptions}
                       value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      required
-                    />
-                  )}
-                />
-              </div>
-
-              {/* Destination */}
-              <div className="space-y-2">
-                <Label>Destination (Optional)</Label>
-                <form.Field
-                  name="destination"
-                  children={(field) => (
-                    <Input
-                      placeholder="e.g., Warsaw Central Station"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onValueChange={(value) => field.handleChange(value)}
+                      placeholder="Search and select route..."
+                      className="w-full"
+                      onSearch={setSearchTerm}
+                      searchTerm={searchTerm}
                     />
                   )}
                 />
@@ -481,12 +451,15 @@ export default function ReportsPage() {
 
                       <div className="text-sm text-muted-foreground">
                         <p>
-                          {report.transportInfo.transportMode ??
-                            report.transportMode}{' '}
-                          Line {report.transportInfo.routeNumber}
+                          {report.transportMode}{' '}
+                          {report.route
+                            ? `Route ${report.route.routeNumber}`
+                            : 'Unknown route'}
                         </p>
-                        {report.transportInfo.destination && (
-                          <p>Destination: {report.transportInfo.destination}</p>
+                        {report.route && (
+                          <p>
+                            {report.route.source} to {report.route.destination}
+                          </p>
                         )}
                         {report.delayMinutes && (
                           <p>Delay: {report.delayMinutes} minutes</p>

@@ -1,15 +1,15 @@
 'use client'
 
 import {
-  User,
-  Shield,
-  LogOut,
-  HelpCircle,
-  Heart,
   ChevronRight,
   Edit,
+  Fingerprint,
+  Heart,
+  HelpCircle,
+  LogOut,
+  Shield,
+  User,
   UserPlus,
-  Fingerprint
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -71,13 +71,19 @@ export default function ProfilePage() {
 
                 {/* User Details */}
                 <div>
-                  <h2 className="text-xl font-bold text-white">Itunuoluwa Abidoye</h2>
+                  <h2 className="text-xl font-bold text-white">
+                    Itunuoluwa Abidoye
+                  </h2>
                   <p className="text-sm text-white/90">@Itunuoluwa</p>
                 </div>
               </div>
 
               {/* Edit Icon */}
-              <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-white/20"
+              >
                 <Edit className="w-5 h-5" />
               </Button>
             </div>
@@ -87,7 +93,9 @@ export default function ProfilePage() {
         {/* My Account Section */}
         <Card>
           <CardContent className="p-6 space-y-4">
-            <h3 className="text-lg font-semibold text-foreground mb-2">My Account</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              My Account
+            </h3>
 
             {/* My Account Row */}
             <div className="flex items-center justify-between py-3 hover:bg-muted/50 rounded-lg px-3 -mx-3 cursor-pointer">
@@ -97,7 +105,9 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <p className="font-medium text-foreground">My Account</p>
-                  <p className="text-sm text-muted-foreground">Make changes to your account</p>
+                  <p className="text-sm text-muted-foreground">
+                    Make changes to your account
+                  </p>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
@@ -112,8 +122,12 @@ export default function ProfilePage() {
                   <UserPlus className="w-5 h-5 text-teal-600" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">Saved Beneficiary</p>
-                  <p className="text-sm text-muted-foreground">Manage your saved account</p>
+                  <p className="font-medium text-foreground">
+                    Saved Beneficiary
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your saved account
+                  </p>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
@@ -127,7 +141,9 @@ export default function ProfilePage() {
                 <div className="w-10 h-10 bg-teal-50 rounded-full flex items-center justify-center">
                   <Fingerprint className="w-5 h-5 text-teal-600" />
                 </div>
-                <p className="font-medium text-foreground">Face ID / Touch ID</p>
+                <p className="font-medium text-foreground">
+                  Face ID / Touch ID
+                </p>
               </div>
               <Switch />
             </div>
@@ -140,7 +156,9 @@ export default function ProfilePage() {
                 <div className="w-10 h-10 bg-teal-50 rounded-full flex items-center justify-center">
                   <Shield className="w-5 h-5 text-teal-600" />
                 </div>
-                <p className="font-medium text-foreground">Two-Factor Authentication</p>
+                <p className="font-medium text-foreground">
+                  Two-Factor Authentication
+                </p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </div>

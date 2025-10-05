@@ -11,11 +11,13 @@ export interface ComboboxOption {
 }
 
 interface ComboboxProps {
-  options: ComboboxOption[]
+  options?: ComboboxOption[]
   value?: string
   onValueChange?: (value: string) => void
   placeholder?: string
   className?: string
+  onSearch?: (searchTerm: string) => void
+  searchTerm?: string
 }
 
 export function Combobox({
@@ -24,21 +26,34 @@ export function Combobox({
   onValueChange,
   placeholder = 'Select an option...',
   className,
+  onSearch,
+  searchTerm,
 }: ComboboxProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [inputValue, setInputValue] = React.useState('')
-  const [filteredOptions, setFilteredOptions] = React.useState(options)
+  const [searchTimeout, setSearchTimeout] = React.useState<NodeJS.Timeout>()
+  const filteredOptions = options || []
   const comboboxRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    const filtered = options.filter((option) =>
-      option.label.toLowerCase().includes(inputValue.toLowerCase()),
-    )
-    setFilteredOptions(filtered)
-  }, [inputValue, options])
+    // Debounced search
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    const timeout = setTimeout(() => {
+      if (onSearch && inputValue.length > 0) {
+        onSearch(inputValue)
+      }
+    }, 300)
+
+    setSearchTimeout(timeout)
+
+    return () => clearTimeout(timeout)
+  }, [inputValue, onSearch])
 
   React.useEffect(() => {
-    if (value) {
+    if (value && options) {
       const selectedOption = options.find((option) => option.value === value)
       if (selectedOption) {
         setInputValue(selectedOption.label)
@@ -48,7 +63,10 @@ export function Combobox({
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (comboboxRef.current && !comboboxRef.current.contains(event.target as Node)) {
+      if (
+        comboboxRef.current &&
+        !comboboxRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false)
       }
     }
@@ -71,11 +89,16 @@ export function Combobox({
     setIsOpen(true)
 
     // If the input exactly matches an option, select it
-    const exactMatch = options.find((option) =>
-      option.label.toLowerCase() === newValue.toLowerCase()
+    const exactMatch = options?.find(
+      (option) => option.label.toLowerCase() === newValue.toLowerCase(),
     )
     if (exactMatch) {
       onValueChange?.(exactMatch.value)
+    }
+
+    // If we have a search function and the input is cleared, call it to reset results
+    if (onSearch && newValue.length === 0) {
+      onSearch('')
     }
   }
 
@@ -123,4 +146,3 @@ export function Combobox({
     </div>
   )
 }
-

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { convex, api } from '@/lib/convex-client'
+import { api, convex } from '@/lib/convex-client'
 
 export const runtime = 'nodejs'
 
@@ -10,7 +10,10 @@ export async function GET() {
     const routes = await convex.query(api.gtfs.getRoutes)
 
     // Create route lookup map with composite key (routeId + transportMode)
-    const routeMap = new Map<string, { routeLongName: string; routeShortName: string }>()
+    const routeMap = new Map<
+      string,
+      { routeLongName: string; routeShortName: string }
+    >()
     routes.forEach((route) => {
       // Create composite key to distinguish between bus and tram routes with same routeId
       const compositeKey = `${route.routeId}_${route.transportMode}` // Keep uppercase for consistency with vehicle data
@@ -52,7 +55,7 @@ export async function GET() {
     console.error('Error fetching GTFS vehicle positions:', error)
     return NextResponse.json(
       { error: 'Failed to fetch vehicle positions' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

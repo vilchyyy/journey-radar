@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { convex, api } from '@/lib/convex-client'
+import { api, convex } from '@/lib/convex-client'
 
 export const runtime = 'nodejs'
 
@@ -38,7 +38,7 @@ export async function GET() {
         route_long_name: route.routeLongName,
         route_type: route.routeType,
         agency_id: route.agencyId,
-        transportMode: route.transportMode
+        transportMode: route.transportMode,
       })
     })
 
@@ -51,12 +51,7 @@ export async function GET() {
     // Log some sample data for debugging
     console.log('Sample routes:', routes.slice(0, 5))
     console.log('Sample trips:', trips.slice(0, 5))
-    console.log(
-      'Total routes:',
-      routes.length,
-      'Total trips:',
-      trips.length,
-    )
+    console.log('Total routes:', routes.length, 'Total trips:', trips.length)
 
     return NextResponse.json(
       {
@@ -78,7 +73,7 @@ export async function GET() {
     console.error('Error fetching GTFS routes:', error)
     return NextResponse.json(
       { error: 'Failed to fetch GTFS routes' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

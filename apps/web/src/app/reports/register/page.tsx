@@ -9,7 +9,7 @@ import { useMutation, useQuery } from 'convex/react'
 import { Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import type React from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/combobox'
@@ -44,6 +44,11 @@ export default function RegisterPage() {
   // Convex mutations and queries
   const createReport = useMutation(api.reports.createReport)
   const routes = useQuery(api.routes.getActiveRoutes)
+  const [searchTerm, setSearchTerm] = useState('')
+  const searchResults = useQuery(
+    api.routes.searchRoutes,
+    searchTerm ? { searchTerm } : 'skip',
+  )
 
   // Form with TanStack Form
   const form = useForm({
@@ -105,8 +110,9 @@ export default function RegisterPage() {
   })
 
   // Prepare route options for combobox
+  const displayRoutes = searchTerm ? searchResults || [] : routes || []
   const routeOptions =
-    routes?.map((route) => ({
+    displayRoutes?.map((route) => ({
       value: route.routeNumber,
       label: `${route.routeNumber} - ${route.source} to ${route.destination}`,
     })) || []
@@ -147,7 +153,12 @@ export default function RegisterPage() {
               name="date"
               children={(field) => (
                 <div className="relative">
-                  <Label htmlFor="date" className="block text-sm font-medium mb-2">Date</Label>
+                  <Label
+                    htmlFor="date"
+                    className="block text-sm font-medium mb-2"
+                  >
+                    Date
+                  </Label>
                   <Input
                     id="date"
                     type="date"
@@ -163,7 +174,12 @@ export default function RegisterPage() {
               name="time"
               children={(field) => (
                 <div className="relative">
-                  <Label htmlFor="time" className="block text-sm font-medium mb-2">Time</Label>
+                  <Label
+                    htmlFor="time"
+                    className="block text-sm font-medium mb-2"
+                  >
+                    Time
+                  </Label>
                   <Input
                     id="time"
                     type="time"
@@ -188,7 +204,12 @@ export default function RegisterPage() {
               name="location"
               children={(field) => (
                 <div>
-                  <Label htmlFor="location" className="block text-sm font-medium mb-2">Location</Label>
+                  <Label
+                    htmlFor="location"
+                    className="block text-sm font-medium mb-2"
+                  >
+                    Location
+                  </Label>
                   <Input
                     id="location"
                     placeholder="Use Current Location"
@@ -204,7 +225,12 @@ export default function RegisterPage() {
               name="transportMode"
               children={(field) => (
                 <div>
-                  <Label htmlFor="transportMode" className="block text-sm font-medium mb-2">Transport Mode</Label>
+                  <Label
+                    htmlFor="transportMode"
+                    className="block text-sm font-medium mb-2"
+                  >
+                    Transport Mode
+                  </Label>
                   <Select
                     value={field.state.value}
                     onValueChange={(value) => field.handleChange(value)}
@@ -228,13 +254,20 @@ export default function RegisterPage() {
               name="route"
               children={(field) => (
                 <div>
-                  <Label htmlFor="route" className="block text-sm font-medium mb-2">Route</Label>
+                  <Label
+                    htmlFor="route"
+                    className="block text-sm font-medium mb-2"
+                  >
+                    Route
+                  </Label>
                   <Combobox
                     options={routeOptions}
                     value={field.state.value}
                     onValueChange={(value) => field.handleChange(value)}
                     placeholder="Search and select route..."
                     className="w-full"
+                    onSearch={setSearchTerm}
+                    searchTerm={searchTerm}
                   />
                 </div>
               )}
@@ -244,7 +277,12 @@ export default function RegisterPage() {
               name="direction"
               children={(field) => (
                 <div>
-                  <Label htmlFor="direction" className="block text-sm font-medium mb-2">Direction</Label>
+                  <Label
+                    htmlFor="direction"
+                    className="block text-sm font-medium mb-2"
+                  >
+                    Direction
+                  </Label>
                   <Input
                     id="direction"
                     placeholder="Direction or additional details"
@@ -268,7 +306,12 @@ export default function RegisterPage() {
               name="delayReason"
               children={(field) => (
                 <div>
-                  <Label htmlFor="delayReason" className="block text-sm font-medium mb-2">Report Type</Label>
+                  <Label
+                    htmlFor="delayReason"
+                    className="block text-sm font-medium mb-2"
+                  >
+                    Report Type
+                  </Label>
                   <Select
                     value={field.state.value}
                     onValueChange={(value) => field.handleChange(value)}
@@ -296,7 +339,10 @@ export default function RegisterPage() {
                     name="delayDuration"
                     children={(field) => (
                       <div>
-                        <Label htmlFor="delayDuration" className="block text-sm font-medium mb-2">
+                        <Label
+                          htmlFor="delayDuration"
+                          className="block text-sm font-medium mb-2"
+                        >
                           Delay Duration (minutes)
                         </Label>
                         <Input
